@@ -1,0 +1,348 @@
+New Changelog at http://tarnos12.github.io/project/updates.html
+_________________________
+v1.6.0 - 29 july 2015    |
+-------------------------|
+- Fixed a bug when saving a dead character would result in being dead forever ._.
+- Changed all weapon masteries to give you % bonus instead of flat.
+- Battle will take ~3 seconds, in that time, battle log will be displayed.
+- Battle log text display effects.
+- New item types! Chest/Helmet/Legs/Boots. Changed off-hand to Shield.
+- Merged off-hand and armor tab in inventory together.
+- Each weapon and armor have a 50% chance to drop with a bonus damage/armor.(This bonus is basic, it does not change amount of bonuses you gain from item drop.)
+- Redesigned item loot, each item can gain different amount of bonuses based on its rarity: Common(1-2), Uncommon(2-3), Rare(3-4), Epic(4-6), Legendary(6-7).
+- Added more secondary stats: Block/Counter/Life on hit. All bonuses can be obtained with items. Some of them can roll on a certain piece of equipment, for example "Block" can be found only on shields.
+- Changed item drop mechanics... You can drop betweem 1-5 items, for each monster kill as long as you have enough inventory space. You will make a roll for each item, and if its successful, you will drop an item.
+- Magic find increase odds of finding an item(it will increase a chance of a good "roll" which means you can drop items more often). It does not increase item rarity chance.
+- Removed equip/unequip/attack buttons. Instead click on item/monster image.
+- Removed item "levels", you can no longer level up your weapon. (Might change in future).
+- Added sorting function for items by Rarity/Value.
+_________________________
+v1.5.6 - 27 june 2015    |
+-------------------------|
+- Fixed a bug with weapon skill tabs closing when you gained a level with a skill.
+- Added more story, and changed Oz Jotnar monster names to fit with the story.
+- Added hardcore mode, if you die your save will be removed and page will refresh.(more ideas for hardcore mode are welcome).
+- Added a starting screen, where you can choose to start a new game or continue from your last save. You can also choose hardcore option or mute sound.
+_________________________
+v1.5.5 - 22 june 2015    |
+-------------------------|
+- Added "last saved:" in the save/options tab, and removed "Game saved" notification from player log.(Game is automatically saved every 10 seconds)
+- "Destroy item" by rarity in the options, now gives you 20% of item value
+- Character classes, pick one to gain benefits from it. Just a basic idea right now, each class gives you different stats per level.
+- Fixed x2 drop rate event not working properly.
+- Import/Export of save file, when you save a game, a code will appear in a box. Copy and paste it in the box below, to load your save.
+- Select all text button, still working on it. First press left mouse button on the box with the save code, then press the button to select text, lastly copy it. You can load a game with "import" button.
+- Background music, mute option in game, and when the game starts. Reset your save, so you can pick a character class.
+_________________________
+v1.5.4 - 30 may 2015     |
+-------------------------|
+- All stat names are capitalized
+- Fixed exp/gold/drop rate values
+_________________________
+v1.5.3 - 27 may 2015     |
+-------------------------|
+- Qucik fix, exp/gold/drop x2 event did not work correctly.
+_________________________
+v1.5.2 - 26 may 2015     |
+-------------------------|
+- Daily Events! Every day of the week, has different event bonus. Sunday for example gives you x2 exp/gold/drop rate. Monday 2x hp/mana regen, Tuesday 50% bonus damage etc.
+- Decoded save file(import/export coming soon).
+- Fixed a bug with gold values not updating when bulk selling items by rarity.
+- Added tabs for weapon skills
+- Progress bar for each weapon skill, updating each time you gain weapon skill experience
+- Fixed small error with save/load
+- Removed footer
+- All links now open in new tab
+- Increased damage gained from Strength(Str)
+_________________________
+v1.5.1 - 24 may 2015     |
+-------------------------|
+- Item values change according to it's stats, so upgrading it/craft (in future) will also change value of the item.
+- Fixed accessories having 0 value.
+- Changed GUI a little, added borders, new buttons.
+- When you hover your mouse over an attack button, your pointer will change into a sword, and will move when you attack.
+- Spells, and weapon skills, deal less damage, sword skill "lifesteal" and "block" give less bonuses. Still working on a better balance, but not all weapon skills are completed yet.
+- All item images are resized, this should fix the problem with equip/sell buttons moving around.
+_________________________
+v1.5.0 - 22 may 2015     |
+-------------------------|
+- Fixed accessories not giving right amount of Drop Rate(They were giving 5 times less).
+- Item values changes depending on item stats (currently only when you drop it, in future upgrading items and chaning stats on it will also increase in value).
+- Tooltip info on few pages to help new players understand the game.
+- Spells are working, each require certain amount of max mana to "activate" and has level requirement to upgrade it.
+- You can active as many spells as you can, if you have enough max Mana.
+- All in game tabs has been changed into icons.
+- Weapon Skills, offensive, defensive, counter attack, passive
+- Log is now scrollable, and display more info
+- Moved player level, experience, gold to the top.
+- Updated the code.
+_________________________
+v1.4.5 - 19 april 2015   |
+-------------------------|
+- Added responsive tables, and scrollbars, most of the stuff should now fit, in your screen no matter of the size.
+- All weapons have a max level of 5, no matter what quality. Exp needed also lowered, and stat bonus are much weaker.
+- Working on spells, there are 2 spells, Fire Ball and Frost shot. Fire Ball is currently active, more intelligence = more damage, Charges = how many times can be used in battle.
+- Spells will be updated soon...
+- Temporary fix for displaying last item tooltip in your inventory.
+- All weapon skill bonuses are displayed, no longer need to equip an item to see bonuses.
+_________________________
+v1.4.4 - 16 april 2015   |
+-------------------------|
+- Agility now gives bonuses to defense and evasion, while dexterity increase critical chance and critical damage, strength no longer gives you critical damage, and it gives 2 times less damage per point.
+- Weapon skill experience now save too.
+- Base Health increased from 50 to 200
+- Each monster damage has been changed for better balancing
+- Experience gain has been changed, fighting first monster will offer less experience, higher the player level.
+- Hopefully balanced item leveling up, Common, Uncommon have max level of 5, Rare and Epic 10, Legendary max weapon level is 15. Also you gain experience to current weapon with monster kill, not each strike.
+- All item stats, are lowered, they are still random but hopefully won't be too strong at early levels.
+- If player is 4 levels higher than a monster, exp rate will be reduced by 50%.
+_________________________
+v1.4.3 - 15 april 2015   |
+-------------------------|
+- Added progress bar to weapon skills tab.
+- Fixed auto Battle mode (i.e "idle mode"), it now works properly. 
+_________________________
+v1.4.2 - 14 april 2015   |
+-------------------------|
+- Added "idle" mode, which cost you mana per second of idling. First monster cost 10 mana/s increasing by 10 for each next enemy.
+- Updated a footer, now it sticks to the bottom of the page.
+- Better tooltip for stats, unlocked wisdom to increase your mana and mana regen for auto battle.
+_________________________
+v1.4.1 - 12 april 2015   |
+-------------------------|
+- Hopefully I fixed a bug with save/load.
+- Added scrollbar for inventory and game story. Removed item value and name from inventory. You can see all item info when hovering over an item image. I left item rarity until I find an easier way to display it.
+- Added chat to the game! Still testing it, and it will be changed in the future.
+- Credits page, still working to update it further, you can see all peoples that helped me.
+- Fixed all known bugs.
+- Added new accessories with new stats
+- Working Exp/Drop/Gold Rate bonuses.
+_________________________
+v1.4.0 - 11 april 2015   |
+-------------------------|
+- Added story to the game (not completed yet), you will unlock new part of the story and stronger enemy each time you level up (soon to be changed with monster kills).
+- Changed item tooltip, to display each item base stat and compare it with currently equipped item and change color to red if you lose stat on equip or green when you gain stat.
+- Weapon levels, each weapon rarity: Common, Uncommon, Rare, Epic, Legendary have "max Level" which is 5, 10, 15, 20, 30 respectively. Each weapon tooltip will display item level and experience.
+Each weapon "strike" gives you experience on currently equipped weapon, based on monster level, and item will gain some new stats and old stats will get stronger. Amount of bonus stat you gain is determined by iLvl (item level) and item rarity.
+Legendary item gives you much higher bonuses than common when you level them up, but also require much more experience to level them.
+- Game Version check, if your save is old, and require you to reset the game to fully enjoy the game, test new stuff etc, it will automatically reset for you.
+- When you press a reset button, there will be a confirm button, and game reset will refresh the page for you and save the fresh game, to overwrite old one.
+_________________________
+v1.3.4 - 27 march 2015   |
+-------------------------|
+- Fixed a bug with bow skill not saving.
+_________________________
+v1.3.3 - 23 march 2015   |
+-------------------------|
+- Added confirm button when selling all epics.
+- Each stat show you bonus from equipped items inside brackets (blue color). It looks like STR -> total Str(equip str).
+- Fixed a bug where old saves with higher level character, would not unlock monsters until you leveled them up.
+_________________________
+v1.3.3 - 22 march 2015   |
+-------------------------|
+- Fixed a bug with firefox, preventing you from spending stat points.
+_________________________
+v1.3.2 - 19 march 2015   |
+-------------------------|
+- Fixed a bug with log overlapping, monster area (Firefox).
+- Changed item shop log display, to show you how much gold you are missing to buy certain item, so if you have 10000 gold and bulk item cost 12000, you will see a message telling you that you need 2000 more gold.
+- Updated buttons, you can no longer hold enter/space to auto attack monsters. It wasn't intended in the first place.
+- Fixed a bug with NaN defense after reset.
+_________________________
+v1.3.1 - 18 march 2015   |
+-------------------------|
+- Hold Ctrl & click to add 10 stats, shift & click for 100 stats
+- Evasion cap at 20%
+- Critical chance cap at 50% from stats(will be possible to increase by other means later in the game, like skills, buffs, items)
+- Moved Secondary Stats panel, and merged it together with Player Stats, so you can see both of the at the same time.
+- Each item has hidden base stats(strength,endurance etc.), iLvl(item level), each monster has a level too...Combining both of those and base stats, give each item random stat each time they drop, so if you kill stronger enemy, and he drop same weapon, it will be much stronger :)
+- All monster drop items of rarity common, uncommon, rare, epic(even epics yes!), but since low level monster, give weaker stats, and has lower chance to drop "epic" then it is better to kill stronger monster.
+- Last monster of each area has a chance to drop "Legendary" quality items.
+- Luck increase your Drop Rate, you need total of 500 luck to increase your Drop Rate by 200%, which means item which has a chance of 0.01% drop will have 0.02% drop rate. Same for 1% will change to 2%. There will be items increasing drop rate directly too.
+- Removed Bestiary tab, since it was not used, but will be in the future.
+- Added buy 10 and buy 100, at the shop.
+- Disabled stat upgrade for Wisdom and Intelligence, since they don't have much of use right now.
+- At the beginning you have only 1 monster to fight, next monsters unlock as you level up(soon I want to add basic story, and maybe quests, which will unlock next monster)
+- Added new items, accessories(rings,amulets,talismans), you can equip one of each accessory type. Also added off-hand (shield, dagger).
+- Bug Fix
+_________________________
+v1.3.0.1 - 12 march 2015 |
+-------------------------|
+- Fixed a bug, with Bow weapon skill not upgrading
+_________________________
+v1.3.0 - 12 march 2015   |
+-------------------------|
+- Redesigned item loot table, no more random stats on items. Each item has it's own name and stats, will be updated further, so each item can have higher stats(randomly)
+- Game log display total damage received/dealt also critical hit rating(total critical hits divided by turns that took you to kill/die)
+- Changed max turns to 20 from 19(that was a mistake actually since it was supossed to be 20). It will be changed to increase based on character stat like endurance later on
+- Player stats now display STR, END etc instead of Strength, Endurance
+- Moved Sell All buttons to inventory page for easy access.
+- Updated item tooltip, now display only stats which are higher than 0,
+- Auto save feature, save the game every 10 seconds. Remeber to load a game manually after you refresh the page.
+- Added donation button at the option menu, if you want to support me feel free to donate. I want to spend some money on better graphic later on, so any amount will help.
+- Each monster health is displayed, when you attack it, monster hp will not change back to max anymore. I will need to consider adding some limitations, so you can't attack stronger monster to farm items easly by fighting it 1000 times etc...
+- Added a little tutorial, on the left side you will find a tab "Game info" I will be updating it with new info, currently there are just basic stuff.
+- Moved Inventory tab next to Equipment tab inside Player Stats tab for easier access
+- Mega potion now saves
+- All potions are used automatically, when you are low enough, they are used while "auto fighting for 20 rounds" You can't see the effect in most cases, but you will notice that "total damage taken" will be lower if you have health potions.
+- There is also requirement for them to be used. Read more in game<Game info tab>
+- You gain stats per level, You can still spend 10 points each level(soon to be changed)
+- Increased defense gain for each point in dexterity and endurance
+- Increased base critical chance to 10%
+- You can upgrade your Inventory slots, at shop. Each upgrade gives you + 1 inventory slots, for 100 gold at the beginning and increasing by 2 times for each purchase(just a basic idea)
+- You can also buy + 1 stat points for 1000 gold at shop, price stays the same for now, might change it later
+- Your max inventory slots are determined by your total strength(including bonuses from items/passives). You start with 20 slots + 1 slot for every 10 points in strength.
+- Lowered all monster defense, ALOT. That should make it much easier fighting stronger enemies, with current changes, when you don't find items with + 10k stats.
+- You can drop multiple items at once, if you are lucky :)
+- Luck increase a chance to "roll an item". What that means is, with more luck, there is a higher chance for you to get an item from a monster, note that this does not increase actual item drop chance, but how often you will roll for that item.
+- There is probably more, I can't remember now.
+_________________________
+v1.2.3 - 22 february 2015|
+-------------------------|
+- Changed some of the code, which allowed me to remove most of it, without any changes to the gameply. In short there is less code :)
+_________________________
+v1.2.2 - 20 february 2015|
+-------------------------|
+- New item type, off-hand. Shields/Orbs/Books/Throwing/Dagger
+- New weapon types: Bow
+- Updated some graphic, added new weapon skill for a bow.
+- Sell all common, uncommon, rare at shop!
+_________________________
+v1.2.1 - 18 february 2015|
+-------------------------|
+- Check options menu! You can use checkbox to set which items will be destroyed when dropped from monsters, if you dont want to see common items in your inventory, then just check a box :)
+- Base drop rate is 100%. When you have 200% drop rate that means every item has 2x higher chance to drop...at some point with high enough drop Rate, common/uncommon won't drop at all, unless you already use auto destroy option :)
+- With higher drop rate, you also drop items more often, base chance to drop an item is around 50%, each point in luck increase that chance by 0.01 so at 100 points of luck you have 51% chance to drop item -_-
+- Increased base damage formula a little, to make it easier with higher difficulty monsters
+_________________________
+v1.2.0 - 17 february 2015|
+-------------------------|
+- Inventory bug with changing tab is fixed!
+- New item graphics!
+- Bug fixes
+- New item slots, accessory split into 3 slots: ring, amulet, talisman. Soon there will be armor slot split, chest/helmet/gloves/boots/legs :)
+- Strength increase your max backpack slots by 1 slot per 1 point in strength, base amout of slots is 100 -_- just for fun, testing etc.
+- Item compare, hover over an item in your inventory, number next to item stats shows you how much of that stat you gain with that item, so (5) means + 5 and (-5) means you lose 5 of that stat upon equipping an item. I will work on something better soon
+- Inventory slot display, check inventory tab.
+_________________________
+v1.1.9 - 16 february 2015|
+-------------------------|
+- Fixed a glitch with inventory items moving off screen when using Firefox
+- Small bug fixes
+- Upgrading luck, and increasing your drop rate, now affects how often you drop an item, starting at 50.5% increasing by 0.1% every point in luck, 
+so you need 500 points in luck to have 100% drop rate, any more than this won't give any bonuses.
+___________________________
+v1.1.8.1 - 14 february 2015|
+---------------------------|
+- Fixed a bug, where you could not load your weapon skill stats
+- Loading "Drop rate" is now working, but currently drop rate, does not affect your drop. I will change this in the near future, when I add new items to the game.
+_________________________
+v1.1.8 - 14 february 2015|
+-------------------------|
+- Weapon skills, When you equip weapon, you gain experience(currently hidden) and level up your weapon mastery, while you have it equipped it gives you passive stats which you can see at Weapon Skills page.
+___________________________
+v1.1.7.1 - 13 february 2015|
+---------------------------|
+- Fix to loading equipped items stats
+_________________________
+v1.1.7 - 13 february 2015|
+-------------------------|
+- Inventory is fully working now
+- Balance changes, each item give much less stats, like 10 times less..if not more, also all stats formula are changed and are much weaker. so instead of 1% critical chance every 1 agi, you need 100 agi.
+- Equipped items now display item rarity, and item value, same for player inventory.
+_________________________
+v1.1.6 - 12 february 2015|
+-------------------------|
+- Inventory and Equip screen is working, you can equip, unequip and sell items. Better quality item is worth more gold, even with lower stats.
+- Added Weapon skill levels, while equipped with a sword, you will gain experience for each killed monster, which will level up your "Sword Mastery level"
+- Currently no bonuses for leveling your sword(or any other weapon) level, but I plan to add some bonus stats for a starter, in the near future.
+-!!!Current BUG!!! When you load a game, you need to unequip and equip items again to gain stats from them. While you have item equipped and you want to equip different item, you will need to
+press equip button 2 times, because first click = unequip currently equipped item, and second click = equipping new item...I am still working on a solution to make it swap items automatically.
+_________________________
+v1.1.5 - 6 february 2015 |
+-------------------------|
+- You can equip items now(your stats will be updated when you equip an item but there is still no image for item, and you cant unequip them)
+- Items are not saved it, still working on it
+_________________________
+v1.1.4 - 2 february 2015 |
+-------------------------|
+- Added item drop, higher level monster drop better items, all items stats are randomly generated
+- You cannot equip items, not yet
+- You gain 10 stats per level
+- Added turn based combat
+- Each turn is displayed in player log
+_________________________
+v1.1.3 - 16 january 2015 |
+-------------------------|
+- Changed all formulas for every stat in game i.e. crit/evasion/accuracy
+- Updated the html code
+_________________________
+v1.1.2 - 12 january 2015 |
+-------------------------|
+- Animated progress bar for health and experience
+- When you die, you lose 20% of current gold and experience
+- Experience formula changed to make it easier to level up
+- Wisdom and intelligence now give you some mana, and mana regen.
+- Basic skill, chance to heal on hit. Increase intelligence for higher chance to proc and better heal, wisdom for more mana.
+_________________________
+v1.1.1 - 11 january 2015 |
+-------------------------|
+- Accuracy and Evasion is working right now
+- Critical chance and bonus damage from critical is working now
+- Changed damage formula which is much better now'
+- Damage per point of strength reduced
+- Base health changed to 50 from 30
+_________________________
+v1.1.0 - 10 january 2015 |
+-------------------------|
+- Removed all orbs from the game, this game won't be an idle game, so no exp/gold per second.
+- Added new player stats, str/end/dex/agi/int/wis/luk.
+- Secondary stats page, which give you more info about player defense,critical, drop rate etc.
+- Still working on weapon skills and equipment. 
+_________________________
+v1.0.7 - 4 january 2015  |
+-------------------------|
+- Changed javascript code
+- Updated html
+- Log is displayed in reverse order
+_________________________
+v1.0.6 - 31 december 2014|
+-------------------------|
+- Changed log position
+- Added new tabs, inventory, equipments(still in development)
+- Changed html file, fixed many bugs
+- Potions are used automatically(more max health you have, a better potion will be used)
+_________________________
+v1.0.5 - 30 december 2014|
+-------------------------|
+- Added tabs to the game, which contain addition game info, as well a shop, options menu etc.
+- Total of 32 monsters, including bosses(all of it require balance changes)
+- New damage system(Will be changed again soon)
+- Can fuse godly orbs with 30% chance to obtain "Black Orb" which gives 5000 exp and gold per second
+- Potion shop where you can spend some gold
+_________________________
+v1.0.4 - 28 december 2014|
+-------------------------|
+- Added exp and health progress bar at the top
+- More monsters, also they have their own stats i.e. health/strength/defense
+_________________________
+v1.0.3 - 27 december 2014|
+-------------------------|
+- Added experience, gold, fusion orbs which let you gain exp/gold per second
+- Added more info in character page
+- Added colors to item rarity
+- Updated a website to work on all resolutions, should work even on mobile devices
+_________________________
+v1.0.2 - 26 december 2014|
+-------------------------|
+- Changed "Sell  all button" to sell all orbs at once(all quality) 
+- Added Level up system, 5 stats per level, health regeneration, Defense, Strength
+- New monsters, changed weapon requirement to fight them
+_________________________
+v1.0.1 - 25 december 2014|
+-------------------------|
+- Added "Sell all button" for a single orb
+_______________________
+v1.0 - 25 december 2014|
+-----------------------|
+- Initial Release
