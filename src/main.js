@@ -7,3 +7,5 @@
 // scripts are deferred). As each file is converted, its <script> tag is removed
 // from index.html and an import is added below.
 import './intervalFunctions.js';
+import './itemSell.js';
+import './potionsHotbar.js';

@@ -242,3 +242,13 @@ function removePotionBuff(bonusToRemove) {
     console.log('test')
     player.buffs[bonusToRemove] = 0;
 };
+
+// ES module (Phase 3): bare reads of classic globals resolve through the global
+// object. Re-expose the public functions on window for inline handlers and the
+// other scripts (main.js, save.js, dynamicHtml.js) that call them by name.
+// hotBarItem stays module-local (only used here).
+window.createPotionInventory = createPotionInventory;
+window.CreatePlayerHotBar = CreatePlayerHotBar;
+window.addHotBarPotion = addHotBarPotion;
+window.usePotion = usePotion;
+window.removePotionBuff = removePotionBuff;
