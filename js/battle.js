@@ -1,4 +1,5 @@
-﻿function startBattle(monster) {
+﻿"use strict";
+function startBattle(monster) {
     //Add buttons <Attack><Defense><Spell><Item><Run?> -->"Spell" change name based on character class later on: Spell/Skill/Runes/Combo/etc...
     //Display enemy at the top/or left/ AND  player at the bottom/or right side
     var monsterStats = monsterList[monster];
@@ -209,7 +210,7 @@ function playerDamage(monster, damage, name, type) {//damage can be from melee/s
 };
 function monsterAttack(monsterStats) {
     if (player.properties.health < player.functions.maxhealth()) {
-        regen = player.functions.hpregen();
+        var regen = player.functions.hpregen();
         player.properties.health += regen;
         if (player.properties.health > player.functions.maxhealth()) {
             regen -= (player.properties.health - player.functions.maxhealth());
