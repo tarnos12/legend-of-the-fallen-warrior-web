@@ -7,12 +7,6 @@
       "runtimeArgs": ["node_modules/vite/bin/vite.js"],
       "port": 5173,
       "autoPort": true
-    },
-    {
-      "name": "idle-grounds",
-      "runtimeExecutable": "C:\\Program Files\\nodejs\\node.exe",
-      "runtimeArgs": ["C:/Work/Marrow Tap Projects/Farm Prototype Claude/server.js"],
-      "port": 5174
     }
   ]
 }

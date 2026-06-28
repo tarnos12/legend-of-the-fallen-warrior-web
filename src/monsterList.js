@@ -189,3 +189,8 @@ function MakeMonsterList() {
     monsterList.monster056 = monster056;
 }
 
+// Re-expose on window for still-classic callers (main.js) and converted modules
+// (save.js) that invoke MakeMonsterList() by bare name. monsterList itself is
+// already published via window.monsterList inside the function above.
+window.MakeMonsterList = MakeMonsterList;
+

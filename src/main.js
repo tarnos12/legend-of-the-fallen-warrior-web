@@ -18,7 +18,9 @@ import './potionsHotbar.js';
 // Core files (data/logic/UI) being migrated from the classic <script> tags in
 // index.html, in their original relative load order. Each still self-exposes its
 // publics on window so not-yet-converted classic files keep working.
+import './skills.js';
 import './weaponMastery.js';
+import './monsterList.js';
 
 // Game bootstrap (Phase 3 ESM). Previously these ran inline at parse-time inside
 // the classic dynamicHtml.js / main.js / professions.js scripts. They were
