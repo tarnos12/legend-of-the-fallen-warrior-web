@@ -21,6 +21,7 @@ import './potionsHotbar.js';
 import './skills.js';
 import './weaponMastery.js';
 import './monsterList.js';
+import './gameObjects.js';
 
 // Game bootstrap (Phase 3 ESM). Previously these ran inline at parse-time inside
 // the classic dynamicHtml.js / main.js / professions.js scripts. They were

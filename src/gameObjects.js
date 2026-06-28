@@ -1989,3 +1989,16 @@ function raceStats() {
     };
     secondaryStatUpdate();
 };
+
+// As a classic <script> every top-level var/function above was an auto-global.
+// As an ES module they are module-scoped, so re-expose the full set on window
+// to preserve the exact global surface still-classic files, converted modules,
+// and inline onclick handlers depend on (Phase 3 ESM transition bridge).
+Object.assign(window, {
+    itemToCraft, secondaryStatInfo, primaryStatInfo, loadingEquippedItems,
+    itemTypes, itemWeaponSubType, itemArmorSubType, itemAccessorySubType,
+    itemPower, itemRarity, itemBaseMod, itemModifiers, emptyItemSlotInfo,
+    InventoryItemTypes, monsterAreas, weaponTypeObject, materiaType,
+    CharacterRace, human, halfElf, dwarf, orc, elf, halfing, sylph, giant,
+    characterRaces, raceStats,
+});
