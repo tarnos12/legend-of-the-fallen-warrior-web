@@ -599,25 +599,29 @@ function createEquippedItemsObject(typeOfTheItem) {
 // createEquippedItemsObject('all') init call moved to initGame() in src/main.js (Phase 3 ESM)
 
 var maxLogLines = 12;
-var logData = {
+// Shared mutable state: these are reassigned and/or read across files (battle.js,
+// save.js, itemDrop/itemSell, dynamicHtml). As an ES module a `var` would be
+// module-scoped, so other modules' bare reassignments would throw (strict mode)
+// or desync. Keep them as window.* properties so every file shares one slot.
+window.logData = {
     length: 0
 };
-var battleTurn;
+window.battleTurn = undefined;
 //Array to store player items
-var playerInventory = [];
-var damageDealt = 0;
-var magicDamage = 0;
-var blockRate = 0;
-var counterDamage = 0;
-var lifeStealAmount = 0;
-var magicDamageDealt = 0;
-var damageTaken = 0;
-var criticalRate = 0;
-var enemyBlock = 0;
-var accuracyRate = 0;
-var monsterDamage = 0;
+window.playerInventory = [];
+window.damageDealt = 0;
+window.magicDamage = 0;
+window.blockRate = 0;
+window.counterDamage = 0;
+window.lifeStealAmount = 0;
+window.magicDamageDealt = 0;
+window.damageTaken = 0;
+window.criticalRate = 0;
+window.enemyBlock = 0;
+window.accuracyRate = 0;
+window.monsterDamage = 0;
 
-var number = 1;
+window.number = 1;
 function disableButtons() {
     if (number === 1) {
         $('a#monsterButton').css('cursor', 'not-allowed');
@@ -837,12 +841,13 @@ function unequipItem(id, type) {
 
 
 
-var checkBoxCommon = false;
-var checkBoxUncommon = false;
-var checkBoxRare = false;
-var checkBoxEpic = false;
-var checkBoxLegendary = false;
-var hardcoreMode = false;
+// Read by itemSell.js and toggled by checkbox handlers -> shared via window.
+window.checkBoxCommon = false;
+window.checkBoxUncommon = false;
+window.checkBoxRare = false;
+window.checkBoxEpic = false;
+window.checkBoxLegendary = false;
+window.hardcoreMode = false;
 function handleClick() {
     checkBoxCommon = document.getElementById("common").checked;
     checkBoxUncommon = document.getElementById("uncommon").checked;
@@ -940,7 +945,7 @@ function resetPassiveSkills() {
         primaryStatUpdate();
         secondaryStatUpdate();
 };
-var checkedShopItem = '';
+window.checkedShopItem = '';
 $(document).on('change', 'input[name="shopItem"]', function () {
     var checkedShopItemInteger = $(this).val();
     checkedShopItem = parseInt(checkedShopItemInteger, 10);
@@ -1038,7 +1043,7 @@ function getThousands(n) {
         return Math.floor(n);
     };
 };
-var monsterKillCount = [];
+window.monsterKillCount = [];
 function changeDifficulty(type, rebirth) {
     for (var key in monsterList) {
         var monster = monsterList[key];
@@ -1088,3 +1093,26 @@ function getStartingItem(itemType) {
     var itemID = player.properties.itemIdNumber - 1;// -1 because "getItemType function finish before it changes ID of the item, so equip function is called, before item drop finishes I guess...not sure -_-
     equipItem(itemID);
 };
+
+// Re-expose this file's top-level functions and stable data objects on window.
+// As a classic <script> they were auto-globals; still-classic files
+// (dynamicHtml/professions), converted modules, inline onclick handlers, and
+// initGame() resolve them by bare name. The reassigned mutable state above is
+// already on window directly (so reassignments from other modules stay in sync);
+// the objects below are only ever mutated in place, so sharing the reference via
+// the bridge is safe. (Phase 3 ESM transition bridge.)
+Object.assign(window, {
+    // functions
+    Log, sumEquippedStat, createEquippedItemsObject, disableButtons,
+    potionBuyLog, notEnoughMoneyLog, inventoryBuyLog, statBuyLog, itemDropLog,
+    levelUpLog, mainLog, deathLog, drawLog, isDeadLog, masteryLog, dropLog,
+    setWeaponTypeFlag, equipSlot, equipItem, unequipItem, handleClick,
+    hardcoreModeCheck, changeRace, myAudio, muteAudio, selectText, showNumber,
+    sortInventory, resetPassiveSkills, sortShop, copyPlayerProperties,
+    changeGameStyling, getNumberMultiplierofFive, getTen, getThousands,
+    changeDifficulty, rebirth, compare, getStartingItem,
+    // stable data objects / constants (mutated in place or read-only)
+    currentGameVersion, defaultValues, equipmentSlots, armorSlots, player,
+    equippedItems, maxLogLines, equipSlotSubTypes, weaponTypeFlags,
+    slotInventorySpace, unequipSlots,
+});

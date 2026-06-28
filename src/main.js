@@ -22,6 +22,7 @@ import './skills.js';
 import './weaponMastery.js';
 import './monsterList.js';
 import './gameObjects.js';
+import './core.js';
 import './stats.js';
 
 // Game bootstrap (Phase 3 ESM). Previously these ran inline at parse-time inside
