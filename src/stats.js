@@ -375,3 +375,13 @@ function upgradePassive(skillName) {
 function skillLog() {
     $("#skillLog").delay(100).fadeIn().delay(1000).fadeOut(500, function() { $(this).remove(); });
 };
+
+// Re-expose top-level functions on window: these were auto-globals as a classic
+// script and are called by inline onclick handlers (upgrade*, etc.) and by
+// other still-classic files (Phase 3 ESM transition bridge).
+Object.assign(window, {
+    updateHtml, expPercent, healthPercent, playerHealthBar, manaRegen, levelUp,
+    loadIsEquipped, resetIsEquipped, upgradeStrength, upgradeEndurance,
+    upgradeAgility, upgradeDexterity, upgradeWisdom, upgradeIntelligence,
+    upgradeLuck, upgradePassive, skillLog,
+});
