@@ -729,3 +729,6 @@ function quest() {
 };
 
 //test
+// ES module (Phase 3): bare reads of classic globals resolve via the global
+// object; expose the public function on window. monsterUnlock stays module-local.
+window.quest = quest;

@@ -785,3 +785,16 @@ function getItemValue(dropItem) {
                       dropItem.expRate * 0.5 + dropItem.goldRate * 0.5 + dropItem.dropRate * 0.5);
 };
 
+
+// ES module (Phase 3): expose public functions on window for callers and
+// inline handlers. Bare reads of classic globals resolve via the global object.
+window.monsterItemDrop = monsterItemDrop;
+window.getItemType = getItemType;
+window.getItemSubType = getItemSubType;
+window.getItemRarity = getItemRarity;
+window.getItemPower = getItemPower;
+window.getItemBaseStats = getItemBaseStats;
+window.getBaseItemMod = getBaseItemMod;
+window.getBonusItemMod = getBonusItemMod;
+window.getNum = getNum;
+window.getItemValue = getItemValue;

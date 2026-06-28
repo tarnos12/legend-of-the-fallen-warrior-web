@@ -443,3 +443,21 @@ function displayLogInfo() {
     activeBuffsHtml();
     CreateMonsterHtml();
 };
+// ES module (Phase 3): expose public functions on window for inline handlers
+// and other scripts. Bare reads of classic globals resolve via the global object.
+window.startBattle = startBattle;
+window.playerSpellDiv = playerSpellDiv;
+window.playerAttack = playerAttack;
+window.playerCritCheck = playerCritCheck;
+window.playerSpellDamage = playerSpellDamage;
+window.playerDamage = playerDamage;
+window.monsterAttack = monsterAttack;
+window.monsterDmg = monsterDmg;
+window.monsterDamageDeal = monsterDamageDeal;
+window.playerDead = playerDead;
+window.monsterKilled = monsterKilled;
+window.weaponSkill = weaponSkill;
+window.updateBar = updateBar;
+window.monsterExperience = monsterExperience;
+window.monsterGold = monsterGold;
+window.displayLogInfo = displayLogInfo;
