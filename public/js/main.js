@@ -703,215 +703,76 @@ function dropLog() {
 };
 
 //Equip item function
+// Armor/accessory sub-types whose equip path is identical apart from the slot
+// name. (weapon is keyed off itemType and also toggles a weapon-type flag;
+// backpack is a separate legacy path.)
+var equipSlotSubTypes = ['shield', 'chest', 'helmet', 'legs', 'boots', 'ring', 'amulet', 'talisman'];
+
+// Maps a weapon sub-type to the player.properties flag the game uses to track
+// which weapon class is equipped (for mastery/skills).
+var weaponTypeFlags = {
+    sword: 'isSword',
+    axe: 'isAxe',
+    mace: 'isMace',
+    staff: 'isStaff',
+    ranged: 'isRanged'
+};
+function setWeaponTypeFlag(subType, value) {
+    var flag = weaponTypeFlags[subType];
+    if (flag !== undefined) {
+        player.properties[flag] = value;
+    }
+}
+
+// The DOM container an unequipped item returns to, per slot.
+var slotInventorySpace = {
+    weapon: 'inventorySpaceweapon',
+    shield: 'inventorySpacearmor',
+    chest: 'inventorySpacearmor',
+    helmet: 'inventorySpacearmor',
+    legs: 'inventorySpacearmor',
+    boots: 'inventorySpacearmor',
+    ring: 'inventorySpaceaccessory',
+    amulet: 'inventorySpaceaccessory',
+    talisman: 'inventorySpaceaccessory'
+};
+
+// Slots checked (in order) when unequipping by item id.
+var unequipSlots = ['weapon', 'shield', 'chest', 'helmet', 'legs', 'boots', 'ring', 'amulet', 'talisman'];
+
+// Shared equip logic for a given slot: swap out anything already there, move the
+// item from the inventory into the slot, and update the UI. (item.id === id is
+// always true here since item was looked up by id, so that guard is dropped.)
+function equipSlot(slot, item, id) {
+    if (equippedItems[slot].isEquipped === true) {
+        unequipItem(equippedItems[slot].id, 'duo'); // duo = swapping while another item is equipped
+    }
+    equippedItems[slot] = item;
+    equippedItems[slot].isEquipped = true;
+    if (slot === 'weapon') {
+        // Set the weapon-type flag here (after the old weapon's unequip cleared
+        // it) so swapping two weapons of the same sub-type ends up enabled.
+        setWeaponTypeFlag(item.subType, true);
+    }
+    var index = playerInventory.indexOf(item, 0);
+    if (index > -1) {
+        playerInventory.splice(index, 1);
+    }
+    player.functions[slot] = $("#testingItem" + id);
+    $("#testingItem" + id).remove();
+    updateHtml();
+}
+
 function equipItem(id) {
     var item = playerInventory.filter(function (obj) {
         return obj.id === id;
     })[0];
     if (item !== undefined) {
         if (item.itemType === "weapon") {
-            if (equippedItems.weapon.isEquipped === true) {
-                var currentId = equippedItems.weapon.id
-                var typeItem = 'duo'; // It means that we equip item while another item is already equipped
-                unequipItem(currentId, typeItem);
-            }
-            if (item.id === id) {
-                equippedItems.weapon = item;
-                equippedItems.weapon.isEquipped = true;
-                //Check which weapon is equipped so you can gain stats and level up weapon mastery
-                if (equippedItems.weapon.subType === "sword") {
-                    player.properties.isSword = true;
-                }
-                else if (equippedItems.weapon.subType === "axe") {
-                    player.properties.isAxe = true;
-                }
-                else if (equippedItems.weapon.subType === "mace") {
-                    player.properties.isMace = true;
-                }
-                else if (equippedItems.weapon.subType === "staff") {
-                    player.properties.isStaff = true;
-                }
-                else if (equippedItems.weapon.subType === "ranged") {
-                    player.properties.isRanged = true;
-                }
-                var item = playerInventory.filter(function (obj) {
-                    return obj.id === id;
-                })[0];
-                var index = playerInventory.indexOf(item, 0);
-                if (index > -1) {
-                    playerInventory.splice(index, 1);
-                };
-            };
-            player.functions.weapon = $("#testingItem" + id);
-            $("#testingItem" + id).remove();
-            updateHtml();
+            equipSlot('weapon', item, id);
         }
-        else if (item.subType === "shield") {
-            if (equippedItems.shield.isEquipped === true) {
-                var currentId = equippedItems.shield.id
-                var typeItem = 'duo'; // It means that we equip item while another item is already equipped
-                unequipItem(currentId, typeItem);
-            };
-            if (item.id === id) {
-                equippedItems.shield = item;
-                equippedItems.shield.isEquipped = true;
-                var item = playerInventory.filter(function (obj) {
-                    return obj.id === id;
-                })[0];
-                var index = playerInventory.indexOf(item, 0);
-                if (index > -1) {
-                    playerInventory.splice(index, 1);
-                };
-            };
-            player.functions.shield = $("#testingItem" + id);
-            $("#testingItem" + id).remove();
-            updateHtml();
-        }
-        else if (item.subType === "chest") {
-            if (equippedItems.chest.isEquipped === true) {
-                var currentId = equippedItems.chest.id
-                var typeItem = 'duo'; // It means that we equip item while another item is already equipped
-                unequipItem(currentId, typeItem);
-            };
-            if (item.id === id) {
-                equippedItems.chest = item;
-                equippedItems.chest.isEquipped = true;
-                var item = playerInventory.filter(function (obj) {
-                    return obj.id === id;
-                })[0];
-                var index = playerInventory.indexOf(item, 0);
-                if (index > -1) {
-                    playerInventory.splice(index, 1);
-                };
-            };
-            player.functions.chest = $("#testingItem" + id);
-            $("#testingItem" + id).remove();
-            updateHtml();
-        }
-        else if (item.subType === "helmet") {
-            if (equippedItems.helmet.isEquipped === true) {
-                var currentId = equippedItems.helmet.id
-                var typeItem = 'duo'; // It means that we equip item while another item is already equipped
-                unequipItem(currentId, typeItem);
-            };
-            if (item.id === id) {
-                equippedItems.helmet = item;
-                equippedItems.helmet.isEquipped = true;
-                var item = playerInventory.filter(function (obj) {
-                    return obj.id === id;
-                })[0];
-                var index = playerInventory.indexOf(item, 0);
-                if (index > -1) {
-                    playerInventory.splice(index, 1);
-                };
-            };
-            player.functions.helmet = $("#testingItem" + id);
-            $("#testingItem" + id).remove();
-            updateHtml();
-        }
-        else if (item.subType === "legs") {
-            if (equippedItems.legs.isEquipped === true) {
-                var currentId = equippedItems.legs.id
-                var typeItem = 'duo'; // It means that we equip item while another item is already equipped
-                unequipItem(currentId, typeItem);
-            };
-            if (item.id === id) {
-                equippedItems.legs = item;
-                equippedItems.legs.isEquipped = true;
-                var item = playerInventory.filter(function (obj) {
-                    return obj.id === id;
-                })[0];
-                var index = playerInventory.indexOf(item, 0);
-                if (index > -1) {
-                    playerInventory.splice(index, 1);
-                };
-            };
-            player.functions.legs = $("#testingItem" + id);
-            $("#testingItem" + id).remove();
-            updateHtml();
-        }
-        else if (item.subType === "boots") {
-            if (equippedItems.boots.isEquipped === true) {
-                var currentId = equippedItems.boots.id
-                var typeItem = 'duo'; // It means that we equip item while another item is already equipped
-                unequipItem(currentId, typeItem);
-            };
-            if (item.id === id) {
-                equippedItems.boots = item;
-                equippedItems.boots.isEquipped = true;
-                var item = playerInventory.filter(function (obj) {
-                    return obj.id === id;
-                })[0];
-                var index = playerInventory.indexOf(item, 0);
-                if (index > -1) {
-                    playerInventory.splice(index, 1);
-                };
-            };
-            player.functions.boots = $("#testingItem" + id);
-            $("#testingItem" + id).remove();
-            updateHtml();
-        }
-        else if (item.subType === "ring") {
-            if (equippedItems.ring.isEquipped === true) {
-                var currentId = equippedItems.ring.id
-                var typeItem = 'duo'; // It means that we equip item while another item is already equipped
-                unequipItem(currentId, typeItem);
-            };
-            if (item.id === id) {
-                equippedItems.ring = item;
-                equippedItems.ring.isEquipped = true;
-                var item = playerInventory.filter(function (obj) {
-                    return obj.id === id;
-                })[0];
-                var index = playerInventory.indexOf(item, 0);
-                if (index > -1) {
-                    playerInventory.splice(index, 1);
-                };
-            };
-            player.functions.ring = $("#testingItem" + id);
-            $("#testingItem" + id).remove();
-            updateHtml();
-        }
-        else if (item.subType === "amulet") {
-            if (equippedItems.amulet.isEquipped === true) {
-                var currentId = equippedItems.amulet.id
-                var typeItem = 'duo'; // It means that we equip item while another item is already equipped
-                unequipItem(currentId, typeItem);
-            };
-            if (item.id === id) {
-                equippedItems.amulet = item;
-                equippedItems.amulet.isEquipped = true;
-                var item = playerInventory.filter(function (obj) {
-                    return obj.id === id;
-                })[0];
-                var index = playerInventory.indexOf(item, 0);
-                if (index > -1) {
-                    playerInventory.splice(index, 1);
-                };
-            };
-            player.functions.amulet = $("#testingItem" + id);
-            $("#testingItem" + id).remove();
-            updateHtml();
-        }
-        else if (item.subType === "talisman") {
-            if (equippedItems.talisman.isEquipped === true) {
-                var currentId = equippedItems.talisman.id
-                var typeItem = 'duo'; // It means that we equip item while another item is already equipped
-                unequipItem(currentId, typeItem);
-            };
-            if (item.id === id) {
-                equippedItems.talisman = item;
-                equippedItems.talisman.isEquipped = true;
-                var item = playerInventory.filter(function (obj) {
-                    return obj.id === id;
-                })[0];
-                var index = playerInventory.indexOf(item, 0);
-                if (index > -1) {
-                    playerInventory.splice(index, 1);
-                };
-            };
-            player.functions.talisman = $("#testingItem" + id);
-            $("#testingItem" + id).remove();
-            updateHtml();
+        else if (equipSlotSubTypes.indexOf(item.subType) > -1) {
+            equipSlot(item.subType, item, id);
         }
         else if (item.itemType === "BackPack") {
             if (equippedItems.backpack.isEquipped === true) {
@@ -945,130 +806,23 @@ function equipItem(id) {
 
 //Unequip item function
 function unequipItem(id, type) {
-    //item id for every slot
-    var weaponId = id;
-    var shieldId = id;
-    var chestId = id;
-    var helmetId = id;
-    var legsId = id;
-    var bootsId = id;
-    var ringId = id;
-    var amuletId = id;
-    var talismanId = id;
-    //Weapon unequip
-    if (weaponId === equippedItems.weapon.id) {
-        equippedItems.weapon.isEquipped = false;
-        playerInventory.push(equippedItems.weapon);
-        if (equippedItems.weapon.subType === "sword") {
-            player.properties.isSword = false;
+    for (var i = 0; i < unequipSlots.length; i++) {
+        var slot = unequipSlots[i];
+        if (id === equippedItems[slot].id) {
+            equippedItems[slot].isEquipped = false;
+            playerInventory.push(equippedItems[slot]);
+            if (slot === "weapon") {
+                setWeaponTypeFlag(equippedItems.weapon.subType, false);
+            }
+            $("#" + slotInventorySpace[slot]).append(player.functions[slot]);
+            $("#equippedItem" + id).remove();
+            if (type === "solo") {
+                createEquippedItemsObject(slot);
+            }
+            updateHtml();
+            break;
         }
-        else if (equippedItems.weapon.subType === "axe") {
-            player.properties.isAxe = false;
-        }
-        else if (equippedItems.weapon.subType === "mace") {
-            player.properties.isMace = false;
-        }
-        else if (equippedItems.weapon.subType === "staff") {
-            player.properties.isStaff = false;
-        }
-        else if (equippedItems.weapon.subType === "ranged") {
-            player.properties.isRanged = false;
-        }
-        $("#inventorySpaceweapon").append(player.functions.weapon);
-        if (type === "solo") {
-            createEquippedItemsObject('weapon');
-        };
-        $("#equippedItem" + id).remove();
-        updateHtml();
     }
-        //Shield unequip
-    else if (shieldId === equippedItems.shield.id) {
-        equippedItems.shield.isEquipped = false;
-        playerInventory.push(equippedItems.shield);
-        $("#inventorySpacearmor").append(player.functions.shield);
-        $("#equippedItem" + id).remove();
-        if (type === "solo") {
-            createEquippedItemsObject('shield');
-        };
-        updateHtml();
-    }
-        //chest unequip
-    else if (chestId === equippedItems.chest.id) {
-        equippedItems.chest.isEquipped = false;
-        playerInventory.push(equippedItems.chest);
-        $("#inventorySpacearmor").append(player.functions.chest);
-        $("#equippedItem" + id).remove();
-        if (type === "solo") {
-            createEquippedItemsObject('chest');
-        };
-        updateHtml();
-    }
-        //helmet unequip
-    else if (helmetId === equippedItems.helmet.id) {
-        equippedItems.helmet.isEquipped = false;
-        playerInventory.push(equippedItems.helmet);
-        $("#inventorySpacearmor").append(player.functions.helmet);
-        $("#equippedItem" + id).remove();
-        if (type === "solo") {
-            createEquippedItemsObject('helmet');
-        };
-        updateHtml();
-    }
-        //legs unequip
-    else if (legsId === equippedItems.legs.id) {
-        equippedItems.legs.isEquipped = false;
-        playerInventory.push(equippedItems.legs);
-        $("#inventorySpacearmor").append(player.functions.legs);
-        $("#equippedItem" + id).remove();
-        if (type === "solo") {
-            createEquippedItemsObject('legs');
-        };
-        updateHtml();
-    }
-        //boots unequip
-    else if (bootsId === equippedItems.boots.id) {
-        equippedItems.boots.isEquipped = false;
-        playerInventory.push(equippedItems.boots);
-        $("#inventorySpacearmor").append(player.functions.boots);
-        $("#equippedItem" + id).remove();
-        if (type === "solo") {
-            createEquippedItemsObject('boots');
-        };
-        updateHtml();
-    }
-        //Ring unequip
-    else if (ringId === equippedItems.ring.id) {
-        equippedItems.ring.isEquipped = false;
-        playerInventory.push(equippedItems.ring);
-        $("#inventorySpaceaccessory").append(player.functions.ring);
-        $("#equippedItem" + id).remove();
-        if (type === "solo") {
-            createEquippedItemsObject('ring');
-        };
-        updateHtml();
-    }
-        //Amulet unequip
-    else if (amuletId === equippedItems.amulet.id) {
-        equippedItems.amulet.isEquipped = false;
-        playerInventory.push(equippedItems.amulet);
-        $("#inventorySpaceaccessory").append(player.functions.amulet);
-        $("#equippedItem" + id).remove();
-        if (type === "solo") {
-            createEquippedItemsObject('amulet');
-        };
-        updateHtml();
-    }
-        //Talisman unequip
-    else if (talismanId === equippedItems.talisman.id) {
-        equippedItems.talisman.isEquipped = false;
-        playerInventory.push(equippedItems.talisman);
-        $("#inventorySpaceaccessory").append(player.functions.talisman);
-        $("#equippedItem" + id).remove();
-        if (type === "solo") {
-            createEquippedItemsObject('talisman');
-        };
-        updateHtml();
-    };
     CreateWeaponSkillHtml();
     updateHtml();
     CreatePlayerSkillsHtml();
