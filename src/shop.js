@@ -109,11 +109,11 @@ function buySuperPotion(count) {
     createPotionInventory()
 };
 
-var backpackStatus = {};
+window.backpackStatus = {};
 backpackStatus.price = 100;
 backpackStatus.multiplier = 1.04;
 
-var statStatus = {};
+window.statStatus = {};
 statStatus.price = 500;
 statStatus.multiplier = 1.01;
 
@@ -158,3 +158,16 @@ function buyStat(count) {
     };
     shopOther();
 };
+// ES module (Phase 3): potionStatus/medium/super are mutated in place and read by
+// dynamicHtml via name, so alias them on window. backpackStatus/statStatus are
+// declared as window.* above (save.js load() reassigns them). Expose buy fns.
+window.potionStatus = potionStatus;
+window.mediumPotionStatus = mediumPotionStatus;
+window.superPotionStatus = superPotionStatus;
+window.potionBuy = potionBuy;
+window.buySmallPotion = buySmallPotion;
+window.buyMediumPotion = buyMediumPotion;
+window.buySuperPotion = buySuperPotion;
+window.buyStuff = buyStuff;
+window.buyBackpack = buyBackpack;
+window.buyStat = buyStat;

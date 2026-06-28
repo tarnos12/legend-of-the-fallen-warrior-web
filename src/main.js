@@ -11,4 +11,6 @@ import './quest.js';
 import './intervalFunctions.js';
 import './itemDrop.js';
 import './itemSell.js';
+import './save.js';
+import './shop.js';
 import './potionsHotbar.js';

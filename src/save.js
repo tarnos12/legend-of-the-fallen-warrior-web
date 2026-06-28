@@ -248,3 +248,18 @@ function importSave() {
     localStorage[saveKeyForSlot(slot)] = btoa(JSON.stringify(savegame));
     load(slot);
 };
+// ES module (Phase 3): expose public functions on window for inline handlers and
+// other scripts. Bare reads/reassignments of globals (player, playerInventory,
+// backpackStatus, statStatus, monsterList, ...) resolve through the global object.
+window.saveKeyForSlot = saveKeyForSlot;
+window.saveGameFunction = saveGameFunction;
+window.loadGame = loadGame;
+window.autoSave = autoSave;
+window.newGame = newGame;
+window.load = load;
+window.resetCheck = resetCheck;
+window.resetallSavesCheck = resetallSavesCheck;
+window.reset = reset;
+window.pageReload = pageReload;
+window.versionCheck = versionCheck;
+window.importSave = importSave;
