@@ -1295,12 +1295,15 @@ function saveGameSlot() {
 };
 
 
-var itemShopWeapon = [];
-var itemShopArmor = [];
-var itemShopAccessory = [];
-var weaponAmount = 0;
-var armorAmount = 0;
-var accessoryAmount = 0;
+// Shop stock: reassigned wholesale by rerollShopItems() and read/mutated by
+// core.js (sortShop) and itemDrop.js, so share via window.* (a module `var`
+// would desync on reassignment). (Phase 3 ESM transition bridge.)
+window.itemShopWeapon = [];
+window.itemShopArmor = [];
+window.itemShopAccessory = [];
+window.weaponAmount = 0;
+window.armorAmount = 0;
+window.accessoryAmount = 0;
 function getShopItem() {
     var shopItemAmount = 100;
     var shopItemLevel = player.properties.level;
@@ -1779,3 +1782,25 @@ function getMonsterTooltip(monster) {
     }
     return html;
 };
+
+// Re-expose all top-level render/UI functions on window: these were auto-globals
+// as a classic <script> and are called by hundreds of inline onclick handlers in
+// the generated HTML, by initGame() (startingScreen/startLogo/testss), and by
+// other modules (core.js, save.js, gameObjects.js call primaryStatUpdate/
+// secondaryStatUpdate/CreateInventoryWeaponHtml/EquippedItemsEmpty/saveGameSlot/
+// CreateMonsterHtml/...). String.prototype.capitalizeFirstLetter is a prototype
+// method (already global) and the shop-stock arrays are shared via window above.
+// (Phase 3 ESM transition bridge.)
+Object.assign(window, {
+    changeTabWeapon, CreateWeaponSkillHtml, changedTabmonster, CreateMonsterHtml,
+    changeMonsterPage, checkBoxHtml, changedTabInventory, CreateInventoryWeaponHtml,
+    unequipItemLoad, CreatePlayerSkillsHtml, startLogo, startingScreen,
+    newGameSlot, loadGameSlot, backToStartingScreen,
+    characterCreationCreateBackground, characterCreationCreateBackground2,
+    removeStartingScreen, characterCreationHtml, checkHeroRace, changeMusicImage,
+    primaryStatUpdate, secondaryStatUpdate, EquippedItemsEmpty,
+    checkIfEquippedEmpty, checkEquippedItemType, saveGameSlot, getShopItem,
+    createShopTabs, displayShopItems, ShopBuyButtons, itemBuy, refillShopInterval,
+    rerollShopItems, shopOther, testss, getAgeButton, getAge, itemTooltipTest,
+    itemTooltipTest2, activeBuffsHtml, getMonsterTooltip,
+});

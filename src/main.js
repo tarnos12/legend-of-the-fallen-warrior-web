@@ -21,6 +21,7 @@ import './potionsHotbar.js';
 import './skills.js';
 import './weaponMastery.js';
 import './monsterList.js';
+import './dynamicHtml.js';
 import './gameObjects.js';
 import './core.js';
 import './stats.js';
