@@ -24,6 +24,22 @@ var defaultValues = {
     properties: {
     }
 };
+
+// Equipment slots that contribute attribute/bonus stats, in a fixed order.
+// Used by the player.functions.total*Bonus() helpers below.
+var equipmentSlots = ['weapon', 'shield', 'chest', 'helmet', 'legs', 'boots', 'ring', 'amulet', 'talisman'];
+// Slots that contribute to armor/defense (excludes weapon and accessories).
+var armorSlots = ['shield', 'chest', 'helmet', 'legs', 'boots'];
+// Sum a single stat key across the given equipped slots. Order-independent for
+// integer stats, so the result is identical to the original unrolled sums.
+function sumEquippedStat(statKey, slots) {
+    var total = 0;
+    for (var i = 0; i < slots.length; i++) {
+        total += equippedItems[slots[i]][statKey];
+    }
+    return total;
+}
+
 //PLAYER STATS
 var player = {
     buffs: {
@@ -147,99 +163,28 @@ var player = {
         amulet: '',
         talisman: '',
         totalAllAttributesBonus: function () {
-            return (equippedItems.weapon['All attributes'] +
-                equippedItems.shield['All attributes'] +
-                equippedItems.chest['All attributes'] +
-                equippedItems.helmet['All attributes'] +
-                equippedItems.legs['All attributes'] +
-                equippedItems.boots['All attributes'] +
-                equippedItems.ring['All attributes'] +
-                equippedItems.amulet['All attributes'] +
-                equippedItems.talisman['All attributes']);
+            return sumEquippedStat('All attributes', equipmentSlots);
         },
         totalStrengthBonus: function () {
-            return (equippedItems.weapon['Strength'] +
-                equippedItems.shield['Strength'] +
-                equippedItems.chest['Strength'] +
-                equippedItems.helmet['Strength'] +
-                equippedItems.legs['Strength'] +
-                equippedItems.boots['Strength'] +
-                equippedItems.ring['Strength'] +
-                equippedItems.amulet['Strength'] +
-                equippedItems.talisman['Strength'] +
-                player.functions.totalAllAttributesBonus());
+            return sumEquippedStat('Strength', equipmentSlots) + player.functions.totalAllAttributesBonus();
         },
         totalEnduranceBonus: function(){
-            return (equippedItems.weapon['Endurance'] +
-                equippedItems.shield['Endurance'] +
-                equippedItems.chest['Endurance'] +
-                equippedItems.helmet['Endurance'] +
-                equippedItems.legs['Endurance'] +
-                equippedItems.boots['Endurance'] +
-                equippedItems.ring['Endurance'] +
-                equippedItems.amulet['Endurance'] +
-                equippedItems.talisman['Endurance'] +
-                player.functions.totalAllAttributesBonus());
+            return sumEquippedStat('Endurance', equipmentSlots) + player.functions.totalAllAttributesBonus();
         },
         totalAgilityBonus: function(){
-            return (equippedItems.weapon['Agility'] +
-                equippedItems.shield['Agility'] +
-                equippedItems.chest['Agility'] +
-                equippedItems.helmet['Agility'] +
-                equippedItems.legs['Agility'] +
-                equippedItems.boots['Agility'] +
-                equippedItems.ring['Agility'] +
-                equippedItems.amulet['Agility'] +
-                equippedItems.talisman['Agility'] +
-                player.functions.totalAllAttributesBonus());
+            return sumEquippedStat('Agility', equipmentSlots) + player.functions.totalAllAttributesBonus();
         },
         totalDexterityBonus: function(){
-            return (equippedItems.weapon['Dexterity'] +
-                equippedItems.shield['Dexterity'] +
-                equippedItems.chest['Dexterity'] +
-                equippedItems.helmet['Dexterity'] +
-                equippedItems.legs['Dexterity'] +
-                equippedItems.boots['Dexterity'] +
-                equippedItems.ring['Dexterity'] +
-                equippedItems.amulet['Dexterity'] +
-                equippedItems.talisman['Dexterity'] +
-                player.functions.totalAllAttributesBonus());
+            return sumEquippedStat('Dexterity', equipmentSlots) + player.functions.totalAllAttributesBonus();
         },
         totalWisdomBonus: function(){
-            return (equippedItems.weapon['Wisdom'] +
-                equippedItems.shield['Wisdom'] +
-                equippedItems.chest['Wisdom'] +
-                equippedItems.helmet['Wisdom'] +
-                equippedItems.legs['Wisdom'] +
-                equippedItems.boots['Wisdom'] +
-                equippedItems.ring['Wisdom'] +
-                equippedItems.amulet['Wisdom'] +
-                equippedItems.talisman['Wisdom'] +
-                player.functions.totalAllAttributesBonus());
+            return sumEquippedStat('Wisdom', equipmentSlots) + player.functions.totalAllAttributesBonus();
         },
         totalIntelligenceBonus: function(){
-            return (equippedItems.weapon['Intelligence'] +
-                equippedItems.shield['Intelligence'] +
-                equippedItems.chest['Intelligence'] +
-                equippedItems.helmet['Intelligence'] +
-                equippedItems.legs['Intelligence'] +
-                equippedItems.boots['Intelligence'] +
-                equippedItems.ring['Intelligence'] +
-                equippedItems.amulet['Intelligence'] +
-                equippedItems.talisman['Intelligence'] +
-                player.functions.totalAllAttributesBonus());
+            return sumEquippedStat('Intelligence', equipmentSlots) + player.functions.totalAllAttributesBonus();
         },
         totalLuckBonus: function(){
-            return (equippedItems.weapon['Luck'] +
-                equippedItems.shield['Luck'] +
-                equippedItems.chest['Luck'] +
-                equippedItems.helmet['Luck'] +
-                equippedItems.legs['Luck'] +
-                equippedItems.boots['Luck'] +
-                equippedItems.ring['Luck'] +
-                equippedItems.amulet['Luck'] +
-                equippedItems.talisman['Luck'] +
-                player.functions.totalAllAttributesBonus());
+            return sumEquippedStat('Luck', equipmentSlots) + player.functions.totalAllAttributesBonus();
         },
         totalBlockChance: function () {
             return (equippedItems.shield['Block chance']);
@@ -254,66 +199,22 @@ var player = {
             return (equippedItems.weapon['Critical chance']);
         },
         totalArmorBonus: function () {
-            return (equippedItems.shield['defense'] +
-                equippedItems.chest['defense'] +
-                equippedItems.helmet['defense'] +
-                equippedItems.legs['defense'] +
-                equippedItems.boots['defense']);
+            return sumEquippedStat('defense', armorSlots);
         },
         totalLifeBonus: function () {
-            return (equippedItems.weapon['Bonus life'] +
-                equippedItems.shield['Bonus life'] +
-                equippedItems.chest['Bonus life'] +
-                equippedItems.helmet['Bonus life'] +
-                equippedItems.legs['Bonus life'] +
-                equippedItems.boots['Bonus life'] +
-                equippedItems.ring['Bonus life'] +
-                equippedItems.amulet['Bonus life'] +
-                equippedItems.talisman['Bonus life']);
+            return sumEquippedStat('Bonus life', equipmentSlots);
         },
         totalManaBonus: function () {
-            return (equippedItems.weapon['Bonus mana'] +
-                equippedItems.shield['Bonus mana'] +
-                equippedItems.chest['Bonus mana'] +
-                equippedItems.helmet['Bonus mana'] +
-                equippedItems.legs['Bonus mana'] +
-                equippedItems.boots['Bonus mana'] +
-                equippedItems.ring['Bonus mana'] +
-                equippedItems.amulet['Bonus mana'] +
-                equippedItems.talisman['Bonus mana']);
+            return sumEquippedStat('Bonus mana', equipmentSlots);
         },
         totalMagicFind: function () {
-            return (equippedItems.weapon['Magic find'] +
-                equippedItems.shield['Magic find'] +
-                equippedItems.chest['Magic find'] +
-                equippedItems.helmet['Magic find'] +
-                equippedItems.legs['Magic find'] +
-                equippedItems.boots['Magic find'] +
-                equippedItems.ring['Magic find'] +
-                equippedItems.amulet['Magic find'] +
-                equippedItems.talisman['Magic find']);
+            return sumEquippedStat('Magic find', equipmentSlots);
         },
         totalGoldDrop: function () {
-            return (equippedItems.weapon['Gold drop'] +
-                equippedItems.shield['Gold drop'] +
-                equippedItems.chest['Gold drop'] +
-                equippedItems.helmet['Gold drop'] +
-                equippedItems.legs['Gold drop'] +
-                equippedItems.boots['Gold drop'] +
-                equippedItems.ring['Gold drop'] +
-                equippedItems.amulet['Gold drop'] +
-                equippedItems.talisman['Gold drop']);
+            return sumEquippedStat('Gold drop', equipmentSlots);
         },
         totalExperienceRate: function () {
-            return (equippedItems.weapon['Experience rate'] +
-                equippedItems.shield['Experience rate'] +
-                equippedItems.chest['Experience rate'] +
-                equippedItems.helmet['Experience rate'] +
-                equippedItems.legs['Experience rate'] +
-                equippedItems.boots['Experience rate'] +
-                equippedItems.ring['Experience rate'] +
-                equippedItems.amulet['Experience rate'] +
-                equippedItems.talisman['Experience rate']);
+            return sumEquippedStat('Experience rate', equipmentSlots);
         },
         bonusDamage: function () {
             var damage = 0;
