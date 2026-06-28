@@ -188,3 +188,5 @@ GeneratedArtifacts/
 _Pvt_Extensions/
 ModelManifest.xml
 images/skills/ButchersInsight.png
+# Vite build output
+dist/

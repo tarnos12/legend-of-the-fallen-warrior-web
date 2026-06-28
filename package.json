@@ -1,0 +1,14 @@
+{
+  "name": "legend-of-the-fallen-warrior",
+  "version": "1.8.0",
+  "private": true,
+  "description": "Legend of the Fallen Warrior - idle/incremental browser RPG",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "vite": "^7.1.0"
+  }
+}
