@@ -1175,3 +1175,22 @@ function craftingHtml2() {
     document.getElementById('crafting').innerHTML = html;
     testss();
 };
+
+// Re-expose top-level functions (called by inline onclick handlers, by core.js's
+// newGame, and by initGame) and the individual mineral/herb data objects (read
+// by core.js and potionsHotbar.js). playerProfession is already on window via
+// the IIFE above; the crafting-state vars and herb/mineral lists are
+// professions-internal and stay module-scoped. Objects are only mutated in
+// place, so sharing the reference is safe. (Phase 3 ESM transition bridge.)
+Object.assign(window, {
+    // functions
+    createHerbs, createMinerals, gather, unlockMineral, unlockHerb,
+    createAlchemyHtml, createPotion, playerProfessionHtml, professionGatherHtml,
+    changeItemType, changeItemBonus, craftingHtml, craftingHtmlButtons,
+    craftItemQuality, displayCraftedItem, craftingBackground, craftItem,
+    craftingHtml2,
+    // mineral/herb data objects read cross-file
+    Thaumerite, LiteCyan, OhmStone, Techtite, XilBond, VulcanatedIron,
+    RusinsSinew, EssenceofWillow, SinnersDelight, BarletBark, Vystim,
+    ThistleWart, LillyWisp,
+});
