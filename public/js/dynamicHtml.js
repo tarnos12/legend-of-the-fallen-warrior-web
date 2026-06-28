@@ -654,8 +654,7 @@ function startingScreen() {
     myAudio.volume = 0.1;
     myAudio.play();
 };
-startingScreen();
-startLogo();
+// startingScreen()/startLogo() init calls moved to initGame() in src/main.js (Phase 3 ESM)
 
 function newGameSlot() {
     changeMusicImage();
@@ -1590,7 +1589,7 @@ var shopOtherList = [
         type3: "superPotionStatus"
     }
 ];
-setTimeout(function () { testss(); }, 3000);
+// setTimeout(testss, 3000) init call moved to initGame() in src/main.js (Phase 3 ESM)
 function testss() {
     $(function() {
         $('[data-toggle="tooltip"]').tooltip();

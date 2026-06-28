@@ -14,3 +14,24 @@ import './itemSell.js';
 import './save.js';
 import './shop.js';
 import './potionsHotbar.js';
+
+// Game bootstrap (Phase 3 ESM). Previously these ran inline at parse-time inside
+// the classic dynamicHtml.js / main.js / professions.js scripts. They were
+// extracted here so the core files can be converted to ES modules in any order
+// without breaking parse-time cross-file references. Order below mirrors the
+// original classic script-load order exactly. The functions are still classic
+// globals for now (resolved off window); they will become imports as each file
+// is converted. Data-construction blocks (gameObjects races, the professions
+// IIFE, String.prototype.capitalizeFirstLetter) stay in their files and run at
+// load, before this code.
+function initGame() {
+    startingScreen();
+    startLogo();
+    setTimeout(function () { testss(); }, 3000);
+    createEquippedItemsObject('all');
+    copyPlayerProperties();
+    createHerbs();
+    createMinerals();
+    playerProfessionHtml();
+}
+initGame();

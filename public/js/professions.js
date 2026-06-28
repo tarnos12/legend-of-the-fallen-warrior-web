@@ -301,7 +301,7 @@ function createHerbs() {
     };
     herbList.LillyWisp = LillyWisp;
 }
-createHerbs();
+// createHerbs() init call moved to initGame() in src/main.js (Phase 3 ESM)
 function createMinerals() {
 
     //Minerals
@@ -390,7 +390,7 @@ function createMinerals() {
     mineralList.VulcanatedIron = VulcanatedIron;
 };
 
-createMinerals();
+// createMinerals() init call moved to initGame() in src/main.js (Phase 3 ESM)
 
 (function () {
     var newProfession = function (name, image) { //default spell object constructor
@@ -566,7 +566,7 @@ function unlockHerb() {
         herbList.LillyWisp.Stats.isShown = true;
     };
 };
-playerProfessionHtml();
+// playerProfessionHtml() init call moved to initGame() in src/main.js (Phase 3 ESM)
 
 
 /*------------------------------------------------------------------------------------------------

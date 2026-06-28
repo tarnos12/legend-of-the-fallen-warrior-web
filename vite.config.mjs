@@ -9,6 +9,8 @@ import { defineConfig } from 'vite';
 export default defineConfig({
   server: {
     open: false,
-    port: 5173,
+    // Honour the PORT assigned by the preview harness (autoPort) so multiple
+    // sessions don't collide on 5173; falls back to 5173 for plain `npm run dev`.
+    port: Number(process.env.PORT) || 5173,
   },
 });

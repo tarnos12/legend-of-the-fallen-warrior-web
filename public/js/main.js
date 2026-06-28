@@ -596,7 +596,7 @@ function createEquippedItemsObject(typeOfTheItem) {
     };
 };
 
-createEquippedItemsObject('all');
+// createEquippedItemsObject('all') init call moved to initGame() in src/main.js (Phase 3 ESM)
 
 var maxLogLines = 12;
 var logData = {
@@ -983,7 +983,7 @@ function copyPlayerProperties() {
         };
     };
 };
-copyPlayerProperties();
+// copyPlayerProperties() init call moved to initGame() in src/main.js (Phase 3 ESM)
 
 function changeGameStyling(style) {
     if (style === "basic") {
