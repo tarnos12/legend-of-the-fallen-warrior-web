@@ -2,7 +2,7 @@
 import { weaponMastery } from './weaponMastery.js';
 import { weaponSkillList } from './skills.js';
 import { characterRaces } from './gameObjects.js';
-import { player, equippedItems } from './core.js';
+import { player, equippedItems, logData } from './core.js';
 import { monsterList } from './monsterList.js';
 function startBattle(monster) {
     //Add buttons <Attack><Defense><Spell><Item><Run?> -->"Spell" change name based on character class later on: Spell/Skill/Runes/Combo/etc...
@@ -44,9 +44,7 @@ function startBattle(monster) {
     $("#" + area).empty().append(html);
     $("#battleButtons").append('<button class="sell c3 marginRight" data-toggle="tooltip" data-placement="top" title="Attack with equipped weapon" onclick="playerAttack(' + "'" + monster + "'" + ');">Attack</button>');
     $("#battleButtons").append('<button class="sell c3" data-toggle="tooltip" data-placement="top" title="Choose your spell" onclick="playerSpellDiv(' + "'" + monster + "'" + ');">Spells</button>');
-    logData = {
-        length: 0
-    };
+    logData.length = 0;
     $("#logConsole").empty();
     testss();
     playerSpellDiv(monster);
@@ -91,9 +89,7 @@ function playerSpellDiv(monster) {
     $('.collapse').collapse('toggle');
 };
 function playerAttack(monster) {
-    logData = {
-        length: 0
-    };
+    logData.length = 0;
     $("#logConsole").empty();
     var animationSrc = 'src="images/animations/slashAnimation.gif"';
     $("#monsterImage").append('<img id="animation"' + animationSrc + 'style="position:absolute; left:45%; top:50%;">');
@@ -140,9 +136,7 @@ function playerCritCheck(monster) {
     playerDamage(monster, damage, "basic attack.", damageType);
 };
 function playerSpellDamage(monster, weapon, name, type, skillKey) {
-    logData = {
-        length: 0
-    };
+    logData.length = 0;
     $("#logConsole").empty();
     if (player.properties.mana >= weaponSkillList[weapon][skillKey].manaCost) {
         var bonusDamage = 0;

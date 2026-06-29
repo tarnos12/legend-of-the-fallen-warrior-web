@@ -6,7 +6,7 @@ import {
     emptyItemSlotInfo, InventoryItemTypes, monsterAreas, weaponTypeObject,
     characterRaces, raceStats,
 } from './gameObjects.js';
-import { player, equippedItems } from './core.js';
+import { player, equippedItems, playerInventory } from './core.js';
 import { monsterList } from './monsterList.js';
 //Create player Weapon skill html
 var weaponTabActive = 'swordTest';
@@ -1304,12 +1304,12 @@ function saveGameSlot() {
 };
 
 
-// Shop stock: reassigned wholesale by rerollShopItems() and read/mutated by
-// core.js (sortShop) and itemDrop.js, so share via window.* (a module `var`
-// would desync on reassignment). (Phase 3 ESM transition bridge.)
-window.itemShopWeapon = [];
-window.itemShopArmor = [];
-window.itemShopAccessory = [];
+// Shop stock arrays: exported and mutated in place (rerollShopItems clears them
+// with .length = 0 instead of reassigning), read by core.js (sortShop) and
+// itemDrop.js. The *Amount counters are reassigned primitives -> src/state.js.
+export const itemShopWeapon = [];
+export const itemShopArmor = [];
+export const itemShopAccessory = [];
 window.weaponAmount = 0;
 window.armorAmount = 0;
 window.accessoryAmount = 0;
@@ -1535,9 +1535,9 @@ function refillShopInterval() {
 };
 
 function rerollShopItems() {
-    itemShopWeapon = [];
-    itemShopArmor = [];
-    itemShopAccessory = [];
+    itemShopWeapon.length = 0;
+    itemShopArmor.length = 0;
+    itemShopAccessory.length = 0;
     weaponAmount = 0;
     armorAmount = 0;
     accessoryAmount = 0;

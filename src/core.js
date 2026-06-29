@@ -3,6 +3,7 @@ import { weaponMastery } from './weaponMastery.js';
 import { playerPassive, weaponSkillList } from './skills.js';
 import { loadingEquippedItems, monsterAreas, characterRaces } from './gameObjects.js';
 import { monsterList, MakeMonsterList } from './monsterList.js';
+import { itemShopWeapon, itemShopArmor, itemShopAccessory } from './dynamicHtml.js';
 
 //Player log
 function Log(data) {
@@ -607,12 +608,15 @@ var maxLogLines = 12;
 // save.js, itemDrop/itemSell, dynamicHtml). As an ES module a `var` would be
 // module-scoped, so other modules' bare reassignments would throw (strict mode)
 // or desync. Keep on window for now (to be moved into src/state.js).
-window.logData = {
+// logData (the console ring-buffer) and playerInventory are mutated in place and
+// exported; their few "reset" sites assign .length = 0 instead of a new object/
+// array, so they never need reassignment across modules.
+var logData = {
     length: 0
 };
+var playerInventory = [];
+//Reassigned primitives still shared via window (moved to src/state.js next):
 window.battleTurn = undefined;
-//Array to store player items
-window.playerInventory = [];
 window.damageTaken = 0;
 
 // These scratch/multiplier vars are only used within core.js (the apparent
@@ -678,9 +682,7 @@ function mainLog() {
         })
        
     };
-    logData = {
-        length: 0
-    };
+    logData.length = 0;
 };
 function deathLog() {
     $(document).ready(function () {
@@ -1129,4 +1131,4 @@ Object.assign(window, {
 // them instead of reading window globals. Circular imports with the provider
 // modules (weaponMastery/skills/gameObjects) are safe: every cross-module use is
 // inside a function/method body (runtime), never at module-eval.
-export { player, equippedItems, defaultValues };
+export { player, equippedItems, defaultValues, playerInventory, logData };

@@ -3,7 +3,7 @@ import { weaponMastery } from './weaponMastery.js';
 import { playerPassive } from './skills.js';
 import { characterRaces } from './gameObjects.js';
 import { playerProfession } from './professions.js';
-import { player, equippedItems, defaultValues } from './core.js';
+import { player, equippedItems, defaultValues, playerInventory } from './core.js';
 import { monsterList, MakeMonsterList } from './monsterList.js';
 // Map a save slot (0-3) to its localStorage key. Slot 0 historically uses the
 // bare key "EncodedSave"; slots 1-3 append the number.
@@ -152,7 +152,11 @@ function load(slot) {
 
         if (typeof savegame.backpackStatus !== "undefined") backpackStatus = savegame.backpackStatus;
         if (typeof savegame.statStatus !== "undefined") statStatus = savegame.statStatus;
-        if (typeof savegame.inventory !== "undefined") playerInventory = savegame.inventory;
+        if (typeof savegame.inventory !== "undefined") {
+            // mutate the exported array in place (it's an imported read-only binding)
+            playerInventory.length = 0;
+            playerInventory.push.apply(playerInventory, savegame.inventory);
+        }
 
         document.getElementById("gold").innerHTML = player.properties.gold;
         MakeMonsterList();
