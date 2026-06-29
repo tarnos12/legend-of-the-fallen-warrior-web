@@ -1,4 +1,5 @@
 ﻿"use strict";
+import { player } from './core.js';
 function MakeMonsterList() {
     var newMonster = function (level, name, displayName, id, area) {
         this.difficultyMultiplier = function () {

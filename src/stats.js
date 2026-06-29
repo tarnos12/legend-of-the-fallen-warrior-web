@@ -1,6 +1,7 @@
 ﻿"use strict";
 import { playerPassive } from './skills.js';
 import { characterRaces } from './gameObjects.js';
+import { player, equippedItems } from './core.js';
 function updateHtml() {
     if (player.properties.stats >= 1) { // Show "plus" image when player level up
         document.getElementById("Strength").style.visibility = "visible";

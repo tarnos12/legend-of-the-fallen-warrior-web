@@ -1,4 +1,5 @@
 ﻿"use strict";
+import { player } from './core.js';
 var itemToCraft = [
 {
     weapon: [

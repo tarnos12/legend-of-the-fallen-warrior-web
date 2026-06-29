@@ -1115,7 +1115,14 @@ Object.assign(window, {
     changeGameStyling, getNumberMultiplierofFive, getTen, getThousands,
     changeDifficulty, rebirth, compare, getStartingItem,
     // stable data objects / constants (mutated in place or read-only)
-    currentGameVersion, defaultValues, equipmentSlots, armorSlots, player,
-    equippedItems, maxLogLines, equipSlotSubTypes, weaponTypeFlags,
+    currentGameVersion, equipmentSlots, armorSlots,
+    maxLogLines, equipSlotSubTypes, weaponTypeFlags,
     slotInventorySpace, unequipSlots,
 });
+
+// Phase 3 ESM: player / equippedItems / defaultValues are core game state, never
+// reassigned (mutated in place), so they are real exports now. Consumers import
+// them instead of reading window globals. Circular imports with the provider
+// modules (weaponMastery/skills/gameObjects) are safe: every cross-module use is
+// inside a function/method body (runtime), never at module-eval.
+export { player, equippedItems, defaultValues };

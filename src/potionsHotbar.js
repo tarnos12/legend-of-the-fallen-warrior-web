@@ -1,4 +1,5 @@
 ﻿"use strict";
+import { player } from './core.js';
 
 //Potion list
 (function() {

@@ -4,6 +4,7 @@ import {
     itemToCraft, itemWeaponSubType, itemArmorSubType, itemAccessorySubType,
     InventoryItemTypes,
 } from './gameObjects.js';
+import { player } from './core.js';
 var craftCost = [
     {
         type: 'Common',

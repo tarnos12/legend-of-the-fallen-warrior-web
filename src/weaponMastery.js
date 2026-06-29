@@ -1,4 +1,5 @@
 ﻿"use strict";
+import { player } from './core.js';
 // Phase 3 ESM: exported as a real module binding (consumers import it instead of
 // reading a window global). weaponMastery is mutated in place (save.js sets
 // .level/.experience) but the binding itself is never reassigned.

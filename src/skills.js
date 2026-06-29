@@ -1,5 +1,6 @@
 ﻿"use strict";
 import { weaponMastery } from './weaponMastery.js';
+import { player } from './core.js';
 //Spells
 (function () {
     var weaponSpells = function (name, weaponRarity) {
