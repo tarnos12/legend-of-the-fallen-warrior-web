@@ -46,4 +46,14 @@ function initGame() {
     createMinerals();
     playerProfessionHtml();
 }
+
+// Dev-only: startingScreen() autoplays the background music (myAudio.play()).
+// That's intended for real players, but it's noisy on every preview reload, so
+// mute it under the Vite dev server only. import.meta.env.DEV is false in a
+// production build, so shipped behaviour is unchanged.
+if (import.meta.env.DEV) {
+    const devAudio = document.getElementById('myAudio');
+    if (devAudio) devAudio.muted = true;
+}
+
 initGame();
