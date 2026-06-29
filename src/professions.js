@@ -397,7 +397,9 @@ function createMinerals() {
 
 // createMinerals() init call moved to initGame() in src/main.js (Phase 3 ESM)
 
-(function () {
+// Phase 3 ESM: playerProfession is built here and exported (read by save.js for
+// profession level/exp persistence). Mutated in place, never reassigned.
+export const playerProfession = (function () {
     var newProfession = function (name, image) { //default spell object constructor
         this.level = 1;
         this.maxLevel = 100;
@@ -470,12 +472,12 @@ function createMinerals() {
         return ['Beginner', 'Intermediate', 'Master'];
     };
      
-    window.playerProfession = new Object();
+    var playerProfession = new Object();
     playerProfession.mining = mining;
     playerProfession.herbalism = herbalism;
     playerProfession.crafting = crafting;
     playerProfession.alchemy = alchemy;
-
+    return playerProfession;
 })();
 
 
@@ -1181,21 +1183,16 @@ function craftingHtml2() {
     testss();
 };
 
-// Re-expose top-level functions (called by inline onclick handlers, by core.js's
-// newGame, and by initGame) and the individual mineral/herb data objects (read
-// by core.js and potionsHotbar.js). playerProfession is already on window via
-// the IIFE above; the crafting-state vars and herb/mineral lists are
-// professions-internal and stay module-scoped. Objects are only mutated in
-// place, so sharing the reference is safe. (Phase 3 ESM transition bridge.)
+// Re-expose top-level functions on window: called by inline onclick handlers, by
+// core.js's newGame, and by initGame. These stay on window until the inline
+// onclick handlers are migrated. playerProfession is a real export (above); the
+// mineral/herb data objects, crafting-state vars, and herb/mineral lists are all
+// professions-internal (the apparent cross-file hits were object keys/strings),
+// so they stay module-scoped. (Phase 3 ESM transition bridge.)
 Object.assign(window, {
-    // functions
     createHerbs, createMinerals, gather, unlockMineral, unlockHerb,
     createAlchemyHtml, createPotion, playerProfessionHtml, professionGatherHtml,
     changeItemType, changeItemBonus, craftingHtml, craftingHtmlButtons,
     craftItemQuality, displayCraftedItem, craftingBackground, craftItem,
     craftingHtml2,
-    // mineral/herb data objects read cross-file
-    Thaumerite, LiteCyan, OhmStone, Techtite, XilBond, VulcanatedIron,
-    RusinsSinew, EssenceofWillow, SinnersDelight, BarletBark, Vystim,
-    ThistleWart, LillyWisp,
 });
