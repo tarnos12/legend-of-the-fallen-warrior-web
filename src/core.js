@@ -602,29 +602,32 @@ function createEquippedItemsObject(typeOfTheItem) {
 // createEquippedItemsObject('all') init call moved to initGame() in src/main.js (Phase 3 ESM)
 
 var maxLogLines = 12;
-// Shared mutable state: these are reassigned and/or read across files (battle.js,
+// Genuinely shared mutable state (reassigned and/or read across files: battle.js,
 // save.js, itemDrop/itemSell, dynamicHtml). As an ES module a `var` would be
 // module-scoped, so other modules' bare reassignments would throw (strict mode)
-// or desync. Keep them as window.* properties so every file shares one slot.
+// or desync. Keep on window for now (to be moved into src/state.js).
 window.logData = {
     length: 0
 };
 window.battleTurn = undefined;
 //Array to store player items
 window.playerInventory = [];
-window.damageDealt = 0;
-window.magicDamage = 0;
-window.blockRate = 0;
-window.counterDamage = 0;
-window.lifeStealAmount = 0;
-window.magicDamageDealt = 0;
 window.damageTaken = 0;
-window.criticalRate = 0;
-window.enemyBlock = 0;
-window.accuracyRate = 0;
-window.monsterDamage = 0;
 
-window.number = 1;
+// These scratch/multiplier vars are only used within core.js (the apparent
+// cross-file hits are unrelated .method names / .number data props / locals), so
+// they are plain module-local vars now — no window, no sharing.
+var damageDealt = 0;
+var magicDamage = 0;
+var blockRate = 0;
+var counterDamage = 0;
+var lifeStealAmount = 0;
+var magicDamageDealt = 0;
+var criticalRate = 0;
+var enemyBlock = 0;
+var accuracyRate = 0;
+var monsterDamage = 0;
+var number = 1;
 function disableButtons() {
     if (number === 1) {
         $('a#monsterButton').css('cursor', 'not-allowed');
@@ -1046,7 +1049,7 @@ function getThousands(n) {
         return Math.floor(n);
     };
 };
-window.monsterKillCount = [];
+var monsterKillCount = []; // core.js-only
 function changeDifficulty(type, rebirth) {
     for (var key in monsterList) {
         var monster = monsterList[key];
