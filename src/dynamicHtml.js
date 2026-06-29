@@ -1,5 +1,6 @@
 "use strict";
 import { weaponMastery } from './weaponMastery.js';
+import { playerPassive, weaponSkillList } from './skills.js';
 //Create player Weapon skill html
 var weaponTabActive = 'swordTest';
 function changeTabWeapon(index) {

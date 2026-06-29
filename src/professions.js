@@ -1,4 +1,5 @@
 ﻿"use strict";
+import { playerPassive } from './skills.js';
 var craftCost = [
     {
         type: 'Common',

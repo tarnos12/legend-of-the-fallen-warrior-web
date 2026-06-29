@@ -15,7 +15,9 @@ import { weaponMastery } from './weaponMastery.js';
 
 })();
 //Skills
-(function() {
+// Phase 3 ESM: export real bindings (built in the IIFE, returned). Both objects
+// are mutated in place (save.js sets levels) but never reassigned.
+export const { playerPassive, weaponSkillList } = (function() {
     var newPassive = function(level, maxLevel, levelReq, name, image, bonus, bonusName, isPercentage) { //default spell object constructor
         this.level = level;
         this.maxLevel = maxLevel;
@@ -120,7 +122,7 @@ import { weaponMastery } from './weaponMastery.js';
     storage.firstRow = true;
     miningCritical.lastRow = true;
 
-    window.playerPassive = new Object();
+    var playerPassive = new Object();
     playerPassive.preciseAttack = preciseAttack;
     playerPassive.piercingAttack = piercingAttack;
     playerPassive.assasination = assasination;
@@ -637,10 +639,11 @@ import { weaponMastery } from './weaponMastery.js';
     ranged.makeItRain = makeItRain;
     ranged.rangersRevenge = rangersRevenge;
 
-    window.weaponSkillList = new Object();
+    var weaponSkillList = new Object();
     weaponSkillList.sword = sword;
     weaponSkillList.axe = axe;
     weaponSkillList.mace = mace;
     weaponSkillList.staff = staff;
     weaponSkillList.ranged = ranged;
+    return { playerPassive, weaponSkillList };
 })();
