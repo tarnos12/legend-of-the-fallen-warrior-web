@@ -1,4 +1,8 @@
 ﻿"use strict";
+import {
+    itemTypes, itemWeaponSubType, itemArmorSubType, itemAccessorySubType,
+    itemPower, itemRarity, itemBaseMod, itemModifiers,
+} from './gameObjects.js';
 function monsterItemDrop(monster) {
     var itemDropNumber = 0;
         var randomItemChance = Math.floor(Math.random() * (1000 - 1) + 1);

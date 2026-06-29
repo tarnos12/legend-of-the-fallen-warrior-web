@@ -1,5 +1,9 @@
 ﻿"use strict";
 import { playerPassive } from './skills.js';
+import {
+    itemToCraft, itemWeaponSubType, itemArmorSubType, itemAccessorySubType,
+    InventoryItemTypes,
+} from './gameObjects.js';
 var craftCost = [
     {
         type: 'Common',

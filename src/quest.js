@@ -1,4 +1,5 @@
 ﻿"use strict";
+import { monsterAreas } from './gameObjects.js';
 var monsterUnlock = {
     VarikSoldier: false,
     VarikMarksmen: false,

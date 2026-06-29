@@ -1,4 +1,5 @@
 ﻿"use strict";
+import { itemRarity } from './gameObjects.js';
 var total = 0;
 var inventoryId = [];
 function sellAllItems() {

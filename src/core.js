@@ -1,6 +1,7 @@
 "use strict";
 import { weaponMastery } from './weaponMastery.js';
 import { playerPassive, weaponSkillList } from './skills.js';
+import { loadingEquippedItems, monsterAreas, characterRaces } from './gameObjects.js';
 
 //Player log
 function Log(data) {
