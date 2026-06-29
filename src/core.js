@@ -2,6 +2,7 @@
 import { weaponMastery } from './weaponMastery.js';
 import { playerPassive, weaponSkillList } from './skills.js';
 import { loadingEquippedItems, monsterAreas, characterRaces } from './gameObjects.js';
+import { monsterList, MakeMonsterList } from './monsterList.js';
 
 //Player log
 function Log(data) {

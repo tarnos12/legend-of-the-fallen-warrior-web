@@ -7,6 +7,7 @@ import {
     characterRaces, raceStats,
 } from './gameObjects.js';
 import { player, equippedItems } from './core.js';
+import { monsterList } from './monsterList.js';
 //Create player Weapon skill html
 var weaponTabActive = 'swordTest';
 function changeTabWeapon(index) {

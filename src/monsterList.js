@@ -1,6 +1,13 @@
 ﻿"use strict";
 import { player } from './core.js';
-function MakeMonsterList() {
+
+// Phase 3 ESM: monsterList is a real export, mutated in place. MakeMonsterList
+// rebuilds it (formerly `window.monsterList = new Object()`); it now repopulates
+// the same exported object — the key set is always monster001..056, so no stale
+// keys accumulate and the behaviour is unchanged.
+export const monsterList = {};
+
+export function MakeMonsterList() {
     var newMonster = function (level, name, displayName, id, area) {
         this.difficultyMultiplier = function () {
             if (player.properties.difficulty === "Mortal") {
@@ -131,7 +138,7 @@ function MakeMonsterList() {
 
     monster056.lastEnemy = true;
 
-    window.monsterList = new Object();
+    // monsterList (exported const) is repopulated in place:
     monsterList.monster001 = monster001;
     monsterList.monster002 = monster002;
     monsterList.monster003 = monster003;
@@ -189,9 +196,4 @@ function MakeMonsterList() {
     monsterList.monster055 = monster055;
     monsterList.monster056 = monster056;
 }
-
-// Re-expose on window for still-classic callers (main.js) and converted modules
-// (save.js) that invoke MakeMonsterList() by bare name. monsterList itself is
-// already published via window.monsterList inside the function above.
-window.MakeMonsterList = MakeMonsterList;
 
