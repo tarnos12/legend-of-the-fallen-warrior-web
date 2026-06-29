@@ -8,6 +8,7 @@ import {
 } from './gameObjects.js';
 import { player, equippedItems, playerInventory } from './core.js';
 import { monsterList } from './monsterList.js';
+import { state } from './state.js';
 //Create player Weapon skill html
 var weaponTabActive = 'swordTest';
 function changeTabWeapon(index) {
@@ -294,31 +295,31 @@ function checkBoxHtml() {
     html += '<div class="col-xs-10 col-xs-offset-1">';
     html += '<div class="centerText">';
     html += '<br /><label><input style="visibility:visible; position:relative;" type="checkbox" id="common" onclick="handleClick();"'
-    if (checkBoxCommon === true) {
+    if (state.checkBoxCommon === true) {
         html += "checked";
     }
     html += '><span style="background-color:gray; width:10px;height:10px;" data-toggle="tooltip" data-placement="top" title="Common">__</span></label>';
 
     html += '<label><input style="visibility:visible; position:relative;" type="checkbox" id="uncommon" onclick="handleClick();"'
-    if (checkBoxUncommon === true) {
+    if (state.checkBoxUncommon === true) {
         html += "checked";
     }
     html += '><span style="background-color:green; width:10px;height:10px;" data-toggle="tooltip" data-placement="top" title="Uncommon">__</span></label>';
 
     html += '<label><input style="visibility:visible; position:relative;" type="checkbox" id="rare" onclick="handleClick();"'
-    if (checkBoxRare === true) {
+    if (state.checkBoxRare === true) {
         html += "checked";
     }
     html += '><span style="background-color:blue; width:10px;height:10px;" data-toggle="tooltip" data-placement="top" title="Rare">__</span></label>';
 
     html += '<label><input style="visibility:visible; position:relative;" type="checkbox" id="epic" onclick="handleClick();"'
-    if (checkBoxEpic === true) {
+    if (state.checkBoxEpic === true) {
         html += "checked";
     }
     html += '><span style="background-color:orange; width:10px;height:10px;" data-toggle="tooltip" data-placement="top" title="Epic">__</span></label>';
 
     html += '<label><input style="visibility:visible; position:relative;" type="checkbox" id="legendary" onclick="handleClick();"'
-    if (checkBoxLegendary === true) {
+    if (state.checkBoxLegendary === true) {
         html += "checked";
     }
     html += '><span style="background-color:red; width:10px;height:10px;" data-toggle="tooltip" data-placement="top" title="Legendary">__</span></label><br />';
@@ -1310,9 +1311,7 @@ function saveGameSlot() {
 export const itemShopWeapon = [];
 export const itemShopArmor = [];
 export const itemShopAccessory = [];
-window.weaponAmount = 0;
-window.armorAmount = 0;
-window.accessoryAmount = 0;
+// weaponAmount/armorAmount/accessoryAmount are reassigned primitives -> state.js
 function getShopItem() {
     var shopItemAmount = 100;
     var shopItemLevel = player.properties.level;
@@ -1458,7 +1457,7 @@ function ShopBuyButtons() {
     var html = '';
     html += '<div class="row">';
     html += '<div class="col-xs-4 col-xs-offset-4">';
-    html += '<button type="button" class="shopButton" onclick="itemBuy' + "(" + checkedShopItem + ")" + '">Buy</button>';
+    html += '<button type="button" class="shopButton" onclick="itemBuy' + "(" + state.checkedShopItem + ")" + '">Buy</button>';
     html += '<button type="button" class="shopButton" onclick="rerollShopItems()">Refresh</button>';
     html += '</div>';
     html += '</div>';
@@ -1478,7 +1477,7 @@ function itemBuy(id) {
                 itemShopWeapon.splice(index, 1);
             };
             displayShopItems(itemShopWeapon);
-            weaponAmount--;
+            state.weaponAmount--;
         };
         };
 
@@ -1496,7 +1495,7 @@ function itemBuy(id) {
                         itemShopArmor.splice(index, 1);
                     };
                     displayShopItems(itemShopArmor);
-                    armorAmount--;
+                    state.armorAmount--;
                 };
             };
             if (item === undefined) {
@@ -1513,7 +1512,7 @@ function itemBuy(id) {
                             itemShopAccessory.splice(index, 1);
                         };
                         displayShopItems(itemShopAccessory);
-                        accessoryAmount--;
+                        state.accessoryAmount--;
                     };
                 };
             };
@@ -1538,9 +1537,9 @@ function rerollShopItems() {
     itemShopWeapon.length = 0;
     itemShopArmor.length = 0;
     itemShopAccessory.length = 0;
-    weaponAmount = 0;
-    armorAmount = 0;
-    accessoryAmount = 0;
+    state.weaponAmount = 0;
+    state.armorAmount = 0;
+    state.accessoryAmount = 0;
     getShopItem();
 };
 

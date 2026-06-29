@@ -5,6 +5,7 @@ import {
 } from './gameObjects.js';
 import { player, playerInventory } from './core.js';
 import { itemShopWeapon, itemShopArmor, itemShopAccessory } from './dynamicHtml.js';
+import { state } from './state.js';
 function monsterItemDrop(monster) {
     var itemDropNumber = 0;
         var randomItemChance = Math.floor(Math.random() * (1000 - 1) + 1);
@@ -396,10 +397,10 @@ function getBonusItemMod(monster, dropItem, isDrop) {
         var itemHolder = [];
         if (dropItem.isCrafted === undefined) {
             if (isDrop === true) {
-                if (dropItem.itemRarity === 'Common' && checkBoxCommon === false ||
-                                    dropItem.itemRarity === 'Uncommon' && checkBoxUncommon === false ||
-                                    dropItem.itemRarity === 'Rare' && checkBoxRare === false ||
-                                    dropItem.itemRarity === 'Epic' && checkBoxEpic === false ||
+                if (dropItem.itemRarity === 'Common' && state.checkBoxCommon === false ||
+                                    dropItem.itemRarity === 'Uncommon' && state.checkBoxUncommon === false ||
+                                    dropItem.itemRarity === 'Rare' && state.checkBoxRare === false ||
+                                    dropItem.itemRarity === 'Epic' && state.checkBoxEpic === false ||
                                     dropItem.itemRarity === 'Legendary') {
 
                     itemHolder = [];
@@ -416,11 +417,11 @@ function getBonusItemMod(monster, dropItem, isDrop) {
                 };
             }
             else {
-                if (accessoryAmount < 20 && dropItem.itemType === "accessory" ||
-                    weaponAmount < 20 && dropItem.itemType === "weapon" ||
-                    armorAmount < 20 && dropItem.itemType === "armor") {
+                if (state.accessoryAmount < 20 && dropItem.itemType === "accessory" ||
+                    state.weaponAmount < 20 && dropItem.itemType === "weapon" ||
+                    state.armorAmount < 20 && dropItem.itemType === "armor") {
                     if (dropItem.itemType === "accessory") {
-                        accessoryAmount += 1;
+                        state.accessoryAmount += 1;
                         dropItem["shopPrice"] = Math.floor(dropItem.Value * 10);
                         itemHolder = [];
                         itemHolder.push(dropItem);
@@ -431,7 +432,7 @@ function getBonusItemMod(monster, dropItem, isDrop) {
                         player.properties.itemIdNumber += 1;
                     }
                     else if (dropItem.itemType === "weapon") {
-                        weaponAmount += 1;
+                        state.weaponAmount += 1;
                         dropItem["shopPrice"] = Math.floor(dropItem.Value * 10);
                         itemHolder = [];
                         itemHolder.push(dropItem);
@@ -442,7 +443,7 @@ function getBonusItemMod(monster, dropItem, isDrop) {
                         player.properties.itemIdNumber += 1;
                     }
                     else if (dropItem.itemType === "armor") {
-                        armorAmount += 1;
+                        state.armorAmount += 1;
                         dropItem["shopPrice"] = Math.floor(dropItem.Value * 10);
                         itemHolder = [];
                         itemHolder.push(dropItem);
@@ -755,10 +756,10 @@ function getBonusItemMod(monster, dropItem, isDrop) {
                     };
                 };
                 dropItem["value"] = getItemValue(dropItem); //Get item value function.
-                if (dropItem.itemQuality === 'Common' && checkBoxCommon === false ||
-                    dropItem.itemQuality === 'Uncommon' && checkBoxUncommon === false ||
-                    dropItem.itemQuality === 'Rare' && checkBoxRare === false ||
-                    dropItem.itemQuality === 'Epic' && checkBoxEpic === false ||
+                if (dropItem.itemQuality === 'Common' && state.checkBoxCommon === false ||
+                    dropItem.itemQuality === 'Uncommon' && state.checkBoxUncommon === false ||
+                    dropItem.itemQuality === 'Rare' && state.checkBoxRare === false ||
+                    dropItem.itemQuality === 'Epic' && state.checkBoxEpic === false ||
                     dropItem.itemQuality === 'Legendary') {
 
                     var itemHolder = [];

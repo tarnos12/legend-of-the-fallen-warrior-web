@@ -4,6 +4,7 @@ import { weaponSkillList } from './skills.js';
 import { characterRaces } from './gameObjects.js';
 import { player, equippedItems, logData } from './core.js';
 import { monsterList } from './monsterList.js';
+import { state } from './state.js';
 function startBattle(monster) {
     //Add buttons <Attack><Defense><Spell><Item><Run?> -->"Spell" change name based on character class later on: Spell/Skill/Runes/Combo/etc...
     //Display enemy at the top/or left/ AND  player at the bottom/or right side
@@ -274,7 +275,7 @@ function monsterDamageDeal(monsterDamage, monsterStats) {
         };
     };
     player.properties.health = player.properties.health - monsterDamage;
-    damageTaken += monsterDamage;
+    state.damageTaken += monsterDamage;
 
     Log("<span class =\"bold\" style=\"color:purple;\">Enemy hits you for " + monsterDamage + text + "." + "<br />" + "</span>");
     document.getElementById("health").innerHTML = player.properties.health + "/" + player.functions.maxhealth();
@@ -304,7 +305,7 @@ function playerDead(monsterStats) {
         Log("<span id=\"expLost\" class =\"bold\" style=\"color:red;\">You lost " + expLost + " experience." + "<br />" + "</span>");
         Log("<span id=\"playerDead\" class =\"bold\" style=\"color:red;\">You have died." + "<br />" + "</span>");
         Log("<span id=\"playerDead2\" class =\"bold\" style=\"color:red;\">You need to wait 5 seconds before you can fight again." + "<br />" + "</span>");
-        battleTurn = -1;
+        state.battleTurn = -1;
         displayLogInfo();
         deathLog();
         updateHtml();

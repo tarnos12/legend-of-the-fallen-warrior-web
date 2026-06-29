@@ -1,11 +1,12 @@
 ﻿"use strict";
 import { itemRarity } from './gameObjects.js';
 import { player, playerInventory } from './core.js';
+import { state } from './state.js';
 var total = 0;
 var inventoryId = [];
 function sellAllItems() {
     var canSell = false;
-    if (checkBoxEpic === true || checkBoxLegendary === true) {
+    if (state.checkBoxEpic === true || state.checkBoxLegendary === true) {
         if (confirm("You are going to sell Epic and/or Legendary items, are you sure?") === true) {
             canSell = true;
         }
@@ -18,11 +19,11 @@ function sellAllItems() {
     }
     if (canSell === true) {
         for (var i = 0; i < playerInventory.length; i++) {
-            if ((playerInventory[i].itemRarity === 'Legendary' && checkBoxLegendary === true ||
-                playerInventory[i].itemRarity === 'Epic' && checkBoxEpic === true ||
-                playerInventory[i].itemRarity === 'Rare' && checkBoxRare === true ||
-                playerInventory[i].itemRarity === 'Uncommon' && checkBoxUncommon === true ||
-                playerInventory[i].itemRarity === 'Common' && checkBoxCommon === true)) {
+            if ((playerInventory[i].itemRarity === 'Legendary' && state.checkBoxLegendary === true ||
+                playerInventory[i].itemRarity === 'Epic' && state.checkBoxEpic === true ||
+                playerInventory[i].itemRarity === 'Rare' && state.checkBoxRare === true ||
+                playerInventory[i].itemRarity === 'Uncommon' && state.checkBoxUncommon === true ||
+                playerInventory[i].itemRarity === 'Common' && state.checkBoxCommon === true)) {
                 total += playerInventory[i].Value << 0;
                 var item = "testingItem" + playerInventory[i].id;
                 $('#' + item).remove();

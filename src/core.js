@@ -4,6 +4,7 @@ import { playerPassive, weaponSkillList } from './skills.js';
 import { loadingEquippedItems, monsterAreas, characterRaces } from './gameObjects.js';
 import { monsterList, MakeMonsterList } from './monsterList.js';
 import { itemShopWeapon, itemShopArmor, itemShopAccessory } from './dynamicHtml.js';
+import { state } from './state.js';
 
 //Player log
 function Log(data) {
@@ -606,18 +607,16 @@ function createEquippedItemsObject(typeOfTheItem) {
 var maxLogLines = 12;
 // Genuinely shared mutable state (reassigned and/or read across files: battle.js,
 // save.js, itemDrop/itemSell, dynamicHtml). As an ES module a `var` would be
-// module-scoped, so other modules' bare reassignments would throw (strict mode)
-// or desync. Keep on window for now (to be moved into src/state.js).
-// logData (the console ring-buffer) and playerInventory are mutated in place and
-// exported; their few "reset" sites assign .length = 0 instead of a new object/
-// array, so they never need reassignment across modules.
+// module-scoped. logData (the console ring-buffer) and playerInventory are
+// mutated in place and exported; their few "reset" sites assign .length = 0
+// instead of a new object/array, so they never need reassignment across modules.
 var logData = {
     length: 0
 };
 var playerInventory = [];
-//Reassigned primitives still shared via window (moved to src/state.js next):
-window.battleTurn = undefined;
-window.damageTaken = 0;
+// Reassigned primitives (battleTurn, damageTaken, the checkBox* flags,
+// checkedShopItem, hardcoreMode) now live on the shared `state` object in
+// src/state.js, imported above.
 
 // These scratch/multiplier vars are only used within core.js (the apparent
 // cross-file hits are unrelated .method names / .number data props / locals), so
@@ -850,22 +849,17 @@ function unequipItem(id, type) {
 
 
 
-// Read by itemSell.js and toggled by checkbox handlers -> shared via window.
-window.checkBoxCommon = false;
-window.checkBoxUncommon = false;
-window.checkBoxRare = false;
-window.checkBoxEpic = false;
-window.checkBoxLegendary = false;
-window.hardcoreMode = false;
+// checkBox* drop/sell-filter flags and hardcoreMode are shared mutable primitives
+// on the `state` object (src/state.js).
 function handleClick() {
-    checkBoxCommon = document.getElementById("common").checked;
-    checkBoxUncommon = document.getElementById("uncommon").checked;
-    checkBoxRare = document.getElementById("rare").checked;
-    checkBoxEpic = document.getElementById("epic").checked;
-    checkBoxLegendary = document.getElementById("legendary").checked;
+    state.checkBoxCommon = document.getElementById("common").checked;
+    state.checkBoxUncommon = document.getElementById("uncommon").checked;
+    state.checkBoxRare = document.getElementById("rare").checked;
+    state.checkBoxEpic = document.getElementById("epic").checked;
+    state.checkBoxLegendary = document.getElementById("legendary").checked;
 };
 function hardcoreModeCheck() {
-    hardcoreMode = document.getElementById("hardcoreMode").checked;
+    state.hardcoreMode = document.getElementById("hardcoreMode").checked;
 };
 
 function changeRace(raceName, race) {
@@ -954,10 +948,9 @@ function resetPassiveSkills() {
         primaryStatUpdate();
         secondaryStatUpdate();
 };
-window.checkedShopItem = '';
 $(document).on('change', 'input[name="shopItem"]', function () {
     var checkedShopItemInteger = $(this).val();
-    checkedShopItem = parseInt(checkedShopItemInteger, 10);
+    state.checkedShopItem = parseInt(checkedShopItemInteger, 10);
     ShopBuyButtons();
 });
 
