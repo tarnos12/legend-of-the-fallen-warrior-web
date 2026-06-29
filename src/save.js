@@ -1,4 +1,5 @@
 ﻿"use strict";
+import { weaponMastery } from './weaponMastery.js';
 // Map a save slot (0-3) to its localStorage key. Slot 0 historically uses the
 // bare key "EncodedSave"; slots 1-3 append the number.
 function saveKeyForSlot(slot) {

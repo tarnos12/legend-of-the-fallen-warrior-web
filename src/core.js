@@ -1,4 +1,5 @@
 "use strict";
+import { weaponMastery } from './weaponMastery.js';
 
 //Player log
 function Log(data) {

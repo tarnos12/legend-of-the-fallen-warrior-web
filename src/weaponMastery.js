@@ -1,5 +1,8 @@
 ﻿"use strict";
-(function () {
+// Phase 3 ESM: exported as a real module binding (consumers import it instead of
+// reading a window global). weaponMastery is mutated in place (save.js sets
+// .level/.experience) but the binding itself is never reassigned.
+export const weaponMastery = (function () {
     var weaponSkillType = function(level, experience, maxExperience, image, name) {
         this.level = level;
         this.experience = experience;
@@ -78,10 +81,11 @@
     };
 
 
-    window.weaponMastery = new Object();
+    var weaponMastery = new Object();
     weaponMastery.sword = sword;
     weaponMastery.axe = axe;
     weaponMastery.mace = mace;
     weaponMastery.staff = staff;
     weaponMastery.ranged = ranged;
+    return weaponMastery;
 })();
