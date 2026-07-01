@@ -1657,118 +1657,79 @@ var shopItemTabs = [
 ];
 
 function createShopTabs() {
-    var html = '';
-    html += '<ul class="nav nav-tabs">';
+    const tabs = shopItemTabs.slice(0, 4);
+    const navTabs = tabs
+        .map(
+            (tab, i) =>
+                `<li${i === 0 ? ' class="active"' : ''}>` +
+                `<a href="#tab_${tab.name}" data-toggle="tab"><span class="icons ${tab.type}" data-toggle="tooltip" data-placement="top" title="${tab.name.capitalizeFirstLetter()}"></span>` +
+                `</li>`
+        )
+        .join('');
+    const panes = tabs
+        .map(
+            (tab, i) =>
+                `<div class="tab-pane ${i === 0 ? 'active' : ''}" id="tab_${tab.name}">` +
+                `<div id="${tab.name}"></div>` +
+                `</div>`
+        )
+        .join('');
 
-    for (var i = 0; i < 4; i++) {
-        if (i === 0) {
-            html += '<li class="active">';
-        } else {
-            html += '<li>';
-        }
-        html +=
-            '<a href="#tab_' +
-            shopItemTabs[i].name +
-            '" data-toggle="tab"><span class="icons ' +
-            shopItemTabs[i].type +
-            '" data-toggle="tooltip" data-placement="top" title="' +
-            shopItemTabs[i].name.capitalizeFirstLetter() +
-            '"></span>';
-        html += '</li>';
-    }
-
-    html += '</ul>';
-    html += '<div class="tab-content">';
-
-    for (var i = 0; i < 4; i++) {
-        html += '<div class="tab-pane ';
-        if (i === 0) {
-            html += 'active" ';
-        } else {
-            html += '" ';
-        }
-        html += 'id="tab_' + shopItemTabs[i].name + '">';
-        html += '<div id="' + shopItemTabs[i].name + '"></div>';
-        html += '</div>';
-    }
-    html += '</div>';
-
-    document.getElementById('shopTabs').innerHTML = html;
+    document.getElementById('shopTabs').innerHTML =
+        `<ul class="nav nav-tabs">${navTabs}</ul><div class="tab-content">${panes}</div>`;
 }
 
 function displayShopItems(type) {
-    var html = '';
-    var itemTypeDisplay = type;
-    var event = '';
-    var event2 = '';
-    if (type === itemShopWeapon) {
-        event = 'onclick="sortShop' + '(' + "'Value', " + "'Weapon'" + ')' + '">';
-        event2 = 'onclick="sortShop' + '(' + "'Rarity', " + "'Weapon'" + ')' + '">';
-    } else if (type === itemShopArmor) {
-        event = 'onclick="sortShop' + '(' + "'Value', " + "'Armor'" + ')' + '">';
-        event2 = 'onclick="sortShop' + '(' + "'Rarity', " + "'Armor'" + ')' + '">';
-    } else if (type === itemShopAccessory) {
-        event = 'onclick="sortShop' + '(' + "'Value', " + "'Accessory'" + ')' + '">';
-        event2 = 'onclick="sortShop' + '(' + "'Rarity', " + "'Accessory'" + ')' + '">';
-    }
-    html += '<div class="row">';
-    html += '<div class="col-xs-10 col-xs-offset-1">';
-    html += '<div class="shopItemBuy"></div>';
-    html += '<div class="c3">Sort by:<br />';
-    html += '<button type="button" ' + event + 'Value' + '</button>';
-    html += '<button type="button" ' + event2 + 'Rarity' + '</button>';
-    html += '</div>';
-    html += '<div class="row">';
-    html += '<div class="col-xs-12">';
-    html += '<div class="c3"><h3>Item Shop</h3></div></div>';
-    for (var i = 0; i < itemTypeDisplay.length; i++) {
-        var itemDisplay = itemTypeDisplay[i];
-        html += '<div class="col-xs-3">';
-        html += '<a class="tooltips" style="cursor:pointer;">';
-        html += '<label> <input type="radio" name="shopItem" value=' + itemDisplay.id + '>';
-        if (itemDisplay.itemType === 'weapon') {
-            html += '<img class="' + itemDisplay.itemType + ', ' + itemDisplay.itemRarity;
-        } else {
-            html += '<img class="' + itemDisplay.subType + ', ' + itemDisplay.itemRarity;
-        }
-        html +=
-            '"' + 'src="images/items/' + itemDisplay.subType + '/' + itemDisplay.image + '.png"/>';
-        html += '</label>';
-        html += '<span style="width:300px;left:10px; bottom:40px;">';
-        html += '<div class="row">';
-        html += '<div class="col-xs-10 col-xs-offset-1">';
-        html += itemTooltipTest(itemDisplay);
-        html += '<strong>Left-Click to equip</strong>';
-        html += '</div></div>';
-        html += '</span>' + '</a>';
-        html += '<br />' + itemDisplay.shopPrice + ' Gold';
-        html += '</div>';
-    }
+    // The sort buttons need the category name in their onclick; the target
+    // container is chosen from the same three arrays.
+    let category = '';
+    let containerId = '';
+    if (type === itemShopWeapon) [category, containerId] = ['Weapon', 'shopWeapon'];
+    else if (type === itemShopArmor) [category, containerId] = ['Armor', 'shopArmor'];
+    else if (type === itemShopAccessory) [category, containerId] = ['Accessory', 'shopAccessory'];
 
-    html += '</div></div></div>';
-    if (type === itemShopWeapon) {
-        document.getElementById('shopWeapon').innerHTML = html;
-    } else if (type === itemShopArmor) {
-        document.getElementById('shopArmor').innerHTML = html;
-    } else if (type === itemShopAccessory) {
-        document.getElementById('shopAccessory').innerHTML = html;
-    }
+    const items = type
+        .map((item) => {
+            const imgClass = item.itemType === 'weapon' ? item.itemType : item.subType;
+            return (
+                `<div class="col-xs-3">` +
+                `<a class="tooltips" style="cursor:pointer;">` +
+                `<label> <input type="radio" name="shopItem" value=${item.id}>` +
+                `<img class="${imgClass}, ${item.itemRarity}" src="images/items/${item.subType}/${item.image}.png"/>` +
+                `</label>` +
+                `<span style="width:300px;left:10px; bottom:40px;">` +
+                `<div class="row"><div class="col-xs-10 col-xs-offset-1">` +
+                itemTooltipTest(item) +
+                `<strong>Left-Click to equip</strong>` +
+                `</div></div></span></a>` +
+                `<br />${item.shopPrice} Gold` +
+                `</div>`
+            );
+        })
+        .join('');
+
+    const html =
+        `<div class="row"><div class="col-xs-10 col-xs-offset-1">` +
+        `<div class="shopItemBuy"></div>` +
+        `<div class="c3">Sort by:<br />` +
+        `<button type="button" onclick="sortShop('Value', '${category}')">Value</button>` +
+        `<button type="button" onclick="sortShop('Rarity', '${category}')">Rarity</button>` +
+        `</div>` +
+        `<div class="row"><div class="col-xs-12">` +
+        `<div class="c3"><h3>Item Shop</h3></div></div>` +
+        items +
+        `</div></div></div>`;
+
+    if (containerId) document.getElementById(containerId).innerHTML = html;
     ShopBuyButtons();
 }
 
 function ShopBuyButtons() {
-    var html = '';
-    html += '<div class="row">';
-    html += '<div class="col-xs-4 col-xs-offset-4">';
-    html +=
-        '<button type="button" class="shopButton" onclick="itemBuy' +
-        '(' +
-        state.checkedShopItem +
-        ')' +
-        '">Buy</button>';
-    html += '<button type="button" class="shopButton" onclick="rerollShopItems()">Refresh</button>';
-    html += '</div>';
-    html += '</div>';
+    const html =
+        `<div class="row"><div class="col-xs-4 col-xs-offset-4">` +
+        `<button type="button" class="shopButton" onclick="itemBuy(${state.checkedShopItem})">Buy</button>` +
+        `<button type="button" class="shopButton" onclick="rerollShopItems()">Refresh</button>` +
+        `</div></div>`;
     $('.shopItemBuy').empty().append(html);
 }
 
