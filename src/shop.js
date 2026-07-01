@@ -1,5 +1,5 @@
 ﻿"use strict";
-import { player } from './core.js';
+import { player, Log, potionBuyLog, notEnoughMoneyLog, inventoryBuyLog, statBuyLog } from './core.js';
 import { updateHtml } from './stats.js';
 import { createPotionInventory, potionList } from './potionsHotbar.js';
 var potionStatus = {};

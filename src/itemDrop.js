@@ -3,7 +3,7 @@ import {
     itemTypes, itemWeaponSubType, itemArmorSubType, itemAccessorySubType,
     itemPower, itemRarity, itemBaseMod, itemModifiers,
 } from './gameObjects.js';
-import { player, playerInventory } from './core.js';
+import { player, playerInventory, Log, itemDropLog, getNumberMultiplierofFive } from './core.js';
 import { itemShopWeapon, itemShopArmor, itemShopAccessory } from './dynamicHtml.js';
 import { state } from './state.js';
 import { updateHtml } from './stats.js';

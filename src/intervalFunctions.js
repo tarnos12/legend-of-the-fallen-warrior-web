@@ -6,7 +6,7 @@
 // public functions, however, are no longer auto-attached to window, so we
 // re-expose them explicitly for the remaining classic scripts and inline
 // handlers that still call them by name.
-import { player } from './core.js';
+import { player, Log } from './core.js';
 
 export function playerRevive() {
     setTimeout(

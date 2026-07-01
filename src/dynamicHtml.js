@@ -6,7 +6,7 @@ import {
     emptyItemSlotInfo, InventoryItemTypes, monsterAreas, weaponTypeObject,
     characterRaces, raceStats,
 } from './gameObjects.js';
-import { player, equippedItems, playerInventory } from './core.js';
+import { player, equippedItems, playerInventory, getThousands, compare } from './core.js';
 import { monsterList } from './monsterList.js';
 import { state } from './state.js';
 import { updateHtml } from './stats.js';

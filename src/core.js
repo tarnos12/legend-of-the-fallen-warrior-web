@@ -1108,17 +1108,19 @@ function getStartingItem(itemType) {
 // already on window directly (so reassignments from other modules stay in sync);
 // the objects below are only ever mutated in place, so sharing the reference via
 // the bridge is safe. (Phase 3 ESM transition bridge.)
+// Only inline-onclick-dispatched handlers stay on window: disableButtons,
+// handleClick, hardcoreModeCheck, changeRace, muteAudio, selectText,
+// resetPassiveSkills, changeDifficulty, rebirth (all generated onclick /
+// onclickevent), equipItem/unequipItem (item Sell/Equip images),
+// sortInventory/sortShop (sort buttons), myAudio (kept: shadows the #myAudio
+// element as before). The internal-only helpers (sumEquippedStat, mainLog,
+// drawLog, isDeadLog, masteryLog, dropLog, setWeaponTypeFlag, equipSlot,
+// showNumber, changeGameStyling, getStartingItem) are no longer exposed.
 Object.assign(window, {
-    // functions
-    Log, sumEquippedStat, createEquippedItemsObject, disableButtons,
-    potionBuyLog, notEnoughMoneyLog, inventoryBuyLog, statBuyLog, itemDropLog,
-    levelUpLog, mainLog, deathLog, drawLog, isDeadLog, masteryLog, dropLog,
-    setWeaponTypeFlag, equipSlot, equipItem, unequipItem, handleClick,
-    hardcoreModeCheck, changeRace, myAudio, muteAudio, selectText, showNumber,
-    sortInventory, resetPassiveSkills, sortShop, copyPlayerProperties,
-    changeGameStyling, getNumberMultiplierofFive, getTen, getThousands,
-    changeDifficulty, rebirth, compare, getStartingItem,
-    // stable data objects / constants (mutated in place or read-only)
+    disableButtons, handleClick, hardcoreModeCheck, changeRace, muteAudio,
+    selectText, resetPassiveSkills, changeDifficulty, rebirth, equipItem,
+    unequipItem, sortInventory, sortShop, myAudio,
+    // stable data objects / constants still resolved by bare name cross-module
     currentGameVersion, equipmentSlots, armorSlots,
     maxLogLines, equipSlotSubTypes, weaponTypeFlags,
     slotInventorySpace, unequipSlots,
@@ -1129,4 +1131,10 @@ Object.assign(window, {
 // them instead of reading window globals. Circular imports with the provider
 // modules (weaponMastery/skills/gameObjects) are safe: every cross-module use is
 // inside a function/method body (runtime), never at module-eval.
-export { player, equippedItems, defaultValues, playerInventory, logData };
+// The cross-module (non-onclick) functions are exported here too.
+export {
+    player, equippedItems, defaultValues, playerInventory, logData,
+    Log, createEquippedItemsObject, copyPlayerProperties, potionBuyLog,
+    notEnoughMoneyLog, inventoryBuyLog, statBuyLog, itemDropLog, levelUpLog,
+    deathLog, getNumberMultiplierofFive, getTen, getThousands, compare,
+};

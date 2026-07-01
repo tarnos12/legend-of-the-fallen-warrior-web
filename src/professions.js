@@ -4,7 +4,7 @@ import {
     itemToCraft, itemWeaponSubType, itemArmorSubType, itemAccessorySubType,
     InventoryItemTypes,
 } from './gameObjects.js';
-import { player } from './core.js';
+import { player, getNumberMultiplierofFive } from './core.js';
 import { potionList } from './potionsHotbar.js';
 import { getItemType } from './itemDrop.js';
 var craftCost = [

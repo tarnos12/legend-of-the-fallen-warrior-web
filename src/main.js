@@ -23,7 +23,7 @@ import './weaponMastery.js';
 import './monsterList.js';
 import './dynamicHtml.js';
 import './gameObjects.js';
-import './core.js';
+import { createEquippedItemsObject, copyPlayerProperties } from './core.js';
 import './stats.js';
 import './professions.js';
 
