@@ -68,10 +68,9 @@ function updateInventory() {
     $('#updateInventorySlots').empty().append("Inventory Slots: " + playerInventory.length + "/" + player.functions.inventory())
 };
 
-// ES module (Phase 3): bare reads (player, playerInventory, checkBox*, $) resolve
-// through the global object. Re-expose the public functions on window for the
-// inline onclick handlers (dynamicHtml.js) and other scripts that call them.
+// sellAllItems and itemSell are inline-onclick-dispatched (sellAllItems via the
+// generated `sellAll` string; itemSell via generated per-item Sell buttons), so
+// they stay on window. updateInventory has no callers -> not exposed.
 // total/inventoryId stay module-local (only used here).
 window.sellAllItems = sellAllItems;
 window.itemSell = itemSell;
-window.updateInventory = updateInventory;
