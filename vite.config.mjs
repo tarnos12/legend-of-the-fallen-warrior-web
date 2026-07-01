@@ -13,4 +13,11 @@ export default defineConfig({
     // sessions don't collide on 5173; falls back to 5173 for plain `npm run dev`.
     port: Number(process.env.PORT) || 5173,
   },
+  // Vitest config. The game modules touch document/window at import time, so tests
+  // run in a jsdom environment. See test/*.test.js.
+  test: {
+    environment: 'jsdom',
+    globals: true,
+    include: ['test/**/*.test.js'],
+  },
 });
