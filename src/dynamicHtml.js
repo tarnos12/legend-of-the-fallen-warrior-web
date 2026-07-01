@@ -371,66 +371,40 @@ function changedTabInventory(index) {
     inventoryTabActiveNum = index;
 }
 function CreateInventoryWeaponHtml() {
-    var html = '';
-    var itemStat;
-    html +=
-        '<div class="c3" id="updateInventorySlots">' +
-        'Inventory Slots: ' +
-        playerInventory.length +
-        '/' +
-        player.functions.inventory() +
-        '</div>';
-    html += '<ul class="nav nav-tabs draggable">';
-    for (var k = 0; k < InventoryItemTypes.length; k++) {
-        if (k === inventoryTabActiveNum) {
-            html += '<li class="active" onClick = changedTabInventory(' + k + ')>';
-        } else {
-            html += '<li onClick = changedTabInventory(' + k + ')>';
+    const navTabs = InventoryItemTypes.map((t, k) => {
+        const li =
+            k === inventoryTabActiveNum
+                ? `<li class="active" onClick = changedTabInventory(${k})>`
+                : `<li onClick = changedTabInventory(${k})>`;
+        return (
+            li +
+            `<a href="#tab_${t.type}" data-toggle="tab"><span class="icons ${t.icon}" data-toggle="tooltip" data-placement="top" title="${t.displayName}"></span></a></li>`
+        );
+    }).join('');
+
+    const panes = InventoryItemTypes.map((t, j) => {
+        const active = j === inventoryTabActiveNum ? ' active' : '';
+        const paneOpen =
+            t.type === 'other'
+                ? `<div class="col-xs-12 tab-pane${active} marginBottom"`
+                : `<div class="col-xs-10 col-xs-offset-1 tab-pane${active} marginBottom"`;
+
+        let sortSection = '';
+        if (t.type !== 'other') {
+            sortSection =
+                `<div class="c3">Sort by:</div>` +
+                `<button type="button" onclick="sortInventory('Value')">Value</button>` +
+                `<button type="button" onclick="sortInventory('Rarity')">Rarity</button>` +
+                `<button type="button" onclick="sortInventory('iLvl')">Level</button>` +
+                (t.type === 'weapon'
+                    ? `<button type="button" onclick="sortInventory('Damage')">Damage</button>`
+                    : '');
         }
-        html +=
-            '<a href="#tab_' +
-            InventoryItemTypes[k].type +
-            '" data-toggle="tab"><span class="icons ' +
-            InventoryItemTypes[k].icon +
-            '" data-toggle="tooltip" data-placement="top" title="' +
-            InventoryItemTypes[k].displayName +
-            '"></span></a></li>';
-    }
-    html += '</ul>';
-    html += '<div class="tab-content" id="tabControl_Inventory">';
-    for (var j = 0; j < InventoryItemTypes.length; j++) {
-        if (j === inventoryTabActiveNum) {
-            if (InventoryItemTypes[j].type === 'other') {
-                html += '<div class="col-xs-12 tab-pane active marginBottom"';
-            } else {
-                html += '<div class="col-xs-10 col-xs-offset-1 tab-pane active marginBottom"';
-            }
-        } else {
-            if (InventoryItemTypes[j].type === 'other') {
-                html += '<div class="col-xs-12 tab-pane marginBottom"';
-            } else {
-                html += '<div class="col-xs-10 col-xs-offset-1 tab-pane marginBottom"';
-            }
-        }
-        html += 'id="tab_' + InventoryItemTypes[j].type + '" style="height:400px;">';
-        html += '<div class="row" id="' + 'inventorySpace' + InventoryItemTypes[j].type + '"' + '>';
-        html += '<div class="c3" style="margin-bottom:10px;"><h4>Inventory</h4>';
-        if (InventoryItemTypes[j].type !== 'other') {
-            html += '<div class="c3">Sort by:</div>';
-            var sortItemValue = 'onclick="sortInventory' + '(' + "'Value'" + ')';
-            var sortItemRarity = 'onclick="sortInventory' + '(' + "'Rarity'" + ')';
-            var sortItemLevel = 'onclick="sortInventory' + '(' + "'iLvl'" + ')';
-            html += '<button type="button" ' + sortItemValue + '">Value</button>';
-            html += '<button type="button" ' + sortItemRarity + '">Rarity</button>';
-            html += '<button type="button" ' + sortItemLevel + '">Level</button>';
-            if (InventoryItemTypes[j].type === 'weapon') {
-                var sortItemDamage = 'onclick="sortInventory' + '(' + "'Damage'" + ')';
-                html += '<button type="button" ' + sortItemDamage + '">Damage</button>';
-            }
-        }
-        html += '</div>';
+
+        let cards = '';
         for (var i = 0; i < playerInventory.length; i++) {
-            if (playerInventory[i].itemType === InventoryItemTypes[j].type) {
+            if (playerInventory[i].itemType === t.type) {
+                var itemStat;
                 if (playerInventory[i].itemType === 'weapon') {
                     itemStat = equippedItems.weapon;
                 } else if (playerInventory[i].subType === 'shield') {
@@ -450,117 +424,78 @@ function CreateInventoryWeaponHtml() {
                 } else if (playerInventory[i].subType === 'talisman') {
                     itemStat = equippedItems.talisman;
                 }
-                html +=
-                    '<div class="col-xs-6 col-sm-4 col-md-4 col-lg-2 c8" style="margin-top:5px;" ' +
-                    'id="' +
-                    'testingItem' +
-                    playerInventory[i].id +
-                    '"' +
-                    '>';
-                html += '<a class="tooltips2" style="cursor:pointer;">';
-                if (playerInventory[i].itemType === 'weapon') {
-                    html +=
-                        '<img class="' +
-                        playerInventory[i].itemType +
-                        ', ' +
-                        playerInventory[i].itemRarity;
-                } else {
-                    html +=
-                        '<img class="' +
-                        playerInventory[i].subType +
-                        ', ' +
-                        playerInventory[i].itemRarity;
-                }
-                html +=
-                    '"' +
-                    'src="images/items/' +
-                    playerInventory[i].subType +
-                    '/' +
-                    playerInventory[i].image +
-                    '.png"' +
-                    'onclick="equipItem' +
-                    '(' +
-                    playerInventory[i].id +
-                    ')' +
-                    '"/>';
-
-                if (itemStat.hasOwnProperty('itemType')) {
-                    html +=
-                        '<span style="pointer-events:none; left:-100px;right:0; bottom:100px; width:400px;">';
-                } else {
-                    html += '<span style="width:300px; left:80px;right:0; bottom:100px;">';
-                }
-                html += '<div class="row">';
-                html += '<div class="col-xs-12">';
-
-                if (itemStat.hasOwnProperty('itemType')) {
-                    var equippedItemDisplay = itemStat;
-
-                    html += '<div class="row">';
-                    html += '<div class="col-xs-6 borderRight">';
-
-                    html += itemTooltipTest(equippedItemDisplay);
-
-                    html += '<strong>Currently equipped</strong>';
-                    html += '</div>';
-                }
-
-                if (itemStat.hasOwnProperty('itemType')) {
-                    html += '<div class="col-xs-6">';
-                } else {
-                    html += '<div class="col-xs-10 col-xs-offset-1">';
-                }
-                //Start here
-                html += itemTooltipTest(playerInventory[i]);
-                ///End here
-                html += '<strong>Left-Click to equip</strong>';
-                html += '</div></div>';
-                html += '</div>';
-                if (itemStat.hasOwnProperty('itemType')) {
-                    html += '</div>';
-                }
-                html += '</span>' + '</a>';
-                html +=
-                    '<button type="button" style="margin-top:5px;" class="inventorySell" onclick="itemSell' +
-                    '(' +
-                    playerInventory[i].id +
-                    ')' +
-                    '">Sell</button>';
-                html += '</div>';
+                const item = playerInventory[i];
+                const hasType = itemStat.hasOwnProperty('itemType');
+                const imgClass = item.itemType === 'weapon' ? item.itemType : item.subType;
+                cards +=
+                    `<div class="col-xs-6 col-sm-4 col-md-4 col-lg-2 c8" style="margin-top:5px;" id="testingItem${item.id}">` +
+                    `<a class="tooltips2" style="cursor:pointer;">` +
+                    `<img class="${imgClass}, ${item.itemRarity}"src="images/items/${item.subType}/${item.image}.png"onclick="equipItem(${item.id})"/>` +
+                    (hasType
+                        ? `<span style="pointer-events:none; left:-100px;right:0; bottom:100px; width:400px;">`
+                        : `<span style="width:300px; left:80px;right:0; bottom:100px;">`) +
+                    `<div class="row">` +
+                    `<div class="col-xs-12">` +
+                    (hasType
+                        ? `<div class="row">` +
+                          `<div class="col-xs-6 borderRight">` +
+                          itemTooltipTest(itemStat) +
+                          `<strong>Currently equipped</strong>` +
+                          `</div>`
+                        : '') +
+                    (hasType
+                        ? `<div class="col-xs-6">`
+                        : `<div class="col-xs-10 col-xs-offset-1">`) +
+                    itemTooltipTest(item) +
+                    `<strong>Left-Click to equip</strong>` +
+                    `</div></div>` +
+                    `</div>` +
+                    (hasType ? `</div>` : '') +
+                    `</span>` +
+                    `</a>` +
+                    `<button type="button" style="margin-top:5px;" class="inventorySell" onclick="itemSell(${item.id})">Sell</button>` +
+                    `</div>`;
             }
         }
 
-        if (InventoryItemTypes[j].type === 'other') {
-            html += '<div class="row">';
-            html += '<div class="col-xs-12">';
-            html += 'Choose hot bar slot, then press a button next to a potion.';
-            html += '<form role="form">';
-            html +=
-                '<label class="radio-inline"><input class="visibilityLabel" type="radio" name="hotBarValue" value="1" checked="checked">1</input></label>';
-            html +=
-                '<label class="radio-inline"><input class="visibilityLabel" type="radio" name="hotBarValue" value="2">2</input></label>';
-            html +=
-                '<label class="radio-inline"><input class="visibilityLabel" type="radio" name="hotBarValue" value="3">3</input></label>';
-            html +=
-                '<label class="radio-inline"><input class="visibilityLabel" type="radio" name="hotBarValue" value="4">4</input></label>';
-            html +=
-                '<label class="radio-inline"><input class="visibilityLabel" type="radio" name="hotBarValue" value="5">5</input></label>';
-            html +=
-                '<label class="radio-inline"><input class="visibilityLabel" type="radio" name="hotBarValue" value="6">6</input></label>';
-            html +=
-                '<label class="radio-inline"><input class="visibilityLabel" type="radio" name="hotBarValue" value="7">7</input></label>';
-            html +=
-                '<label class="radio-inline"><input class="visibilityLabel" type="radio" name="hotBarValue" value="8">8</input></label>';
-            html += '</form>';
-            html += '</div>';
-            html += '</div>';
-            html += '<div id="potionInventory">';
+        let otherBlock = '';
+        if (t.type === 'other') {
+            const radios = [1, 2, 3, 4, 5, 6, 7, 8]
+                .map(
+                    (n) =>
+                        `<label class="radio-inline"><input class="visibilityLabel" type="radio" name="hotBarValue" value="${n}"${n === 1 ? ' checked="checked"' : ''}>${n}</input></label>`
+                )
+                .join('');
+            otherBlock =
+                `<div class="row">` +
+                `<div class="col-xs-12">` +
+                `Choose hot bar slot, then press a button next to a potion.` +
+                `<form role="form">` +
+                radios +
+                `</form>` +
+                `</div>` +
+                `</div>` +
+                `<div id="potionInventory">`;
         }
-        html += '</div>';
-        html += '</div>';
-    }
-    html += '</div>';
-    document.getElementById('inventory').innerHTML = html;
+
+        return (
+            paneOpen +
+            `id="tab_${t.type}" style="height:400px;">` +
+            `<div class="row" id="inventorySpace${t.type}">` +
+            `<div class="c3" style="margin-bottom:10px;"><h4>Inventory</h4>` +
+            sortSection +
+            `</div>` +
+            cards +
+            otherBlock +
+            `</div>` +
+            `</div>`
+        );
+    }).join('');
+
+    document.getElementById('inventory').innerHTML =
+        `<div class="c3" id="updateInventorySlots">Inventory Slots: ${playerInventory.length}/${player.functions.inventory()}</div>` +
+        `<ul class="nav nav-tabs draggable">${navTabs}</ul>` +
+        `<div class="tab-content" id="tabControl_Inventory">${panes}</div>`;
     testss();
     createPotionInventory();
 }
@@ -569,72 +504,38 @@ function unequipItemLoad() {
     // Create a variable inside player.properties which store currently equipped item, for easy access...
     for (var key in loadingEquippedItems) {
         if (loadingEquippedItems.hasOwnProperty(key)) {
-            var html = '';
             var i = loadingEquippedItems[key].type;
             var itemStat = equippedItems[i];
             if (itemStat.subType !== undefined) {
-                html +=
-                    '<div class="col-xs-12 col-lg-6 c8"' +
-                    'id="' +
-                    'testingItem' +
-                    itemStat.id +
-                    '"' +
-                    '>';
-                html += '<a class="tooltips" style="cursor:pointer;">';
-                if (itemStat.itemType === 'weapon') {
-                    html += '<img class="' + itemStat.itemType;
-                } else {
-                    html += '<img class="' + itemStat.subType;
-                }
-                html +=
-                    '"' +
-                    'src="images/items/' +
-                    itemStat.subType +
-                    '/' +
-                    itemStat.image +
-                    '.png" onclick="equipItem' +
-                    '(' +
-                    itemStat.id +
-                    ')' +
-                    '"/>';
-                if (itemStat.hasOwnProperty('itemType')) {
-                    html += '<span>';
-                } else {
-                    html += '<span style="width:200px;">';
-                }
-                html += '<div class="row">';
-                html += '<div class="col-xs-12">';
-
-                if (itemStat.hasOwnProperty('itemType')) {
-                    var equippedItemDisplay = itemStat;
-                    html += '<div class="row">';
-                    html += '<div class="col-xs-6">';
-                    html += itemTooltipTest(equippedItemDisplay);
-                    html += '<strong>Currently equipped</strong>';
-                    html += '</div>';
-                }
-
-                if (itemStat.hasOwnProperty('itemType')) {
-                    html += '<div class="col-xs-6">';
-                } else {
-                    html += '<div class="col-xs-10 col-xs-offset-1">';
-                }
-                html += itemTooltipTest(itemStat);
-                html += '<strong>Left-Click to equip</strong>';
-                html += '</div></div>';
-                html += '</div>';
-                if (itemStat.hasOwnProperty('itemType')) {
-                    html += '</div>';
-                }
-                html +=
-                    '</span>' +
-                    '</a>' +
-                    '<button type="button" class="equip" onclick="itemSell' +
-                    '(' +
-                    itemStat.id +
-                    ')' +
-                    '">Sell</button>';
-                html += '</div>';
+                const hasType = itemStat.hasOwnProperty('itemType');
+                const imgClass =
+                    itemStat.itemType === 'weapon' ? itemStat.itemType : itemStat.subType;
+                var html =
+                    `<div class="col-xs-12 col-lg-6 c8"id="testingItem${itemStat.id}">` +
+                    `<a class="tooltips" style="cursor:pointer;">` +
+                    `<img class="${imgClass}"src="images/items/${itemStat.subType}/${itemStat.image}.png" onclick="equipItem(${itemStat.id})"/>` +
+                    (hasType ? `<span>` : `<span style="width:200px;">`) +
+                    `<div class="row">` +
+                    `<div class="col-xs-12">` +
+                    (hasType
+                        ? `<div class="row">` +
+                          `<div class="col-xs-6">` +
+                          itemTooltipTest(itemStat) +
+                          `<strong>Currently equipped</strong>` +
+                          `</div>`
+                        : '') +
+                    (hasType
+                        ? `<div class="col-xs-6">`
+                        : `<div class="col-xs-10 col-xs-offset-1">`) +
+                    itemTooltipTest(itemStat) +
+                    `<strong>Left-Click to equip</strong>` +
+                    `</div></div>` +
+                    `</div>` +
+                    (hasType ? `</div>` : '') +
+                    `</span>` +
+                    `</a>` +
+                    `<button type="button" class="equip" onclick="itemSell(${itemStat.id})">Sell</button>` +
+                    `</div>`;
                 player.functions[i] = $(html);
             }
         }
