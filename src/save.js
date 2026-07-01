@@ -2,7 +2,7 @@
 import { weaponMastery } from './weaponMastery.js';
 import { playerPassive } from './skills.js';
 import { characterRaces } from './gameObjects.js';
-import { playerProfession } from './professions.js';
+import { playerProfession, unlockMineral, unlockHerb, createAlchemyHtml, playerProfessionHtml, craftingHtml } from './professions.js';
 import { player, equippedItems, defaultValues, playerInventory, Log } from './core.js';
 import { monsterList, MakeMonsterList } from './monsterList.js';
 import { state } from './state.js';

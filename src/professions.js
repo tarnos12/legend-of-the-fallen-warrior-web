@@ -1192,10 +1192,19 @@ function craftingHtml2() {
 // mineral/herb data objects, crafting-state vars, and herb/mineral lists are all
 // professions-internal (the apparent cross-file hits were object keys/strings),
 // so they stay module-scoped. (Phase 3 ESM transition bridge.)
+// Cross-module functions are exported and imported by their callers:
+// createHerbs/createMinerals/playerProfessionHtml (module entry initGame),
+// unlockMineral/unlockHerb/createAlchemyHtml/craftingHtml + playerProfessionHtml
+// (save.js load/newGame). The inline-onclick handlers stay on window: gather
+// (generated onclickEvent), createPotion, changeItemType, changeItemBonus,
+// craftItemQuality, displayCraftedItem, craftItem (crafting/alchemy buttons).
+// professionGatherHtml/craftingHtmlButtons/craftingBackground/craftingHtml2 are
+// internal-only.
+export {
+    createHerbs, createMinerals, unlockMineral, unlockHerb, createAlchemyHtml,
+    playerProfessionHtml, craftingHtml,
+};
 Object.assign(window, {
-    createHerbs, createMinerals, gather, unlockMineral, unlockHerb,
-    createAlchemyHtml, createPotion, playerProfessionHtml, professionGatherHtml,
-    changeItemType, changeItemBonus, craftingHtml, craftingHtmlButtons,
-    craftItemQuality, displayCraftedItem, craftingBackground, craftItem,
-    craftingHtml2,
+    gather, createPotion, changeItemType, changeItemBonus, craftItemQuality,
+    displayCraftedItem, craftItem,
 });
