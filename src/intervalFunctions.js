@@ -8,7 +8,7 @@
 // handlers that still call them by name.
 import { player } from './core.js';
 
-function playerRevive() {
+export function playerRevive() {
     setTimeout(
         function () {
             player.properties.health = player.functions.maxhealth();
@@ -16,7 +16,7 @@ function playerRevive() {
         }, 5000);
 }
 
-function playerReviveCheck() {
+export function playerReviveCheck() {
     if (player.properties.isDead === true) {
         playerRevive();
         Log("<span class =\"bold\" style=\"color:red\">You have died!</span>");
@@ -24,7 +24,5 @@ function playerReviveCheck() {
     }
 }
 
-window.playerRevive = playerRevive;
-window.playerReviveCheck = playerReviveCheck;
-
-export { playerRevive, playerReviveCheck };
+// playerRevive/playerReviveCheck are exported (inline above) and imported by
+// their callers (battle.js, save.js); neither is dispatched from inline onclick.
