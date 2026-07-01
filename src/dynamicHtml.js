@@ -1251,11 +1251,11 @@ function checkIfEquippedEmpty() {
         var itemType = equippedItems[item];
         if (itemType.isEquipped === true) {
             var testItem = checkEquippedItemType(item);
-            $('#' + item + "Empty" + '').empty().append(testItem);
+            document.getElementById(item + "Empty").innerHTML = testItem;
         }
         else if (itemType.isEquipped === false) {
             var currentItem = '<img src=images/' + item + "Empty" + '.png>';
-            $('#' + item + "Empty" + '').empty().append(currentItem);
+            document.getElementById(item + "Empty").innerHTML = currentItem;
         }
     }
 };
@@ -1389,7 +1389,7 @@ function createShopTabs() {
     }
     html += '</div>';
 
-    $('#shopTabs').empty().append(html);
+    document.getElementById('shopTabs').innerHTML = html;
 }
 
 function displayShopItems(type) {
@@ -1445,15 +1445,15 @@ function displayShopItems(type) {
 
     html += '</div></div></div>';
     if (type === itemShopWeapon) {
-        $('#shopWeapon').empty().append(html);
+        document.getElementById('shopWeapon').innerHTML = html;
     }
     else if (type === itemShopArmor) {
 
-        $('#shopArmor').empty().append(html);
+        document.getElementById('shopArmor').innerHTML = html;
     }
     else if (type === itemShopAccessory) {
 
-        $('#shopAccessory').empty().append(html);
+        document.getElementById('shopAccessory').innerHTML = html;
     }
     ShopBuyButtons();
 };
@@ -1574,7 +1574,7 @@ function shopOther() {
     };
     html += '</div></div></div>';
 
-    $('#shopOther').empty().append(html);
+    document.getElementById('shopOther').innerHTML = html;
 };
 
 var shopOtherList = [

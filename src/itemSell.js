@@ -65,7 +65,7 @@ function itemSell(id) {
 };
 
 function updateInventory() {
-    $('#updateInventorySlots').empty().append("Inventory Slots: " + playerInventory.length + "/" + player.functions.inventory())
+    document.getElementById('updateInventorySlots').innerHTML = "Inventory Slots: " + playerInventory.length + "/" + player.functions.inventory();
 };
 
 // sellAllItems and itemSell are inline-onclick-dispatched (sellAllItems via the
