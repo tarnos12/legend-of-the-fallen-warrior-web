@@ -247,7 +247,7 @@ function reset(slot) {
     pageReload();
 };//test
 
-function pageReload() {
+export function pageReload() {
     location.reload();
 };
 function versionCheck(slot) {
@@ -267,15 +267,16 @@ function importSave() {
 // ES module (Phase 3): expose public functions on window for inline handlers and
 // other scripts. Bare reads/reassignments of globals (player, playerInventory,
 // backpackStatus, statStatus, monsterList, ...) resolve through the global object.
-window.saveKeyForSlot = saveKeyForSlot;
+// Inline-onclick handlers stay on window: saveGameFunction (onclickevent),
+// newGame/load/reset/resetCheck/resetallSavesCheck (generated slot/reset buttons),
+// importSave (index.html), loadGame (start-screen Load). pageReload is exported
+// (imported by battle/dynamicHtml). saveKeyForSlot, autoSave, and versionCheck are
+// internal-only.
 window.saveGameFunction = saveGameFunction;
 window.loadGame = loadGame;
-window.autoSave = autoSave;
 window.newGame = newGame;
 window.load = load;
 window.resetCheck = resetCheck;
 window.resetallSavesCheck = resetallSavesCheck;
 window.reset = reset;
-window.pageReload = pageReload;
-window.versionCheck = versionCheck;
 window.importSave = importSave;

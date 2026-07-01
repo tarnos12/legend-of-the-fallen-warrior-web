@@ -161,16 +161,16 @@ function buyStat(count) {
     };
     shopOther();
 };
-// ES module (Phase 3): potionStatus/medium/super are mutated in place and read by
-// dynamicHtml via name, so alias them on window. backpackStatus/statStatus are
-// declared as window.* above (save.js load() reassigns them). Expose buy fns.
+// potionStatus/medium/super stay on window: dynamicHtml resolves them by name via
+// window[item.type3].price. backpackStatus/statStatus are window.* above (save.js
+// load() reassigns them). The buy* handlers stay on window: they are inline-onclick
+// dispatched via item.type2 (onclick="' + type2 + '(...)"). potionBuy and buyStuff
+// are internal-only helpers -> not exposed.
 window.potionStatus = potionStatus;
 window.mediumPotionStatus = mediumPotionStatus;
 window.superPotionStatus = superPotionStatus;
-window.potionBuy = potionBuy;
 window.buySmallPotion = buySmallPotion;
 window.buyMediumPotion = buyMediumPotion;
 window.buySuperPotion = buySuperPotion;
-window.buyStuff = buyStuff;
 window.buyBackpack = buyBackpack;
 window.buyStat = buyStat;

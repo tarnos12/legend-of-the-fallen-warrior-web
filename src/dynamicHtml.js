@@ -12,6 +12,7 @@ import { state } from './state.js';
 import { updateHtml } from './stats.js';
 import { createPotionInventory } from './potionsHotbar.js';
 import { getItemType } from './itemDrop.js';
+import { pageReload } from './save.js';
 //Create player Weapon skill html
 var weaponTabActive = 'swordTest';
 function changeTabWeapon(index) {
