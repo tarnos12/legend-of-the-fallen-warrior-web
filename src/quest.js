@@ -65,7 +65,7 @@ var monsterUnlock = {
     KingoftheLegionGrantBannecs: false,
 };
 
-function quest() {
+export function quest() {
     var varikElement = "";
     var forestElement = "";
     var ozJotnarElement = "";
@@ -731,6 +731,5 @@ function quest() {
 };
 
 //test
-// ES module (Phase 3): bare reads of classic globals resolve via the global
-// object; expose the public function on window. monsterUnlock stays module-local.
-window.quest = quest;
+// quest is exported (inline above) and imported by its callers (battle, core,
+// save); it is not onclick-dispatched. monsterUnlock stays module-local.
