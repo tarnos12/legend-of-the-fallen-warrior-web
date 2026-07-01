@@ -1,5 +1,6 @@
 ﻿"use strict";
 import { player } from './core.js';
+import { updateHtml } from './stats.js';
 
 //Potion list
 (function() {

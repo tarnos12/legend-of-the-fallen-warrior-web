@@ -5,6 +5,7 @@ import { loadingEquippedItems, monsterAreas, characterRaces } from './gameObject
 import { monsterList, MakeMonsterList } from './monsterList.js';
 import { itemShopWeapon, itemShopArmor, itemShopAccessory } from './dynamicHtml.js';
 import { state } from './state.js';
+import { updateHtml, manaRegen } from './stats.js';
 
 //Player log
 function Log(data) {

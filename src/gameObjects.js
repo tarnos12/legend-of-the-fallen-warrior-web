@@ -1,5 +1,6 @@
 ﻿"use strict";
 import { player } from './core.js';
+import { manaRegen } from './stats.js';
 var itemToCraft = [
 {
     weapon: [

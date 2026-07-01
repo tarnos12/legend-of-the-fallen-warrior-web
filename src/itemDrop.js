@@ -6,6 +6,7 @@ import {
 import { player, playerInventory } from './core.js';
 import { itemShopWeapon, itemShopArmor, itemShopAccessory } from './dynamicHtml.js';
 import { state } from './state.js';
+import { updateHtml } from './stats.js';
 function monsterItemDrop(monster) {
     var itemDropNumber = 0;
         var randomItemChance = Math.floor(Math.random() * (1000 - 1) + 1);

@@ -382,9 +382,16 @@ function skillLog() {
 // Re-expose top-level functions on window: these were auto-globals as a classic
 // script and are called by inline onclick handlers (upgrade*, etc.) and by
 // other still-classic files (Phase 3 ESM transition bridge).
-Object.assign(window, {
+// Cross-module functions are exported as real bindings (imported by their
+// callers instead of read off window). resetIsEquipped/skillLog are module-
+// internal. Only the inline-onclick-dispatched handlers stay on window: the
+// upgrade* stat buttons (generated as 'upgrade'+type+'(event)') and upgradePassive
+// (generated onclick).
+export {
     updateHtml, expPercent, healthPercent, playerHealthBar, manaRegen, levelUp,
-    loadIsEquipped, resetIsEquipped, upgradeStrength, upgradeEndurance,
-    upgradeAgility, upgradeDexterity, upgradeWisdom, upgradeIntelligence,
-    upgradeLuck, upgradePassive, skillLog,
+    loadIsEquipped,
+};
+Object.assign(window, {
+    upgradeStrength, upgradeEndurance, upgradeAgility, upgradeDexterity,
+    upgradeWisdom, upgradeIntelligence, upgradeLuck, upgradePassive,
 });

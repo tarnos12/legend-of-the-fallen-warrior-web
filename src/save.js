@@ -6,6 +6,7 @@ import { playerProfession } from './professions.js';
 import { player, equippedItems, defaultValues, playerInventory } from './core.js';
 import { monsterList, MakeMonsterList } from './monsterList.js';
 import { state } from './state.js';
+import { updateHtml, expPercent, healthPercent, playerHealthBar, manaRegen, loadIsEquipped } from './stats.js';
 // Map a save slot (0-3) to its localStorage key. Slot 0 historically uses the
 // bare key "EncodedSave"; slots 1-3 append the number.
 function saveKeyForSlot(slot) {
