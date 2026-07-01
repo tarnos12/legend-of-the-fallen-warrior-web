@@ -652,67 +652,81 @@ function disableButtons() {
     number = number === 1 ? 2 : 1;
 };
 
+// Vanilla replacement for the jQuery notification animation
+// `$("#id").delay(delayIn).fadeIn().delay(holdMs).fadeOut(fadeOutMs, remove)`.
+// The elements are created hidden (style="display:none") via Log(); this fades
+// them in (opacity 0->1 over ~400ms, jQuery's fadeIn default), holds, fades out,
+// then removes. No-ops safely if the element is absent (matches jQuery, which
+// silently skips an empty selector).
+function fadeLog(id, delayIn, holdMs, fadeOutMs) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    var FADE_IN = 400;
+    setTimeout(function () {
+        if (!el.isConnected) return;
+        el.style.transition = 'opacity ' + FADE_IN + 'ms';
+        el.style.opacity = '0';
+        el.style.display = '';
+        // Trigger the fade-in on a later tick so the transition runs. Use
+        // setTimeout, NOT requestAnimationFrame: rAF is paused in background/
+        // hidden tabs (which would leave the notification stuck at opacity 0),
+        // whereas setTimeout + CSS transitions keep working.
+        setTimeout(function () { if (el.isConnected) el.style.opacity = '1'; }, 20);
+        setTimeout(function () {
+            if (!el.isConnected) return;
+            el.style.transition = 'opacity ' + fadeOutMs + 'ms';
+            el.style.opacity = '0';
+            setTimeout(function () { if (el.isConnected) el.remove(); }, fadeOutMs);
+        }, FADE_IN + holdMs);
+    }, delayIn);
+}
 function potionBuyLog() {
-    $("#potionBuy").delay(200).fadeIn().delay(3000).fadeOut(5000, function () { $(this).remove(); });
+    fadeLog('potionBuy', 200, 3000, 5000);
 }
 function notEnoughMoneyLog() {
-    $("#notEnoughMoney").delay(200).fadeIn().delay(3000).fadeOut(5000, function () { $(this).remove(); });
+    fadeLog('notEnoughMoney', 200, 3000, 5000);
 }
 function inventoryBuyLog() {
-    $("#inventoryBuy").delay(200).fadeIn().delay(3000).fadeOut(5000, function () { $(this).remove(); });
+    fadeLog('inventoryBuy', 200, 3000, 5000);
 }
 function statBuyLog() {
-    $("#statBuy").delay(200).fadeIn().delay(3000).fadeOut(5000, function () { $(this).remove(); });
+    fadeLog('statBuy', 200, 3000, 5000);
 }
 function itemDropLog() {
-    $("#itemDropNew").delay(200).fadeIn().delay(3000).fadeOut(5000, function () { $(this).remove(); });
+    fadeLog('itemDropNew', 200, 3000, 5000);
 };
 
 function levelUpLog() {
-    $("#levelUpLog").delay(1800).fadeIn().delay(3000).fadeOut(5000, function () { $(this).remove(); });
+    fadeLog('levelUpLog', 1800, 3000, 5000);
 };
 function mainLog() {
     if (player.properties.isDead === false) {
-        $(document).ready(function () {
-            $("#test1").delay(1600).fadeIn().delay(3000).fadeOut(5000, function () { $(this).remove(); });
-            $("#test2").delay(1400).fadeIn().delay(3000).fadeOut(5200, function () { $(this).remove(); });
-            $("#test3").delay(1200).fadeIn().delay(3000).fadeOut(5400, function () { $(this).remove(); });
-            $("#test4").delay(1000).fadeIn().delay(3000).fadeOut(5600, function () { $(this).remove(); });
-            $("#test5").delay(800).fadeIn().delay(3000).fadeOut(5800, function () { $(this).remove(); });
-        })
-       
+        fadeLog('test1', 1600, 3000, 5000);
+        fadeLog('test2', 1400, 3000, 5200);
+        fadeLog('test3', 1200, 3000, 5400);
+        fadeLog('test4', 1000, 3000, 5600);
+        fadeLog('test5', 800, 3000, 5800);
     };
     logData.length = 0;
 };
 function deathLog() {
-    $(document).ready(function () {
-        $("#playerDead").delay(200)
-           .fadeIn().delay(3000).fadeOut(2000, function () { $(this).remove(); });
-        $("#playerDead2").delay(100)
-        .fadeIn().delay(3000).fadeOut(2000, function () { $(this).remove(); });
-        $("#goldLost").delay(400)
-        .fadeIn().delay(3000).fadeOut(2000, function () { $(this).remove(); });
-        $("#expLost").delay(400)
-        .fadeIn().delay(3000).fadeOut(2000, function () { $(this).remove(); });
-    })
-
+    fadeLog('playerDead', 200, 3000, 2000);
+    fadeLog('playerDead2', 100, 3000, 2000);
+    fadeLog('goldLost', 400, 3000, 2000);
+    fadeLog('expLost', 400, 3000, 2000);
 };
 function drawLog() {
-    $("#draw").delay(100).fadeIn().delay(3000).fadeOut(2000, function () { $(this).remove(); });
+    fadeLog('draw', 100, 3000, 2000);
 };
 function isDeadLog() {
-    $("#isDead").delay(100).fadeIn().delay(3000).fadeOut(2000, function () { $(this).remove(); });
+    fadeLog('isDead', 100, 3000, 2000);
 };
 function masteryLog() {
 
 };
 function dropLog() {
-    $(document).ready(function () {
-        $("#goldDrop").delay(200)
-                .fadeIn().delay(3000).fadeOut(2000, function () { $(this).remove(); });
-        $("#expGain").delay(200)
-                .fadeIn().delay(3000).fadeOut(2000, function () { $(this).remove(); });
-    })
+    fadeLog('goldDrop', 200, 3000, 2000);
+    fadeLog('expGain', 200, 3000, 2000);
 };
 
 //Equip item function
