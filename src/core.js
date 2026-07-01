@@ -963,10 +963,13 @@ function resetPassiveSkills() {
         primaryStatUpdate();
         secondaryStatUpdate();
 };
-$(document).on('change', 'input[name="shopItem"]', function () {
-    var checkedShopItemInteger = $(this).val();
-    state.checkedShopItem = parseInt(checkedShopItemInteger, 10);
-    ShopBuyButtons();
+// Delegated change handler for the shop radio buttons (vanilla equivalent of
+// jQuery's $(document).on('change', 'input[name="shopItem"]', ...)).
+document.addEventListener('change', function (e) {
+    if (e.target && e.target.matches && e.target.matches('input[name="shopItem"]')) {
+        state.checkedShopItem = parseInt(e.target.value, 10);
+        ShopBuyButtons();
+    }
 });
 
 function sortShop(type, itemType) {
