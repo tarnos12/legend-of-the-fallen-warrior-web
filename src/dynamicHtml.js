@@ -470,55 +470,30 @@ function CreatePlayerSkillsHtml() {
 
 //Adds a logo to the starting screen
 function startLogo() {
-    var html = '';
-    html += '<div class="row">';
-    html += '<div class ="col-xs-12">';
-    html += '</div></div>';
-    document.getElementById('gameLogo').innerHTML = html;
+    document.getElementById('gameLogo').innerHTML =
+        `<div class="row"><div class ="col-xs-12"></div></div>`;
 }
 
 //This screen shows up everytime you load a page...
 function startingScreen() {
-    var html = '';
-    var newGame = 'newGameSlot();'; // might pass value to pick a slot for new game
-    var loadGame = 'loadGameSlot();'; // later on might need to pass some value when loading, once I add more save slots...
-    var reset = 'resetallSavesCheck();';
-    var muteSound = 'muteAudio();';
     var myAudio = document.getElementById('myAudio');
-    html += '<div class="row">';
-    html += '<div class="col-xs-6 col-xs-3">';
-    html += '<div class="btn-group-vertical" role="group" aria-label="New game, load game">';
-    html +=
-        '<button type="button" style="margin-bottom:5px;" class="btn btn-default border" onclick="' +
-        newGame +
-        '">New Game</button>';
-    html +=
-        '<button type="button" style="margin-bottom:5px;" class="btn btn-default border" onclick="' +
-        loadGame +
-        '">Load</button>';
-    html +=
-        '<button type="button" style="margin-bottom:5px;" class="btn btn-default border" onclick="' +
-        reset +
-        '">Reset all saves</button>';
-    html +=
-        '<label><input type="checkbox" id="hardcoreMode" style ="visibility:visible; position:relative;" onclick="hardcoreModeCheck();">Hardcore Mode?</label>';
-    html += '</div>';
-    html +=
-        '<button type="button" class="btn btn-default shopButton" onclick="' +
-        muteSound +
-        'changeMusicImage();""><span id="musicImage" class="glyphicon glyphicon-volume-up" aria-hidden="true"></span></button>';
-
-    html += '</div>';
-    html += '</div>';
-
-    html += '<div class="row" style="position:relative; left:-30%;">';
-    html += '<div class="col-xs-8 col-xs-offset-2">';
-    html +=
-        '<h4>If you are unable to start a game, use button above to reset all saves.' +
-        'If you see this message first time, then you should reset your save, since its a new update which change a lot.</h4>';
-    html += '</div>';
-    html += '</div>';
-    document.getElementById('buttonDiv').innerHTML = html;
+    document.getElementById('buttonDiv').innerHTML =
+        `<div class="row">` +
+        `<div class="col-xs-6 col-xs-3">` +
+        `<div class="btn-group-vertical" role="group" aria-label="New game, load game">` +
+        `<button type="button" style="margin-bottom:5px;" class="btn btn-default border" onclick="newGameSlot();">New Game</button>` +
+        `<button type="button" style="margin-bottom:5px;" class="btn btn-default border" onclick="loadGameSlot();">Load</button>` +
+        `<button type="button" style="margin-bottom:5px;" class="btn btn-default border" onclick="resetallSavesCheck();">Reset all saves</button>` +
+        `<label><input type="checkbox" id="hardcoreMode" style ="visibility:visible; position:relative;" onclick="hardcoreModeCheck();">Hardcore Mode?</label>` +
+        `</div>` +
+        `<button type="button" class="btn btn-default shopButton" onclick="muteAudio();changeMusicImage();""><span id="musicImage" class="glyphicon glyphicon-volume-up" aria-hidden="true"></span></button>` +
+        `</div>` +
+        `</div>` +
+        `<div class="row" style="position:relative; left:-30%;">` +
+        `<div class="col-xs-8 col-xs-offset-2">` +
+        `<h4>If you are unable to start a game, use button above to reset all saves.If you see this message first time, then you should reset your save, since its a new update which change a lot.</h4>` +
+        `</div>` +
+        `</div>`;
     myAudio.volume = 0.1;
     myAudio.play();
 }
@@ -527,11 +502,6 @@ function startingScreen() {
 function newGameSlot() {
     changeMusicImage();
     characterCreationCreateBackground();
-    var html = '';
-    var newGameSlot0 = 'newGame(0);';
-    var newGameSlot1 = 'newGame(1);';
-    var newGameSlot2 = 'newGame(2);';
-    var newGameSlot3 = 'newGame(3);';
     var displayInfo0 = '';
     var displayInfo = '';
     var displayInfo2 = '';
@@ -603,54 +573,31 @@ function newGameSlot() {
         displayInfo3 = 'Empty Slot';
     }
 
-    html += '<div class="row">';
-    html += '<div class ="col-xs-12 newGameButton">';
-    html += '<div class="btn-group-vertical" role="group" aria-label="New game, load game">';
-    html += '<div class="row">';
-    html += '<div class ="col-xs-12">';
-    html +=
-        '<button type="button" style="margin-bottom:5px;" class="btn btn-default border" onclick="' +
-        newGameSlot1 +
-        '">New game 1</button> ' +
-        displayInfo;
-    html += '</div>';
-    html += '<div class ="col-xs-12">';
-    html +=
-        '<button type="button" style="margin-bottom:5px;" class="btn btn-default border" onclick="' +
-        newGameSlot2 +
-        '">New Game 2</button> ' +
-        displayInfo2;
-    html += '</div>';
-    html += '<div class ="col-xs-12">';
-    html +=
-        '<button type="button" style="margin-bottom:5px;" class="btn btn-default border" onclick="' +
-        newGameSlot3 +
-        '">New Game 3</button> ' +
-        displayInfo3;
-    html += '</div>';
-    html += '<div class ="col-xs-12">';
-    html +=
-        '<button type="button" style="margin-bottom:5px;" class="btn btn-default border" onclick="' +
-        newGameSlot0 +
-        '">New game 0</button> ' +
-        displayInfo0;
-    html += '</div>';
-    html += '</div></div>';
-    html +=
-        '<button type="button" class="btn btn-default border startBackButtonMargin" onclick="backToStartingScreen()">Go Back</button>';
-    html += '</div></div>';
-
-    document.getElementById('raceCreation').innerHTML = html;
+    document.getElementById('raceCreation').innerHTML =
+        `<div class="row">` +
+        `<div class ="col-xs-12 newGameButton">` +
+        `<div class="btn-group-vertical" role="group" aria-label="New game, load game">` +
+        `<div class="row">` +
+        `<div class ="col-xs-12">` +
+        `<button type="button" style="margin-bottom:5px;" class="btn btn-default border" onclick="newGame(1);">New game 1</button> ${displayInfo}` +
+        `</div>` +
+        `<div class ="col-xs-12">` +
+        `<button type="button" style="margin-bottom:5px;" class="btn btn-default border" onclick="newGame(2);">New Game 2</button> ${displayInfo2}` +
+        `</div>` +
+        `<div class ="col-xs-12">` +
+        `<button type="button" style="margin-bottom:5px;" class="btn btn-default border" onclick="newGame(3);">New Game 3</button> ${displayInfo3}` +
+        `</div>` +
+        `<div class ="col-xs-12">` +
+        `<button type="button" style="margin-bottom:5px;" class="btn btn-default border" onclick="newGame(0);">New game 0</button> ${displayInfo0}` +
+        `</div>` +
+        `</div></div>` +
+        `<button type="button" class="btn btn-default border startBackButtonMargin" onclick="backToStartingScreen()">Go Back</button>` +
+        `</div></div>`;
     //document.getElementById("raceText").innerHTML = html2
 }
 
 function loadGameSlot() {
     characterCreationCreateBackground();
-    var html = '';
-    var loadGameSlot0 = 'loadGame(0);';
-    var loadGameSlot1 = 'loadGame(1);';
-    var loadGameSlot2 = 'loadGame(2);';
-    var loadGameSlot3 = 'loadGame(3);';
     var displayInfo0 = '';
     var displayInfo = '';
     var displayInfo2 = '';
@@ -719,44 +666,26 @@ function loadGameSlot() {
         displayInfo3 = 'Empty Slot';
     }
 
-    html += '<div class="row">';
-    html += '<div class ="col-xs-12 newGameButton">';
-    html += '<div class="btn-group-vertical" role="group" aria-label="New game, load game">';
-    html += '<div class="row">';
-    html += '<div class ="col-xs-12">';
-    html +=
-        '<button type="button" style="margin-bottom:5px;" class="btn btn-default border" onclick="' +
-        loadGameSlot1 +
-        '">Load game 1</button> ' +
-        displayInfo;
-    html += '</div>';
-    html += '<div class ="col-xs-12">';
-    html +=
-        '<button type="button" style="margin-bottom:5px;" class="btn btn-default border" onclick="' +
-        loadGameSlot2 +
-        '">Load Game 2</button> ' +
-        displayInfo2;
-    html += '</div>';
-    html += '<div class ="col-xs-12">';
-    html +=
-        '<button type="button" style="margin-bottom:5px;" class="btn btn-default border" onclick="' +
-        loadGameSlot3 +
-        '">Load Game 3</button> ' +
-        displayInfo3;
-    html += '</div>';
-    html += '<div class ="col-xs-12">';
-    html +=
-        '<button type="button" style="margin-bottom:5px;" class="btn btn-default border" onclick="' +
-        loadGameSlot0 +
-        '">Load Game 0</button> ' +
-        displayInfo0;
-    html += '</div>';
-    html += '</div></div>';
-    html +=
-        '<button type="button" class="btn btn-default border startBackButtonMargin" onclick="backToStartingScreen()">Go Back</button>';
-    html += '</div></div>';
-
-    document.getElementById('raceCreation').innerHTML = html;
+    document.getElementById('raceCreation').innerHTML =
+        `<div class="row">` +
+        `<div class ="col-xs-12 newGameButton">` +
+        `<div class="btn-group-vertical" role="group" aria-label="New game, load game">` +
+        `<div class="row">` +
+        `<div class ="col-xs-12">` +
+        `<button type="button" style="margin-bottom:5px;" class="btn btn-default border" onclick="loadGame(1);">Load game 1</button> ${displayInfo}` +
+        `</div>` +
+        `<div class ="col-xs-12">` +
+        `<button type="button" style="margin-bottom:5px;" class="btn btn-default border" onclick="loadGame(2);">Load Game 2</button> ${displayInfo2}` +
+        `</div>` +
+        `<div class ="col-xs-12">` +
+        `<button type="button" style="margin-bottom:5px;" class="btn btn-default border" onclick="loadGame(3);">Load Game 3</button> ${displayInfo3}` +
+        `</div>` +
+        `<div class ="col-xs-12">` +
+        `<button type="button" style="margin-bottom:5px;" class="btn btn-default border" onclick="loadGame(0);">Load Game 0</button> ${displayInfo0}` +
+        `</div>` +
+        `</div></div>` +
+        `<button type="button" class="btn btn-default border startBackButtonMargin" onclick="backToStartingScreen()">Go Back</button>` +
+        `</div></div>`;
 }
 
 function backToStartingScreen() {
@@ -1134,64 +1063,37 @@ function secondaryStatUpdate() {
 }
 
 function EquippedItemsEmpty() {
-    var html = '';
-    html += '<div class="row" style="padding-top: 5px; padding-bottom: 10px;">';
-    html += '<div class="centerText"><h4>Equipped Items</h4></div>';
+    let slots = '';
     for (var itemType in emptyItemSlotInfo) {
         if (emptyItemSlotInfo.hasOwnProperty(itemType)) {
             var item = emptyItemSlotInfo[itemType].type;
             var itemEmpty = item + 'Empty';
+            const cell = `<div class="col-xs-4 marginTest"id="${itemEmpty}"><img src=images/${itemEmpty}.png></div>`;
             if (item === 'talisman' || item === 'helmet' || item === 'amulet') {
-                if (item === 'talisman') {
-                    html += '<div class="col-xs-10 col-xs-offset-1">';
-                    html += '<div class="row">';
-                }
-                html += '<div class="col-xs-4 marginTest"' + 'id="' + itemEmpty + '">';
-                html += '<img src=images/' + itemEmpty + '.png>';
-                html += '</div>';
-                if (item === 'amulet') {
-                    html += '</div>';
-                    html += '</div>';
-                }
+                if (item === 'talisman')
+                    slots += `<div class="col-xs-10 col-xs-offset-1"><div class="row">`;
+                slots += cell;
+                if (item === 'amulet') slots += `</div></div>`;
             } else if (item === 'weapon' || item === 'chest' || item === 'shield') {
-                if (item === 'weapon') {
-                    html += '<div class="col-xs-10 col-xs-offset-1">';
-                    html += '<div class="row">';
-                }
-                html += '<div class="col-xs-4 marginTest"' + 'id="' + itemEmpty + '">';
-                html += '<img src=images/' + itemEmpty + '.png>';
-                html += '</div>';
-                if (item === 'shield') {
-                    html += '</div>';
-                    html += '</div>';
-                }
+                if (item === 'weapon')
+                    slots += `<div class="col-xs-10 col-xs-offset-1"><div class="row">`;
+                slots += cell;
+                if (item === 'shield') slots += `</div></div>`;
             } else if (item === 'legs' || item === 'ring') {
-                if (item === 'legs') {
-                    html += '<div class="col-xs-10 col-xs-offset-1">';
-                    html += '<div class="row">';
-                    html += '<div class="col-xs-4 marginTest">';
-                    html += '</div>';
-                }
-                html += '<div class="col-xs-4 marginTest"' + 'id="' + itemEmpty + '">';
-                html += '<img src=images/' + itemEmpty + '.png>';
-                html += '</div>';
-                if (item === 'ring') {
-                    html += '</div>';
-                    html += '</div>';
-                }
+                if (item === 'legs')
+                    slots += `<div class="col-xs-10 col-xs-offset-1"><div class="row"><div class="col-xs-4 marginTest"></div>`;
+                slots += cell;
+                if (item === 'ring') slots += `</div></div>`;
             } else if (item === 'boots') {
-                html += '<div class="col-xs-10 col-xs-offset-1">';
-                html += '<div class="row">';
-                html += '<div class="col-xs-4 col-xs-offset-4"' + 'id="' + itemEmpty + '">';
-                html += '<img src=images/' + itemEmpty + '.png>';
-                html += '</div>';
-                html += '</div>';
-                html += '</div>';
+                slots += `<div class="col-xs-10 col-xs-offset-1"><div class="row"><div class="col-xs-4 col-xs-offset-4"id="${itemEmpty}"><img src=images/${itemEmpty}.png></div></div></div>`;
             }
         }
     }
-    html += '</div>';
-    document.getElementById('equipHtml').innerHTML = html;
+    document.getElementById('equipHtml').innerHTML =
+        `<div class="row" style="padding-top: 5px; padding-bottom: 10px;">` +
+        `<div class="centerText"><h4>Equipped Items</h4></div>` +
+        slots +
+        `</div>`;
 }
 
 function checkIfEquippedEmpty() {
@@ -1209,68 +1111,33 @@ function checkIfEquippedEmpty() {
 }
 
 function checkEquippedItemType(newItem, check) {
-    var html = '';
-    var item = equippedItems[newItem];
-    var itemType = item;
-    if (itemType.hasOwnProperty('itemType')) {
-        html += '<div id="equippedItem' + itemType.id + '"' + '>';
-        html += '<a class="tooltips" style="cursor:pointer;">';
-        if (itemType.itemType === 'weapon') {
-            html += '<img class="' + itemType.itemType;
-        } else {
-            html += '<img class="' + itemType.subType;
-        }
-        html +=
-            '"' +
-            'src="images/items/' +
-            itemType.subType +
-            '/' +
-            itemType.image +
-            '.png" onclick="unequipItem' +
-            '(' +
-            itemType.id +
-            ', ' +
-            "'solo'" +
-            ')' +
-            '" />';
-        html += '<span style="width:200px; left:50px; right:0px; bottom:50px;">';
-        html += '<div class="row">';
-        html += '<div class="col-xs-12">';
-
-        if (itemType.hasOwnProperty('itemType')) {
-            var equippedItemDisplay = itemType;
-            html += itemTooltipTest(equippedItemDisplay);
-            html += '<strong>Currently equipped</strong>';
-            html += '</div>';
-            html += '</div>';
-            html += '</span></a>';
-        }
-        html += '</div>';
+    const itemType = equippedItems[newItem];
+    if (!itemType.hasOwnProperty('itemType')) {
+        return '';
     }
-    return html;
+    const imgClass = itemType.itemType === 'weapon' ? itemType.itemType : itemType.subType;
+    return (
+        `<div id="equippedItem${itemType.id}">` +
+        `<a class="tooltips" style="cursor:pointer;">` +
+        `<img class="${imgClass}"src="images/items/${itemType.subType}/${itemType.image}.png" onclick="unequipItem(${itemType.id}, 'solo')" />` +
+        `<span style="width:200px; left:50px; right:0px; bottom:50px;">` +
+        `<div class="row">` +
+        `<div class="col-xs-12">` +
+        itemTooltipTest(itemType) +
+        `<strong>Currently equipped</strong>` +
+        `</div>` +
+        `</div>` +
+        `</span></a>` +
+        `</div>`
+    );
 }
 
 function saveGameSlot() {
-    var html = '';
-
-    var onclickevent =
-        'onclick="saveGameFunction' +
-        '(' +
-        "'manualSave', " +
-        player.properties.saveSlot +
-        ')' +
-        '">';
-    var onclickevent2 = 'onclick="load' + '(' + player.properties.saveSlot + ')' + '">';
-    html += '<button type="button" class="btn btn-sm btn-default"' + onclickevent;
-    html += 'save';
-    html += '</button>';
-    html += '<button type="button" class="btn btn-sm btn-default"' + onclickevent2;
-    html += 'load';
-    html += '</button>';
-    html += '<button type="button" class="btn btn-sm btn-default" onclick="resetCheck()">';
-    html += 'reset';
-    html += '</button><br /><br />';
-    document.getElementById('saveGameSlot').innerHTML = html;
+    const slot = player.properties.saveSlot;
+    document.getElementById('saveGameSlot').innerHTML =
+        `<button type="button" class="btn btn-sm btn-default"onclick="saveGameFunction('manualSave', ${slot})">save</button>` +
+        `<button type="button" class="btn btn-sm btn-default"onclick="load(${slot})">load</button>` +
+        `<button type="button" class="btn btn-sm btn-default" onclick="resetCheck()">reset</button><br /><br />`;
 }
 
 // Shop stock arrays: exported and mutated in place (rerollShopItems clears them
