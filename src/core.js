@@ -639,22 +639,17 @@ var accuracyRate = 0;
 var monsterDamage = 0;
 var number = 1;
 function disableButtons() {
-    if (number === 1) {
-        $('a#monsterButton').css('cursor', 'not-allowed');
-        $("img.monster").toggleClass("buttonDisable");
-        $("button.monsterButtonDisable").toggleClass("buttonDisable").toggleClass("backgroundRed");
-        $("li.monsterNavBar").toggleClass("buttonDisable");
-        $("li.monsterNavBar > a").toggleClass("backgroundRed");
-        number = 2;
-    }
-    else {
-        $('a#monsterButton').css('cursor', 'pointer');
-        $("img.monster").toggleClass("buttonDisable");
-        $("button.monsterButtonDisable").toggleClass("buttonDisable").toggleClass("backgroundRed");
-        $("li.monsterNavBar").toggleClass("buttonDisable");
-        $("li.monsterNavBar > a").toggleClass("backgroundRed");
-        number = 1;
-    }
+    // The class toggles are identical in both branches; only the cursor differs.
+    var cursor = number === 1 ? 'not-allowed' : 'pointer';
+    document.querySelectorAll('a#monsterButton').forEach(function (el) { el.style.cursor = cursor; });
+    document.querySelectorAll('img.monster').forEach(function (el) { el.classList.toggle('buttonDisable'); });
+    document.querySelectorAll('button.monsterButtonDisable').forEach(function (el) {
+        el.classList.toggle('buttonDisable');
+        el.classList.toggle('backgroundRed');
+    });
+    document.querySelectorAll('li.monsterNavBar').forEach(function (el) { el.classList.toggle('buttonDisable'); });
+    document.querySelectorAll('li.monsterNavBar > a').forEach(function (el) { el.classList.toggle('backgroundRed'); });
+    number = number === 1 ? 2 : 1;
 };
 
 function potionBuyLog() {
@@ -999,21 +994,24 @@ function copyPlayerProperties() {
 // copyPlayerProperties() init call moved to initGame() in src/main.js (Phase 3 ESM)
 
 function changeGameStyling(style) {
+    function setCss(selector, prop, val) {
+        document.querySelectorAll(selector).forEach(function (el) { el.style.setProperty(prop, val); });
+    }
     if (style === "basic") {
-        $("div.c4").css("background-color", "#EDD26E");
-        $(".background").css("background-color", "#EEDFA6");
-        $(".darkBackground").css("background-color", "#baa65a");
-        $(".border").css("border", "1px solid black");
-        $(".borderBottom").css("border-bottom", "1px solid black");
-        $(".borderTop").css("border-top", "1px solid black");
+        setCss("div.c4", "background-color", "#EDD26E");
+        setCss(".background", "background-color", "#EEDFA6");
+        setCss(".darkBackground", "background-color", "#baa65a");
+        setCss(".border", "border", "1px solid black");
+        setCss(".borderBottom", "border-bottom", "1px solid black");
+        setCss(".borderTop", "border-top", "1px solid black");
     }
     else if (style === 2) {
-        $("div.c4").css("background-color", "red");
-        $(".background").css("background-color", "green");
-        $(".darkBackground").css("background-color", "blue");
-        $(".border").css("border", "1px solid purple");
-        $(".borderBottom").css("border-bottom", "1px solid purple");
-        $(".borderTop").css("border-top", "1px solid purple");
+        setCss("div.c4", "background-color", "red");
+        setCss(".background", "background-color", "green");
+        setCss(".darkBackground", "background-color", "blue");
+        setCss(".border", "border", "1px solid purple");
+        setCss(".borderBottom", "border-bottom", "1px solid purple");
+        setCss(".borderTop", "border-top", "1px solid purple");
     }
     else if (style === 3) {
 
