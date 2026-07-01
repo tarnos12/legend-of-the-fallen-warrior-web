@@ -6,6 +6,7 @@ import {
 } from './gameObjects.js';
 import { player } from './core.js';
 import { potionList } from './potionsHotbar.js';
+import { getItemType } from './itemDrop.js';
 var craftCost = [
     {
         type: 'Common',

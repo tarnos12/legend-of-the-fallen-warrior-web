@@ -8,6 +8,7 @@ import { state } from './state.js';
 import { updateHtml, manaRegen } from './stats.js';
 import { quest } from './quest.js';
 import { CreatePlayerHotBar } from './potionsHotbar.js';
+import { getItemType } from './itemDrop.js';
 
 //Player log
 function Log(data) {

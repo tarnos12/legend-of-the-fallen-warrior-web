@@ -8,6 +8,7 @@ import { state } from './state.js';
 import { updateHtml, manaRegen, levelUp } from './stats.js';
 import { playerRevive } from './intervalFunctions.js';
 import { quest } from './quest.js';
+import { monsterItemDrop } from './itemDrop.js';
 function startBattle(monster) {
     //Add buttons <Attack><Defense><Spell><Item><Run?> -->"Spell" change name based on character class later on: Spell/Skill/Runes/Combo/etc...
     //Display enemy at the top/or left/ AND  player at the bottom/or right side

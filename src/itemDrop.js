@@ -7,7 +7,7 @@ import { player, playerInventory } from './core.js';
 import { itemShopWeapon, itemShopArmor, itemShopAccessory } from './dynamicHtml.js';
 import { state } from './state.js';
 import { updateHtml } from './stats.js';
-function monsterItemDrop(monster) {
+export function monsterItemDrop(monster) {
     var itemDropNumber = 0;
         var randomItemChance = Math.floor(Math.random() * (1000 - 1) + 1);
         if (randomItemChance * player.functions.dropRate() >= 500) {
@@ -24,7 +24,7 @@ function monsterItemDrop(monster) {
     CreateInventoryWeaponHtml();
 };
 
-function getItemType(monster, isDrop, craftItemType, craftitemSubType, craftItemQuality) { //isDrop will check if generated item is monster drop or item sold in shop/crafted
+export function getItemType(monster, isDrop, craftItemType, craftitemSubType, craftItemQuality) { //isDrop will check if generated item is monster drop or item sold in shop/crafted
     var monsterStats = monster;
     var dropItem = {};
     var totalChance = 0;
@@ -794,15 +794,8 @@ function getItemValue(dropItem) {
 };
 
 
-// ES module (Phase 3): expose public functions on window for callers and
-// inline handlers. Bare reads of classic globals resolve via the global object.
-window.monsterItemDrop = monsterItemDrop;
-window.getItemType = getItemType;
-window.getItemSubType = getItemSubType;
-window.getItemRarity = getItemRarity;
-window.getItemPower = getItemPower;
-window.getItemBaseStats = getItemBaseStats;
-window.getBaseItemMod = getBaseItemMod;
-window.getBonusItemMod = getBonusItemMod;
-window.getNum = getNum;
-window.getItemValue = getItemValue;
+// monsterItemDrop (battle) and getItemType (core, dynamicHtml, professions) are
+// exported (inline above) and imported by their callers. The rest of the
+// item-generation pipeline (getItemSubType/getItemRarity/getItemPower/
+// getItemBaseStats/getBaseItemMod/getBonusItemMod/getNum/getItemValue) is called
+// only internally here and is no longer exposed. None are onclick-dispatched.
