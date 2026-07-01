@@ -2,6 +2,10 @@
 import { player } from './core.js';
 import { updateHtml } from './stats.js';
 
+// potionList is a real export (read by professions.js and shop.js), populated in
+// place by the IIFE below instead of `window.potionList = new Object()`.
+export const potionList = {};
+
 //Potion list
 (function() {
     var newPotion = function(levelReq, effect, bonus, name, displayName, propertyName, timer, displayBonus, experienceGain) {
@@ -92,7 +96,7 @@ import { updateHtml } from './stats.js';
 
 
 
-    window.potionList = new Object();
+    // potionList (exported const) repopulated in place:
     potionList.smallPotion = smallPotion;
     potionList.mediumPotion = mediumPotion;
     potionList.potionofStrength = potionofStrength;
@@ -111,7 +115,7 @@ import { updateHtml } from './stats.js';
     })();
 
 
-function createPotionInventory() {
+export function createPotionInventory() {
     var html = '';
     var playerPotionList = player.properties.potionInventory;
     for (var item = 0; item < playerPotionList.length; item++) {
@@ -148,7 +152,7 @@ var hotBarItem = [
 {},
 {},
 {}, ];
-function CreatePlayerHotBar() {
+export function CreatePlayerHotBar() {
     var html = '';
     html += '<div class="row" style="margin-top:10px;margin-bottom:10px;">';
     html += '<div class="col-xs-10 col-xs-offset-1">';
@@ -246,11 +250,8 @@ function removePotionBuff(bonusToRemove) {
 };
 
 // ES module (Phase 3): bare reads of classic globals resolve through the global
-// object. Re-expose the public functions on window for inline handlers and the
-// other scripts (main.js, save.js, dynamicHtml.js) that call them by name.
-// hotBarItem stays module-local (only used here).
-window.createPotionInventory = createPotionInventory;
-window.CreatePlayerHotBar = CreatePlayerHotBar;
+// createPotionInventory/CreatePlayerHotBar are exported (imported by their
+// callers); removePotionBuff is module-internal. Only the inline-onclick handlers
+// addHotBarPotion/usePotion stay on window.
 window.addHotBarPotion = addHotBarPotion;
 window.usePotion = usePotion;
-window.removePotionBuff = removePotionBuff;

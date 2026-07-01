@@ -5,6 +5,7 @@ import {
     InventoryItemTypes,
 } from './gameObjects.js';
 import { player } from './core.js';
+import { potionList } from './potionsHotbar.js';
 var craftCost = [
     {
         type: 'Common',

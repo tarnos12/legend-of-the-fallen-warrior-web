@@ -10,6 +10,7 @@ import { player, equippedItems, playerInventory } from './core.js';
 import { monsterList } from './monsterList.js';
 import { state } from './state.js';
 import { updateHtml } from './stats.js';
+import { createPotionInventory } from './potionsHotbar.js';
 //Create player Weapon skill html
 var weaponTabActive = 'swordTest';
 function changeTabWeapon(index) {

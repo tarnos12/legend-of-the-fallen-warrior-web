@@ -7,6 +7,7 @@ import { itemShopWeapon, itemShopArmor, itemShopAccessory } from './dynamicHtml.
 import { state } from './state.js';
 import { updateHtml, manaRegen } from './stats.js';
 import { quest } from './quest.js';
+import { CreatePlayerHotBar } from './potionsHotbar.js';
 
 //Player log
 function Log(data) {

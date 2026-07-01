@@ -1,6 +1,7 @@
 ﻿"use strict";
 import { player } from './core.js';
 import { updateHtml } from './stats.js';
+import { createPotionInventory, potionList } from './potionsHotbar.js';
 var potionStatus = {};
 potionStatus.price = 20;
 var mediumPotionStatus = {};
