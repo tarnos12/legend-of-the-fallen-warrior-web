@@ -9,3 +9,11 @@ export function testss() {
         $('[data-toggle="tooltip"]').tooltip();
     });
 }
+
+// Global String helper used across the UI layer (and professions/itemDrop/etc).
+// Lives here — a zero-dependency module imported early — so the prototype is
+// installed before any render function that calls it runs. Use as
+// "string".capitalizeFirstLetter().
+String.prototype.capitalizeFirstLetter = function () {
+    return this.charAt(0).toUpperCase() + this.slice(1);
+};
