@@ -1117,14 +1117,14 @@ function getStartingItem(itemType) {
 // element as before). The internal-only helpers (sumEquippedStat, mainLog,
 // drawLog, isDeadLog, masteryLog, dropLog, setWeaponTypeFlag, equipSlot,
 // showNumber, changeGameStyling, getStartingItem) are no longer exposed.
+// window now holds ONLY inline-onclick-dispatched handlers. The former stable
+// data objects here (equipmentSlots, armorSlots, maxLogLines, equipSlotSubTypes,
+// weaponTypeFlags, slotInventorySpace, unequipSlots) are core-internal and no
+// longer exposed; currentGameVersion is exported (read by save.js versionCheck).
 Object.assign(window, {
     disableButtons, handleClick, hardcoreModeCheck, changeRace, muteAudio,
     selectText, resetPassiveSkills, changeDifficulty, rebirth, equipItem,
     unequipItem, sortInventory, sortShop, myAudio,
-    // stable data objects / constants still resolved by bare name cross-module
-    currentGameVersion, equipmentSlots, armorSlots,
-    maxLogLines, equipSlotSubTypes, weaponTypeFlags,
-    slotInventorySpace, unequipSlots,
 });
 
 // Phase 3 ESM: player / equippedItems / defaultValues are core game state, never
@@ -1134,7 +1134,7 @@ Object.assign(window, {
 // inside a function/method body (runtime), never at module-eval.
 // The cross-module (non-onclick) functions are exported here too.
 export {
-    player, equippedItems, defaultValues, playerInventory, logData,
+    player, equippedItems, defaultValues, playerInventory, logData, currentGameVersion,
     Log, createEquippedItemsObject, copyPlayerProperties, potionBuyLog,
     notEnoughMoneyLog, inventoryBuyLog, statBuyLog, itemDropLog, levelUpLog,
     deathLog, getNumberMultiplierofFive, getTen, getThousands, compare,
