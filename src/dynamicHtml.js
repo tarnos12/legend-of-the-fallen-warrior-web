@@ -5,7 +5,6 @@ import {
     secondaryStatInfo,
     primaryStatInfo,
     loadingEquippedItems,
-    itemRarity,
     emptyItemSlotInfo,
     InventoryItemTypes,
     monsterAreas,
@@ -29,9 +28,6 @@ import {
 } from './shop.js';
 //Create player Weapon skill html
 var weaponTabActive = 'swordTest';
-function changeTabWeapon(index) {
-    weaponTabActive = index;
-}
 function CreateWeaponSkillHtml() {
     var html = '';
     html += '<div class="row">';
@@ -2115,124 +2111,6 @@ function itemTooltipTest(item) {
     return html;
 }
 
-function itemTooltipTest2(item) {
-    var html = '';
-    html += '<font color="' + item.color + '"><strong>' + item.name + '</strong></font>' + '<br />';
-    if (item.itemType === 'weapon') {
-        html +=
-            '<div class="borderBottom borderTop">Weapon class: ' +
-            item.subType.capitalizeFirstLetter() +
-            '<br />';
-        if (item['Bonus damage'] > 0) {
-            html +=
-                '<strong><font color="#2175D9">' +
-                'Damage: ' +
-                item.MinDamage +
-                ' to ' +
-                item.MaxDamage +
-                '</font></strong>' +
-                '</div>';
-        } else {
-            html += 'Damage: ' + item.MinDamage + ' to ' + item.MaxDamage + '</div>';
-        }
-        html +=
-            '<div class="borderBottom borderTop">Critical Chance: ' +
-            item['Critical chance'] +
-            '%' +
-            '</div>';
-    }
-    if (item.itemType === 'armor') {
-        if (item['Bonus armor'] > 0) {
-            html +=
-                '<div class="borderBottom borderTop"><strong><font color="#1e69c3">Defense: ' +
-                item.defense.toFixed(0) +
-                '</font></strong></div>';
-        } else {
-            html += '<div class="borderBottom borderTop">Defense: ' + item.defense + ' </div>';
-        }
-        if (item.subType === 'shield') {
-            html +=
-                '<div class="borderBottom borderTop">Chance to Block: ' +
-                item['Block chance'] +
-                '%' +
-                ' </div>';
-        }
-        if (item['Bonus armor'] > 0) {
-            html +=
-                '<strong><font color="#7FCC7F">' +
-                'Bonus armor' +
-                ': ' +
-                item['Bonus armor'] +
-                '%' +
-                '</font></strong>' +
-                '<br />';
-        }
-        html +=
-            'Damage reduction: ' +
-            (
-                100 -
-                ((player.properties.prestigeMultiplier * 500) /
-                    (player.properties.prestigeMultiplier * 500 +
-                        (player.functions.defense() +
-                            (item.defense - equippedItems[item.subType].defense)))) *
-                    100 -
-                (100 -
-                    ((player.properties.prestigeMultiplier * 500) /
-                        (player.properties.prestigeMultiplier * 500 + player.functions.defense())) *
-                        100)
-            ).toFixed(2) +
-            '%' +
-            '<br />';
-    }
-    for (var statName in item) {
-        //Here stat will become the word Defense
-        if (item.hasOwnProperty(statName)) {
-            if (
-                'All attributes, Strength, Endurance, Agility, Dexterity, Wisdom, Intelligence, Luck, Evasion, Bonus damage, Bonus life, Bonus mana, Health regen, Mana regen, Magic find, Gold drop, Experience rate, Life gain on hit, Critical damage'.indexOf(
-                    statName
-                ) !== -1
-            ) {
-                //Getting the actual stat object from the word.
-                var selectedStat = item[statName];
-                if (selectedStat > 0 && statName === 'Bonus damage') {
-                    html +=
-                        '<strong><font color="#7FCC7F">' +
-                        statName +
-                        ': ' +
-                        selectedStat +
-                        '%</font></strong>' +
-                        '<br />';
-                } else if (
-                    (selectedStat > 0 && statName === 'Magic find') ||
-                    (selectedStat > 0 && statName === 'Gold drop') ||
-                    (selectedStat > 0 && statName === 'Experience rate')
-                ) {
-                    html +=
-                        '<strong><font color="#0066FF">' +
-                        statName +
-                        ': ' +
-                        selectedStat +
-                        '%</font></strong>' +
-                        '<br />';
-                } else if (selectedStat > 0) {
-                    html +=
-                        '<strong><font color="#0066FF">' +
-                        statName +
-                        ': ' +
-                        selectedStat +
-                        '</font></strong>' +
-                        '<br />';
-                }
-            }
-        }
-    }
-    html += '<div class="borderBottom borderTop">';
-    html += 'Value: ' + item.Value + ' gold<br />';
-    html += 'Item level: ' + item.iLvl + '<br />';
-    html += '<font color="#CC6633">' + item.lore + '</font>';
-    html += '</div>';
-    return html;
-}
 
 function activeBuffsHtml() {
     var html = '';

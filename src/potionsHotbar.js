@@ -431,10 +431,6 @@ function usePotion(index) {
     updateHtml();
 }
 
-function removePotionBuff(bonusToRemove) {
-    console.log('test');
-    player.buffs[bonusToRemove] = 0;
-}
 
 // ES module (Phase 3): bare reads of classic globals resolve through the global
 // createPotionInventory/CreatePlayerHotBar are exported (imported by their

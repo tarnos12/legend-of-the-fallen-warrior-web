@@ -19,11 +19,11 @@ import {
     changedTabmonster,
 } from './dynamicHtml.js';
 import { state } from './state.js';
-import { updateHtml, manaRegen } from './stats.js';
+import { updateHtml } from './stats.js';
 import { quest } from './quest.js';
 import { CreatePlayerHotBar } from './potionsHotbar.js';
 import { getItemType } from './itemDrop.js';
-import { playerDead, updateBar } from './battle.js';
+import { updateBar } from './battle.js';
 
 //Player log
 function Log(data) {
@@ -798,19 +798,7 @@ var playerInventory = [];
 // checkedShopItem, hardcoreMode) now live on the shared `state` object in
 // src/state.js, imported above.
 
-// These scratch/multiplier vars are only used within core.js (the apparent
-// cross-file hits are unrelated .method names / .number data props / locals), so
-// they are plain module-local vars now — no window, no sharing.
-var damageDealt = 0;
-var magicDamage = 0;
-var blockRate = 0;
-var counterDamage = 0;
-var lifeStealAmount = 0;
-var magicDamageDealt = 0;
-var criticalRate = 0;
-var enemyBlock = 0;
-var accuracyRate = 0;
-var monsterDamage = 0;
+// `number` is the stat-buy / display multiplier, module-local to core.js.
 var number = 1;
 function disableButtons() {
     // The class toggles are identical in both branches; only the cursor differs.
@@ -885,32 +873,11 @@ function itemDropLog() {
 function levelUpLog() {
     fadeLog('levelUpLog', 1800, 3000, 5000);
 }
-function mainLog() {
-    if (player.properties.isDead === false) {
-        fadeLog('test1', 1600, 3000, 5000);
-        fadeLog('test2', 1400, 3000, 5200);
-        fadeLog('test3', 1200, 3000, 5400);
-        fadeLog('test4', 1000, 3000, 5600);
-        fadeLog('test5', 800, 3000, 5800);
-    }
-    logData.length = 0;
-}
 function deathLog() {
     fadeLog('playerDead', 200, 3000, 2000);
     fadeLog('playerDead2', 100, 3000, 2000);
     fadeLog('goldLost', 400, 3000, 2000);
     fadeLog('expLost', 400, 3000, 2000);
-}
-function drawLog() {
-    fadeLog('draw', 100, 3000, 2000);
-}
-function isDeadLog() {
-    fadeLog('isDead', 100, 3000, 2000);
-}
-function masteryLog() {}
-function dropLog() {
-    fadeLog('goldDrop', 200, 3000, 2000);
-    fadeLog('expGain', 200, 3000, 2000);
 }
 
 //Equip item function
@@ -1118,10 +1085,6 @@ function selectText(containerid) {
 }
 
 //Will show a number on a tab like inventory, displaying amount of NEW items, player have not seen yet.
-function showNumber() {
-    var number = playerInventory.length;
-    document.getElementById('playerInventory').innerHTML = '<p>' + number + '</p>';
-}
 
 function sortInventory(type) {
     if (type === 'Value') {
@@ -1198,29 +1161,6 @@ function copyPlayerProperties() {
 }
 // copyPlayerProperties() init call moved to initGame() in src/main.js (Phase 3 ESM)
 
-function changeGameStyling(style) {
-    function setCss(selector, prop, val) {
-        document.querySelectorAll(selector).forEach(function (el) {
-            el.style.setProperty(prop, val);
-        });
-    }
-    if (style === 'basic') {
-        setCss('div.c4', 'background-color', '#EDD26E');
-        setCss('.background', 'background-color', '#EEDFA6');
-        setCss('.darkBackground', 'background-color', '#baa65a');
-        setCss('.border', 'border', '1px solid black');
-        setCss('.borderBottom', 'border-bottom', '1px solid black');
-        setCss('.borderTop', 'border-top', '1px solid black');
-    } else if (style === 2) {
-        setCss('div.c4', 'background-color', 'red');
-        setCss('.background', 'background-color', 'green');
-        setCss('.darkBackground', 'background-color', 'blue');
-        setCss('.border', 'border', '1px solid purple');
-        setCss('.borderBottom', 'border-bottom', '1px solid purple');
-        setCss('.borderTop', 'border-top', '1px solid purple');
-    } else if (style === 3) {
-    }
-}
 
 function getNumberMultiplierofFive(n) {
     if (n > 100) {

@@ -1,6 +1,5 @@
 ﻿'use strict';
 import { player } from './core.js';
-import { manaRegen } from './stats.js';
 import { secondaryStatUpdate } from './dynamicHtml.js';
 var itemToCraft = [
     {

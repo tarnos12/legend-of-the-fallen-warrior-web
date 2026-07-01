@@ -1,5 +1,4 @@
 ﻿'use strict';
-import { itemRarity } from './gameObjects.js';
 import { player, playerInventory } from './core.js';
 import { state } from './state.js';
 var total = 0;

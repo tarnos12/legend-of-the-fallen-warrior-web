@@ -1,12 +1,6 @@
 ﻿'use strict';
 import { playerPassive } from './skills.js';
-import {
-    itemToCraft,
-    itemWeaponSubType,
-    itemArmorSubType,
-    itemAccessorySubType,
-    InventoryItemTypes,
-} from './gameObjects.js';
+import { itemToCraft } from './gameObjects.js';
 import { player, getNumberMultiplierofFive } from './core.js';
 import { potionList } from './potionsHotbar.js';
 import { getItemType } from './itemDrop.js';
