@@ -47,12 +47,14 @@ function startBattle(monster) {
     html += '<div class="collapse" id="spellCollapse"></div>';
     html += '</div>';
     html += '</div>';
-    $("#monster" + monsterStats.id).remove();
-    $("#" + area).empty().append(html);
-    $("#battleButtons").append('<button class="sell c3 marginRight" data-toggle="tooltip" data-placement="top" title="Attack with equipped weapon" onclick="playerAttack(' + "'" + monster + "'" + ');">Attack</button>');
-    $("#battleButtons").append('<button class="sell c3" data-toggle="tooltip" data-placement="top" title="Choose your spell" onclick="playerSpellDiv(' + "'" + monster + "'" + ');">Spells</button>');
+    var oldMonster = document.getElementById("monster" + monsterStats.id);
+    if (oldMonster) oldMonster.remove();
+    document.getElementById(area).innerHTML = html;
+    var battleButtons = document.getElementById("battleButtons");
+    battleButtons.insertAdjacentHTML('beforeend', '<button class="sell c3 marginRight" data-toggle="tooltip" data-placement="top" title="Attack with equipped weapon" onclick="playerAttack(' + "'" + monster + "'" + ');">Attack</button>');
+    battleButtons.insertAdjacentHTML('beforeend', '<button class="sell c3" data-toggle="tooltip" data-placement="top" title="Choose your spell" onclick="playerSpellDiv(' + "'" + monster + "'" + ');">Spells</button>');
     logData.length = 0;
-    $("#logConsole").empty();
+    document.getElementById("logConsole").innerHTML = '';
     testss();
     playerSpellDiv(monster);
     $('.collapse').collapse('show');
@@ -92,16 +94,17 @@ function playerSpellDiv(monster) {
     if (skillAmount === 0) {
         html += "<div class='c3'>Unlock some skills first! Using a weapon, will level up your proficiency, and unlock skills with it.</div>";
     };
-    $("#spellCollapse").empty().append(html);
+    document.getElementById("spellCollapse").innerHTML = html;
     $('.collapse').collapse('toggle');
 };
 function playerAttack(monster) {
     logData.length = 0;
-    $("#logConsole").empty();
+    document.getElementById("logConsole").innerHTML = '';
     var animationSrc = 'src="images/animations/slashAnimation.gif"';
-    $("#monsterImage").append('<img id="animation"' + animationSrc + 'style="position:absolute; left:45%; top:50%;">');
+    var monsterImage = document.getElementById("monsterImage");
+    if (monsterImage) monsterImage.insertAdjacentHTML('beforeend', '<img id="animation"' + animationSrc + 'style="position:absolute; left:45%; top:50%;">');
     setTimeout(function () {
-        $('#animation').remove();
+        var anim = document.getElementById('animation'); if (anim) anim.remove();
     }, 350);
     var monsterStats = monsterList[monster];
     //Hit/Miss/Crit/Damage + possible on hit bonuses + lifesteal
@@ -144,7 +147,7 @@ function playerCritCheck(monster) {
 };
 function playerSpellDamage(monster, weapon, name, type, skillKey) {
     logData.length = 0;
-    $("#logConsole").empty();
+    document.getElementById("logConsole").innerHTML = '';
     if (player.properties.mana >= weaponSkillList[weapon][skillKey].manaCost) {
         var bonusDamage = 0;
         for (var skillKey2 in weaponSkillList[weapon]) {
@@ -159,9 +162,10 @@ function playerSpellDamage(monster, weapon, name, type, skillKey) {
         };
 
         var animationSrc = 'src="images/animations/' + weaponSkillList[weapon][skillKey].animation() + '.gif"';
-        $("#monsterImage").append('<img id="animation"' + animationSrc + 'style="position:absolute; left:45%; top:50%;">');
+        var monsterImageSpell = document.getElementById("monsterImage");
+        if (monsterImageSpell) monsterImageSpell.insertAdjacentHTML('beforeend', '<img id="animation"' + animationSrc + 'style="position:absolute; left:45%; top:50%;">');
         setTimeout(function () {
-            $('#animation').remove();
+            var anim = document.getElementById('animation'); if (anim) anim.remove();
         }, 350);
         var monsterStats = monsterList[monster];
         var playerHitChance = (player.functions.accuracy() - monsterStats.eva) / 100;
@@ -186,9 +190,11 @@ function playerSpellDamage(monster, weapon, name, type, skillKey) {
 };
 function playerDamage(monster, damage, name, type) {//damage can be from melee/spell
     var monsterStats = monsterList[monster];
-    $("#playerAnimation").css({ bottom: '30%' });
+    var playerAnim = document.getElementById("playerAnimation");
+    if (playerAnim) playerAnim.style.bottom = '30%';
     setTimeout(function () {
-        $('#playerAnimation').css({ bottom: '10%' });
+        var pa = document.getElementById('playerAnimation');
+        if (pa) pa.style.bottom = '10%';
     }, 200);
     Log("<span class =\"bold\" style=\"color:red;\">You deal " + damage + type + " with " + name + "<br />" + "</span>");
     if (player.functions.lifeSteal() > 0) {
@@ -202,8 +208,10 @@ function playerDamage(monster, damage, name, type) {//damage can be from melee/s
     monsterStats.hp -= damage;
     weaponSkill(monsterStats, monster);
     var monsterPercent = ((monsterStats.hp / monsterStats.maxHp) * 100);
-    $("#" + monsterStats.name + "1").css("width", monsterPercent + "%");
-    $("#" + monsterStats.name + "1 span").empty().append(monsterStats.hp + " HP");
+    var monsterBar = document.getElementById(monsterStats.name + "1");
+    if (monsterBar) monsterBar.style.width = monsterPercent + "%";
+    var monsterBarSpan = document.querySelector("#" + monsterStats.name + "1 span");
+    if (monsterBarSpan) monsterBarSpan.innerHTML = monsterStats.hp + " HP";
     Log("<span class =\"bold\" style=\"color:black; border-top:1px solid; border-bottom:1px solid;\">Player turn" + "<br />" + "</span>");
     if (monsterStats.hp <= 0) {
         Log("<span class =\"bold\" style=\"color:black;\">Enemy killed!" + "<br />" + "</span>");
@@ -331,7 +339,8 @@ function monsterKilled(monsterStats) {
     quest();
     if (monsterStats.lastEnemy === true) {
         var monsterNumber = monsterStats.id; //Used to determine div which contain a monster
-        $("#" + monsterNumber).append("<button class='sell' onclick='rebirth(" + monsterStats.level + ")'>Warp</button>");
+        var monsterNumberEl = document.getElementById(monsterNumber);
+        if (monsterNumberEl) monsterNumberEl.insertAdjacentHTML('beforeend', "<button class='sell' onclick='rebirth(" + monsterStats.level + ")'>Warp</button>");
         //rebirth(monsterStats.level);
     };
     player.properties.lastEnemyLevel = monsterStats.level;
@@ -372,23 +381,23 @@ export function updateBar() {
         var divArray = document.getElementById(subType + '1'); //Doing + 1 so I can use "subType" for a span, which let me center progress bar value.
         divArray.style.width = ((weaponExp) + '%');
         if (subType === "sword") {
-            $('#sword').empty().append(weaponExp + "%");
+            document.getElementById('sword').innerHTML = weaponExp + "%";
             player.properties.swordSkill = weaponExp;
         }
         if (subType === "axe") {
-            $('#axe').empty().append(weaponExp + "%");
+            document.getElementById('axe').innerHTML = weaponExp + "%";
             player.properties.axeSkill = weaponExp;
         }
         if (subType === "mace") {
-            $('#mace').empty().append(weaponExp + "%");
+            document.getElementById('mace').innerHTML = weaponExp + "%";
             player.properties.maceSkill = weaponExp;
         }
         if (subType === "staff") {
-            $('#staff').empty().append(weaponExp + "%");
+            document.getElementById('staff').innerHTML = weaponExp + "%";
             player.properties.staffSkill = weaponExp;
         }
         if (subType === "ranged") {
-            $('#ranged').empty().append(weaponExp + "%");
+            document.getElementById('ranged').innerHTML = weaponExp + "%";
             player.properties.rangedSkill = weaponExp;
         };
     }

@@ -26,7 +26,7 @@ function sellAllItems() {
                 playerInventory[i].itemRarity === 'Common' && state.checkBoxCommon === true)) {
                 total += playerInventory[i].Value << 0;
                 var item = "testingItem" + playerInventory[i].id;
-                $('#' + item).remove();
+                var itemEl = document.getElementById(item); if (itemEl) itemEl.remove();
                 var itemId = playerInventory[i];
                 inventoryId.push(itemId);
             }
@@ -55,7 +55,7 @@ function itemSell(id) {
     if (index > -1) {
         playerInventory.splice(index, 1);
         var itemToRemove = "testingItem" + item.id;
-        $('#' + itemToRemove).remove();
+        var removeEl = document.getElementById(itemToRemove); if (removeEl) removeEl.remove();
         updateInventory();
     }
     if (item !== undefined) {
