@@ -291,7 +291,7 @@ function monsterDamageDeal(monsterDamage, monsterStats) {
         monsterKilled(monsterStats);
     };
 };
-function playerDead(monsterStats) {
+export function playerDead(monsterStats) {
     if (player.properties.hardcoreMode === false) {
         var goldLost = player.properties.goldLost;
         var expLost = player.properties.expLost;
@@ -362,7 +362,7 @@ function weaponSkill(monsterStats, monster) {
     };
     updateBar();
 };
-function updateBar() {
+export function updateBar() {
     if (equippedItems.weapon.isEquipped === true) {
         var subType = equippedItems.weapon.subType;
         var itemStat = weaponMastery[subType];
@@ -447,21 +447,13 @@ function displayLogInfo() {
     activeBuffsHtml();
     CreateMonsterHtml();
 };
-// ES module (Phase 3): expose public functions on window for inline handlers
-// and other scripts. Bare reads of classic globals resolve via the global object.
+// Only the inline-onclick battle handlers stay on window: startBattle (generated
+// onclickevent), playerAttack/playerSpellDiv/playerSpellDamage (generated Attack/
+// Spell buttons). playerDead and updateBar are exported (imported by core/save);
+// everything else (playerCritCheck, playerDamage, monsterAttack, monsterDmg,
+// monsterDamageDeal, monsterKilled, weaponSkill, monsterExperience, monsterGold,
+// displayLogInfo) is called only internally here.
 window.startBattle = startBattle;
 window.playerSpellDiv = playerSpellDiv;
 window.playerAttack = playerAttack;
-window.playerCritCheck = playerCritCheck;
 window.playerSpellDamage = playerSpellDamage;
-window.playerDamage = playerDamage;
-window.monsterAttack = monsterAttack;
-window.monsterDmg = monsterDmg;
-window.monsterDamageDeal = monsterDamageDeal;
-window.playerDead = playerDead;
-window.monsterKilled = monsterKilled;
-window.weaponSkill = weaponSkill;
-window.updateBar = updateBar;
-window.monsterExperience = monsterExperience;
-window.monsterGold = monsterGold;
-window.displayLogInfo = displayLogInfo;
