@@ -2,6 +2,7 @@
 import { player, Log, potionBuyLog, notEnoughMoneyLog, inventoryBuyLog, statBuyLog } from './core.js';
 import { updateHtml } from './stats.js';
 import { createPotionInventory, potionList } from './potionsHotbar.js';
+import { shopOther } from './dynamicHtml.js';
 var potionStatus = {};
 potionStatus.price = 20;
 var mediumPotionStatus = {};

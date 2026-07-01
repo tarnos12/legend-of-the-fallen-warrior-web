@@ -3,6 +3,7 @@ import { playerPassive } from './skills.js';
 import { characterRaces } from './gameObjects.js';
 import { player, equippedItems, Log, getThousands } from './core.js';
 import { CreatePlayerHotBar } from './potionsHotbar.js';
+import { CreateWeaponSkillHtml, CreateMonsterHtml, CreatePlayerSkillsHtml, primaryStatUpdate, secondaryStatUpdate } from './dynamicHtml.js';
 function updateHtml() {
     if (player.properties.stats >= 1) { // Show "plus" image when player level up
         document.getElementById("Strength").style.visibility = "visible";

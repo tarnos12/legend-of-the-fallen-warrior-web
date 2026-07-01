@@ -1803,16 +1803,23 @@ function getMonsterTooltip(monster) {
 // CreateMonsterHtml/...). String.prototype.capitalizeFirstLetter is a prototype
 // method (already global) and the shop-stock arrays are shared via window above.
 // (Phase 3 ESM transition bridge.)
+// Cross-module (non-onclick) render functions are exported and imported by their
+// callers. Only inline-onclick handlers stay on window: changeMonsterPage,
+// CreateInventoryWeaponHtml, newGameSlot, loadGameSlot, backToStartingScreen,
+// changeMusicImage, itemBuy, rerollShopItems, getAgeButton, getAge, and
+// changedTabmonster (generated onClick). The internal-only helpers
+// (changeTabWeapon, changedTabInventory, characterCreationCreateBackground(2),
+// checkEquippedItemType, getShopItem, createShopTabs, itemTooltipTest(2),
+// getMonsterTooltip) are no longer exposed.
+export {
+    CreateWeaponSkillHtml, CreateMonsterHtml, checkBoxHtml, unequipItemLoad,
+    CreatePlayerSkillsHtml, startLogo, startingScreen, removeStartingScreen,
+    characterCreationHtml, checkHeroRace, primaryStatUpdate, secondaryStatUpdate,
+    EquippedItemsEmpty, checkIfEquippedEmpty, displayShopItems, ShopBuyButtons,
+    refillShopInterval, shopOther, testss, activeBuffsHtml, saveGameSlot,
+};
 Object.assign(window, {
-    changeTabWeapon, CreateWeaponSkillHtml, changedTabmonster, CreateMonsterHtml,
-    changeMonsterPage, checkBoxHtml, changedTabInventory, CreateInventoryWeaponHtml,
-    unequipItemLoad, CreatePlayerSkillsHtml, startLogo, startingScreen,
-    newGameSlot, loadGameSlot, backToStartingScreen,
-    characterCreationCreateBackground, characterCreationCreateBackground2,
-    removeStartingScreen, characterCreationHtml, checkHeroRace, changeMusicImage,
-    primaryStatUpdate, secondaryStatUpdate, EquippedItemsEmpty,
-    checkIfEquippedEmpty, checkEquippedItemType, saveGameSlot, getShopItem,
-    createShopTabs, displayShopItems, ShopBuyButtons, itemBuy, refillShopInterval,
-    rerollShopItems, shopOther, testss, getAgeButton, getAge, itemTooltipTest,
-    itemTooltipTest2, activeBuffsHtml, getMonsterTooltip,
+    changeMonsterPage, CreateInventoryWeaponHtml, newGameSlot, loadGameSlot,
+    backToStartingScreen, changeMusicImage, itemBuy, rerollShopItems,
+    getAgeButton, getAge, changedTabmonster,
 });

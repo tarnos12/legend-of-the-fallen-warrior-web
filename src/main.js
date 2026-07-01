@@ -26,6 +26,7 @@ import './gameObjects.js';
 import { createEquippedItemsObject, copyPlayerProperties } from './core.js';
 import './stats.js';
 import { createHerbs, createMinerals, playerProfessionHtml } from './professions.js';
+import { startLogo, startingScreen, testss } from './dynamicHtml.js';
 
 // Game bootstrap (Phase 3 ESM). Previously these ran inline at parse-time inside
 // the classic dynamicHtml.js / main.js / professions.js scripts. They were

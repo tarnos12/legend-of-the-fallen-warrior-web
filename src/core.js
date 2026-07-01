@@ -4,6 +4,7 @@ import { playerPassive, weaponSkillList } from './skills.js';
 import { loadingEquippedItems, monsterAreas, characterRaces } from './gameObjects.js';
 import { monsterList, MakeMonsterList } from './monsterList.js';
 import { itemShopWeapon, itemShopArmor, itemShopAccessory } from './dynamicHtml.js';
+import { CreateWeaponSkillHtml, CreateMonsterHtml, CreatePlayerSkillsHtml, removeStartingScreen, checkHeroRace, primaryStatUpdate, secondaryStatUpdate, checkIfEquippedEmpty, displayShopItems, ShopBuyButtons } from './dynamicHtml.js';
 import { state } from './state.js';
 import { updateHtml, manaRegen } from './stats.js';
 import { quest } from './quest.js';

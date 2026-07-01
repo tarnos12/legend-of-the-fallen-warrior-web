@@ -7,6 +7,7 @@ import {
 import { player, getNumberMultiplierofFive } from './core.js';
 import { potionList } from './potionsHotbar.js';
 import { getItemType } from './itemDrop.js';
+import { testss } from './dynamicHtml.js';
 var craftCost = [
     {
         type: 'Common',

@@ -1,6 +1,7 @@
 ﻿"use strict";
 import { player } from './core.js';
 import { updateHtml } from './stats.js';
+import { testss, activeBuffsHtml } from './dynamicHtml.js';
 
 // potionList is a real export (read by professions.js and shop.js), populated in
 // place by the IIFE below instead of `window.potionList = new Object()`.
