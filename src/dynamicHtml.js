@@ -1847,62 +1847,34 @@ function rerollShopItems() {
 }
 
 function shopOther() {
-    var html = '';
-    html += '<div class="row">';
-    html += '<div class="col-xs-12">';
-    html += '<div class="row">';
     // Resolve item.type3 (e.g. "backpackStatus") to its status object. Built at
     // runtime (not module scope) so the circular shop<->dynamicHtml imports are
     // initialised. Replaces the former window[item.type3] dynamic global lookup.
-    var shopStatusByName = {
+    const shopStatusByName = {
         potionStatus,
         mediumPotionStatus,
         superPotionStatus,
         backpackStatus,
         statStatus,
     };
-    for (var key in shopOtherList) {
-        if (shopOtherList.hasOwnProperty(key)) {
-            var itemType = shopOtherList[key];
-            var itemTypePrice = itemType.type3;
-            html += '<div class="col-xs-12">';
-            html += '<div class="c3">';
-            html += '<img src=' + itemType.image + ' alt="Buy"><br />';
-            html += itemType.type + ' - ' + shopStatusByName[itemTypePrice].price + ' Gold<br />';
-            html +=
-                '<button type="button" class="buy" onclick="' +
-                itemType.type2 +
-                '(' +
-                1 +
-                ')' +
-                '">' +
-                'Buy' +
-                '</button>';
-            html +=
-                '<button type="button" class="buy" onclick="' +
-                itemType.type2 +
-                '(' +
-                10 +
-                ')' +
-                '">' +
-                'Buy 10' +
-                '</button>';
-            html +=
-                '<button type="button" class="buy" onclick="' +
-                itemType.type2 +
-                '(' +
-                100 +
-                ')' +
-                '">' +
-                'Buy 100' +
-                '</button>';
-            html += '</div>';
-            html += '</div>';
-        }
-    }
-    html += '</div></div></div>';
+    const buyButton = (type2, amount, label) =>
+        `<button type="button" class="buy" onclick="${type2}(${amount})">${label}</button>`;
 
-    document.getElementById('shopOther').innerHTML = html;
+    const rows = Object.values(shopOtherList)
+        .map(
+            (item) =>
+                `<div class="col-xs-12"><div class="c3">` +
+                `<img src=${item.image} alt="Buy"><br />` +
+                `${item.type} - ${shopStatusByName[item.type3].price} Gold<br />` +
+                buyButton(item.type2, 1, 'Buy') +
+                buyButton(item.type2, 10, 'Buy 10') +
+                buyButton(item.type2, 100, 'Buy 100') +
+                `</div></div>`
+        )
+        .join('');
+
+    document.getElementById('shopOther').innerHTML =
+        `<div class="row"><div class="col-xs-12"><div class="row">${rows}</div></div></div>`;
 }
 
 var shopOtherList = [
@@ -2110,7 +2082,6 @@ function itemTooltipTest(item) {
     html += '</div>';
     return html;
 }
-
 
 function activeBuffsHtml() {
     var html = '';
