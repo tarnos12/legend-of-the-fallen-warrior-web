@@ -7,13 +7,13 @@ import { describe, it, expect } from 'vitest';
 import * as core from '../src/core.js';
 
 describe('module graph loads', () => {
-  it('exports core game state + helpers', () => {
-    expect(core.player).toBeTypeOf('object');
-    expect(core.player.properties).toBeTypeOf('object');
-    expect(core.equippedItems).toBeTypeOf('object');
-    expect(core.getThousands).toBeTypeOf('function');
-    expect(core.getNumberMultiplierofFive).toBeTypeOf('function');
-    expect(core.getTen).toBeTypeOf('function');
-    expect(core.Log).toBeTypeOf('function');
-  });
+    it('exports core game state + helpers', () => {
+        expect(core.player).toBeTypeOf('object');
+        expect(core.player.properties).toBeTypeOf('object');
+        expect(core.equippedItems).toBeTypeOf('object');
+        expect(core.getThousands).toBeTypeOf('function');
+        expect(core.getNumberMultiplierofFive).toBeTypeOf('function');
+        expect(core.getTen).toBeTypeOf('function');
+        expect(core.Log).toBeTypeOf('function');
+    });
 });

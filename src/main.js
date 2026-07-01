@@ -40,7 +40,9 @@ import { startLogo, startingScreen, testss } from './dynamicHtml.js';
 function initGame() {
     startingScreen();
     startLogo();
-    setTimeout(function () { testss(); }, 3000);
+    setTimeout(function () {
+        testss();
+    }, 3000);
     createEquippedItemsObject('all');
     copyPlayerProperties();
     createHerbs();

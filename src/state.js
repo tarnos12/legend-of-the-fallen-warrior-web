@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 // Shared mutable PRIMITIVE game state (Phase 3 ESM).
 //

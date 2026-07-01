@@ -1,4 +1,4 @@
-﻿"use strict";
+﻿'use strict';
 import { player } from './core.js';
 
 // Phase 3 ESM: monsterList is a real export, mutated in place. MakeMonsterList
@@ -10,29 +10,23 @@ export const monsterList = {};
 export function MakeMonsterList() {
     var newMonster = function (level, name, displayName, id, area) {
         this.difficultyMultiplier = function () {
-            if (player.properties.difficulty === "Mortal") {
+            if (player.properties.difficulty === 'Mortal') {
                 return 0.2;
-            }
-            else if (player.properties.difficulty === "Ageless") {
+            } else if (player.properties.difficulty === 'Ageless') {
                 return 0.5;
-            }
-            else if (player.properties.difficulty === "Hero") {
+            } else if (player.properties.difficulty === 'Hero') {
                 return 1;
-            }
-            else if (player.properties.difficulty === "Immortal") {
+            } else if (player.properties.difficulty === 'Immortal') {
                 return 2;
-            }
-            else if (player.properties.difficulty === "Lich") {
+            } else if (player.properties.difficulty === 'Lich') {
                 return 3;
-            }
-            else if (player.properties.difficulty === "Legend") {
+            } else if (player.properties.difficulty === 'Legend') {
                 return 5;
-            }
-            else {
+            } else {
                 console.log('Difficulty settings changed');
-                player.properties.difficulty = "Hero";
+                player.properties.difficulty = 'Hero';
                 return 1;
-            };
+            }
         };
         this.level = level + player.properties.monsterLevel;
         this.name = name;
@@ -40,101 +34,208 @@ export function MakeMonsterList() {
         this.id = id;
         this.area = area;
         this.monsterHealth = function () {
-            return Math.floor(this.level * 150 * this.difficultyMultiplier() * player.properties.prestigeMultiplier);
+            return Math.floor(
+                this.level *
+                    150 *
+                    this.difficultyMultiplier() *
+                    player.properties.prestigeMultiplier
+            );
         };
         this.hp = this.monsterHealth();
         this.maxHp = this.hp;
         this.def = function () {
-            return this.level * 3 * this.difficultyMultiplier() * player.properties.prestigeMultiplier;
+            return (
+                this.level * 3 * this.difficultyMultiplier() * player.properties.prestigeMultiplier
+            );
         };
         this.minDmg = function () {
-            return this.level * 22 * this.difficultyMultiplier() * player.properties.prestigeMultiplier;
+            return (
+                this.level * 22 * this.difficultyMultiplier() * player.properties.prestigeMultiplier
+            );
         };
         this.maxDmg = function () {
-            return this.level * 27 * this.difficultyMultiplier() * player.properties.prestigeMultiplier;
+            return (
+                this.level * 27 * this.difficultyMultiplier() * player.properties.prestigeMultiplier
+            );
         };
         this.baseExp = function () {
-            return this.level * 5 * this.difficultyMultiplier() * player.properties.prestigeMultiplier;
+            return (
+                this.level * 5 * this.difficultyMultiplier() * player.properties.prestigeMultiplier
+            );
         };
         this.acc = 100;
         this.eva = 10;
         this.isShown = false;
         this.killCount = 0;
         this.manaCost = function () {
-            return this.level * 100 * this.difficultyMultiplier() * player.properties.prestigeMultiplier;
+            return (
+                this.level *
+                100 *
+                this.difficultyMultiplier() *
+                player.properties.prestigeMultiplier
+            );
         };
     };
     //Bandit Hideout
-    var monster001 = new newMonster(1, "VarikGrunt", "Varik Grunt", 1, "BanditHideout");
+    var monster001 = new newMonster(1, 'VarikGrunt', 'Varik Grunt', 1, 'BanditHideout');
     monster001.isShown = true;
-    var monster002 = new newMonster(2, "VarikSoldier", "Varik Soldier", 2, "BanditHideout");
-    var monster003 = new newMonster(3, "VarikMarksmen", "Varik Marksmen", 3, "BanditHideout");
-    var monster004 = new newMonster(4, "VarikVulture", "Varik Vulture", 4, "BanditHideout");
-    var monster005 = new newMonster(5, "VarikEvader", "Varik Evader", 5, "BanditHideout");
-    var monster006 = new newMonster(6, "VariksLiar", "Variks Liar", 6, "BanditHideout");
-    var monster007 = new newMonster(8, "VariksQueen", "Variks Queen", 7, "BanditHideout");
-    var monster008 = new newMonster(10, "LordVarik", "Lord Varik", 8, "BanditHideout");
+    var monster002 = new newMonster(2, 'VarikSoldier', 'Varik Soldier', 2, 'BanditHideout');
+    var monster003 = new newMonster(3, 'VarikMarksmen', 'Varik Marksmen', 3, 'BanditHideout');
+    var monster004 = new newMonster(4, 'VarikVulture', 'Varik Vulture', 4, 'BanditHideout');
+    var monster005 = new newMonster(5, 'VarikEvader', 'Varik Evader', 5, 'BanditHideout');
+    var monster006 = new newMonster(6, 'VariksLiar', 'Variks Liar', 6, 'BanditHideout');
+    var monster007 = new newMonster(8, 'VariksQueen', 'Variks Queen', 7, 'BanditHideout');
+    var monster008 = new newMonster(10, 'LordVarik', 'Lord Varik', 8, 'BanditHideout');
 
     //Forest of Narsus
-    var monster009 = new newMonster(11, "ToxicFlies", "Toxic Flies", 9, "ForestofNarsus");
-    var monster010 = new newMonster(12, "Stalker", "Stalker", 10, "ForestofNarsus");
-    var monster011 = new newMonster(13, "AlphaStalker", "Alpha Stalker", 11, "ForestofNarsus");
-    var monster012 = new newMonster(14, "StalkerPack", "Stalker Pack", 12, "ForestofNarsus");
-    var monster013 = new newMonster(15, "JumpingSpider", "Jumping Spider", 13, "ForestofNarsus");
-    var monster014 = new newMonster(16, "SpiderBeast", "Spider Beast", 14, "ForestofNarsus");
-    var monster015 = new newMonster(18, "Narsus", "Narsus", 15, "ForestofNarsus");
-    var monster016 = new newMonster(20, "JotunnScout", "Jotunn Scout", 16, "ForestofNarsus");
+    var monster009 = new newMonster(11, 'ToxicFlies', 'Toxic Flies', 9, 'ForestofNarsus');
+    var monster010 = new newMonster(12, 'Stalker', 'Stalker', 10, 'ForestofNarsus');
+    var monster011 = new newMonster(13, 'AlphaStalker', 'Alpha Stalker', 11, 'ForestofNarsus');
+    var monster012 = new newMonster(14, 'StalkerPack', 'Stalker Pack', 12, 'ForestofNarsus');
+    var monster013 = new newMonster(15, 'JumpingSpider', 'Jumping Spider', 13, 'ForestofNarsus');
+    var monster014 = new newMonster(16, 'SpiderBeast', 'Spider Beast', 14, 'ForestofNarsus');
+    var monster015 = new newMonster(18, 'Narsus', 'Narsus', 15, 'ForestofNarsus');
+    var monster016 = new newMonster(20, 'JotunnScout', 'Jotunn Scout', 16, 'ForestofNarsus');
 
     //Oz Jotnar
-    var monster017 = new newMonster(21, "JotnarAmbushSquad", "Jotnar Ambush Squad", 17, "OzJotnar");
-    var monster018 = new newMonster(22, "LongRangeExterminationSquad", "Long Range Extermination Squad", 18, "OzJotnar");
-    var monster019 = new newMonster(23, "BerserkerShockSquad", "Berserker Shock Squad", 19, "OzJotnar");
-    var monster020 = new newMonster(24, "BerserkerShockSquadCaptainRendGrest", "Berserker Shock Squad Captain Rend Grest", 20, "OzJotnar");
-    var monster021 = new newMonster(25, "ArtillerySquad", "Artillery Squad", 21, "OzJotnar");
-    var monster022 = new newMonster(26, "JottunMainInfantry", "Jottun Main Infantry", 22, "OzJotnar");
-    var monster023 = new newMonster(28, "RegentCairLorn", "Regent Cair Lorn", 23, "OzJotnar");
-    var monster024 = new newMonster(30, "DeepKingTarNuk", "Deep King Tar Nuk", 24, "OzJotnar");
-
+    var monster017 = new newMonster(21, 'JotnarAmbushSquad', 'Jotnar Ambush Squad', 17, 'OzJotnar');
+    var monster018 = new newMonster(
+        22,
+        'LongRangeExterminationSquad',
+        'Long Range Extermination Squad',
+        18,
+        'OzJotnar'
+    );
+    var monster019 = new newMonster(
+        23,
+        'BerserkerShockSquad',
+        'Berserker Shock Squad',
+        19,
+        'OzJotnar'
+    );
+    var monster020 = new newMonster(
+        24,
+        'BerserkerShockSquadCaptainRendGrest',
+        'Berserker Shock Squad Captain Rend Grest',
+        20,
+        'OzJotnar'
+    );
+    var monster021 = new newMonster(25, 'ArtillerySquad', 'Artillery Squad', 21, 'OzJotnar');
+    var monster022 = new newMonster(
+        26,
+        'JottunMainInfantry',
+        'Jottun Main Infantry',
+        22,
+        'OzJotnar'
+    );
+    var monster023 = new newMonster(28, 'RegentCairLorn', 'Regent Cair Lorn', 23, 'OzJotnar');
+    var monster024 = new newMonster(30, 'DeepKingTarNuk', 'Deep King Tar Nuk', 24, 'OzJotnar');
 
     //Twisted Marrow
-    var monster025 = new newMonster(31, "DepthCrawler", "Depth Crawler", 25, "TwistedMarrow");
-    var monster026 = new newMonster(32, "FadingGoblins", "Fading Goblins", 26, "TwistedMarrow");
-    var monster027 = new newMonster(33, "StarBriteGolems", "Star Brite Golems", 27, "TwistedMarrow");
-    var monster028 = new newMonster(34, "Bannecs", "Bannecs", 28, "TwistedMarrow");
-    var monster029 = new newMonster(35, "Kholders", "Kholders", 29, "TwistedMarrow");
-    var monster030 = new newMonster(36, "LivingWalls", "Living Walls", 30, "TwistedMarrow");
-    var monster031 = new newMonster(38, "Keeper", "Keeper", 31, "TwistedMarrow");
-    var monster032 = new newMonster(40, "LegendoftheAncientDreamer", "Legend of the Ancient Dreamer", 32, "TwistedMarrow");
+    var monster025 = new newMonster(31, 'DepthCrawler', 'Depth Crawler', 25, 'TwistedMarrow');
+    var monster026 = new newMonster(32, 'FadingGoblins', 'Fading Goblins', 26, 'TwistedMarrow');
+    var monster027 = new newMonster(
+        33,
+        'StarBriteGolems',
+        'Star Brite Golems',
+        27,
+        'TwistedMarrow'
+    );
+    var monster028 = new newMonster(34, 'Bannecs', 'Bannecs', 28, 'TwistedMarrow');
+    var monster029 = new newMonster(35, 'Kholders', 'Kholders', 29, 'TwistedMarrow');
+    var monster030 = new newMonster(36, 'LivingWalls', 'Living Walls', 30, 'TwistedMarrow');
+    var monster031 = new newMonster(38, 'Keeper', 'Keeper', 31, 'TwistedMarrow');
+    var monster032 = new newMonster(
+        40,
+        'LegendoftheAncientDreamer',
+        'Legend of the Ancient Dreamer',
+        32,
+        'TwistedMarrow'
+    );
 
     //Kharm Sheath
-    var monster033 = new newMonster(41, "BabyDuneDigger", "Baby Dune Digger", 33, "KharmSheath");
-    var monster034 = new newMonster(42, "CamelSpiderHerds", "Camel Spider Herds", 34, "KharmSheath");
-    var monster035 = new newMonster(43, "WasteEagle", "Waste Eagle", 35, "KharmSheath");
-    var monster036 = new newMonster(44, "GrelTribeGuard", "Grel Tribe Guard", 36, "KharmSheath");
-    var monster037 = new newMonster(45, "GrelWarriors", "Grel Warriors", 37, "KharmSheath");
-    var monster038 = new newMonster(46, "GrelSpitters", "Grel Spitters", 38, "KharmSheath");
-    var monster039 = new newMonster(48, "GrelChief", "Grel Chief", 39, "KharmSheath");
-    var monster040 = new newMonster(50, "MommaDuneDiggerSheila", "Momma Dune Digger Sheila", 40, "KharmSheath");
+    var monster033 = new newMonster(41, 'BabyDuneDigger', 'Baby Dune Digger', 33, 'KharmSheath');
+    var monster034 = new newMonster(
+        42,
+        'CamelSpiderHerds',
+        'Camel Spider Herds',
+        34,
+        'KharmSheath'
+    );
+    var monster035 = new newMonster(43, 'WasteEagle', 'Waste Eagle', 35, 'KharmSheath');
+    var monster036 = new newMonster(44, 'GrelTribeGuard', 'Grel Tribe Guard', 36, 'KharmSheath');
+    var monster037 = new newMonster(45, 'GrelWarriors', 'Grel Warriors', 37, 'KharmSheath');
+    var monster038 = new newMonster(46, 'GrelSpitters', 'Grel Spitters', 38, 'KharmSheath');
+    var monster039 = new newMonster(48, 'GrelChief', 'Grel Chief', 39, 'KharmSheath');
+    var monster040 = new newMonster(
+        50,
+        'MommaDuneDiggerSheila',
+        'Momma Dune Digger Sheila',
+        40,
+        'KharmSheath'
+    );
 
     //Frigid Aberration
-    var monster041 = new newMonster(51, "CrystalFloater", "Crystal Floater", 41, "FrigidAberration");
-    var monster042 = new newMonster(52, "SnowWatcher", "Snow Watcher", 42, "FrigidAberration");
-    var monster043 = new newMonster(53, "CannibalTribeTrachid", "Cannibal Tribe Trachid", 43, "FrigidAberration");
-    var monster044 = new newMonster(54, "LegendoftheRageCalm", "Legend of the Rage Calm", 44, "FrigidAberration");
-    var monster045 = new newMonster(55, "IceGiantKing", "Ice Giant King", 45, "FrigidAberration");
-    var monster046 = new newMonster(56, "FrightGolem", "Fright Golem", 46, "FrigidAberration");
-    var monster047 = new newMonster(58, "FrightGolemArmy", "Fright Golem Army", 47, "FrigidAberration");
-    var monster048 = new newMonster(60, "LegendoftheRageFullPower", "Legend of the Rage Full Power", 48, "FrigidAberration");
+    var monster041 = new newMonster(
+        51,
+        'CrystalFloater',
+        'Crystal Floater',
+        41,
+        'FrigidAberration'
+    );
+    var monster042 = new newMonster(52, 'SnowWatcher', 'Snow Watcher', 42, 'FrigidAberration');
+    var monster043 = new newMonster(
+        53,
+        'CannibalTribeTrachid',
+        'Cannibal Tribe Trachid',
+        43,
+        'FrigidAberration'
+    );
+    var monster044 = new newMonster(
+        54,
+        'LegendoftheRageCalm',
+        'Legend of the Rage Calm',
+        44,
+        'FrigidAberration'
+    );
+    var monster045 = new newMonster(55, 'IceGiantKing', 'Ice Giant King', 45, 'FrigidAberration');
+    var monster046 = new newMonster(56, 'FrightGolem', 'Fright Golem', 46, 'FrigidAberration');
+    var monster047 = new newMonster(
+        58,
+        'FrightGolemArmy',
+        'Fright Golem Army',
+        47,
+        'FrigidAberration'
+    );
+    var monster048 = new newMonster(
+        60,
+        'LegendoftheRageFullPower',
+        'Legend of the Rage Full Power',
+        48,
+        'FrigidAberration'
+    );
 
     //Capital of Zyzx
-    var monster049 = new newMonster(61, "LegionofDreadWallGuards", "Legion of Dread Wall Guards", 49, "Zyzx");
-    var monster050 = new newMonster(62, "Dreadnaughts", "Dreadnaughts", 50, "Zyzx");
-    var monster051 = new newMonster(63, "DreadnaughtElite", "Dreadnaught Elite", 51, "Zyzx");
-    var monster052 = new newMonster(64, "EmaciatedMagi", "Emaciated Magi", 52, "Zyzx");
-    var monster053 = new newMonster(65, "MagiThunderCallers", "Magi Thunder Callers", 53, "Zyzx");
-    var monster054 = new newMonster(66, "FalseDragonSlayers", "False Dragon Slayers", 54, "Zyzx");
-    var monster055 = new newMonster(68, "TorturedBeholder", "Tortured Beholder", 55, "Zyzx");
-    var monster056 = new newMonster(70, "KingoftheLegionGrantBannecs", "King of the Legion Grant Bannecs", 56, "Zyzx");
+    var monster049 = new newMonster(
+        61,
+        'LegionofDreadWallGuards',
+        'Legion of Dread Wall Guards',
+        49,
+        'Zyzx'
+    );
+    var monster050 = new newMonster(62, 'Dreadnaughts', 'Dreadnaughts', 50, 'Zyzx');
+    var monster051 = new newMonster(63, 'DreadnaughtElite', 'Dreadnaught Elite', 51, 'Zyzx');
+    var monster052 = new newMonster(64, 'EmaciatedMagi', 'Emaciated Magi', 52, 'Zyzx');
+    var monster053 = new newMonster(65, 'MagiThunderCallers', 'Magi Thunder Callers', 53, 'Zyzx');
+    var monster054 = new newMonster(66, 'FalseDragonSlayers', 'False Dragon Slayers', 54, 'Zyzx');
+    var monster055 = new newMonster(68, 'TorturedBeholder', 'Tortured Beholder', 55, 'Zyzx');
+    var monster056 = new newMonster(
+        70,
+        'KingoftheLegionGrantBannecs',
+        'King of the Legion Grant Bannecs',
+        56,
+        'Zyzx'
+    );
 
     monster056.lastEnemy = true;
 
@@ -196,4 +297,3 @@ export function MakeMonsterList() {
     monsterList.monster055 = monster055;
     monsterList.monster056 = monster056;
 }
-

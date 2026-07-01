@@ -1,5 +1,12 @@
-﻿"use strict";
-import { player, Log, potionBuyLog, notEnoughMoneyLog, inventoryBuyLog, statBuyLog } from './core.js';
+﻿'use strict';
+import {
+    player,
+    Log,
+    potionBuyLog,
+    notEnoughMoneyLog,
+    inventoryBuyLog,
+    statBuyLog,
+} from './core.js';
 import { updateHtml } from './stats.js';
 import { createPotionInventory, potionList } from './potionsHotbar.js';
 import { shopOther, CreateInventoryWeaponHtml } from './dynamicHtml.js';
@@ -19,16 +26,21 @@ function potionBuy(type, count) {
     var priceToPay = 0;
     for (var i = 0; i < count; i++) {
         priceToPay += priceTemp;
-    };
+    }
     if (player.properties.gold >= priceToPay) {
         type.price = priceTemp;
         player.properties.gold -= priceToPay;
         return true;
-    };
-    Log("<span id=\"notEnoughMoney\" class =\"bold\" style=\"color:red; display:none;\">You do not have enough money to buy this. You need : " + (priceToPay - player.properties.gold) + " more gold.<br />" + "</span>");
+    }
+    Log(
+        '<span id="notEnoughMoney" class ="bold" style="color:red; display:none;">You do not have enough money to buy this. You need : ' +
+            (priceToPay - player.properties.gold) +
+            ' more gold.<br />' +
+            '</span>'
+    );
     notEnoughMoneyLog();
     return false;
-};
+}
 
 //Buy potions
 function buySmallPotion(count) {
@@ -41,27 +53,32 @@ function buySmallPotion(count) {
             if (potionInventory[i].name === 'smallPotion') {
                 potionInventory[i].amount += count;
                 break;
-            }
-            else if (i === potionInventory.length - 1) {
+            } else if (i === potionInventory.length - 1) {
                 potionInventory.push(potionList.smallPotion);
                 potionInventory[i + 1].amount += count;
                 break;
             }
-        };
-        
+        }
+
         updateHtml();
-        var potionType = "Potions";
-        Log("<span id=\"potionBuy\" class =\"bold\" style=\"color:green; display:none;\">You bought : " + count + " " + potionType + ".<br />" + "</span>");
+        var potionType = 'Potions';
+        Log(
+            '<span id="potionBuy" class ="bold" style="color:green; display:none;">You bought : ' +
+                count +
+                ' ' +
+                potionType +
+                '.<br />' +
+                '</span>'
+        );
         potionBuyLog();
-    };
+    }
     shopOther();
-    createPotionInventory()
-};
+    createPotionInventory();
+}
 
 //Buy Super potions
 function buyMediumPotion(count) {
     if (potionBuy(mediumPotionStatus, count)) {
-
         var potionInventory = player.properties.potionInventory;
         if (potionInventory.length < 1) {
             potionInventory.push(potionList.mediumPotion);
@@ -70,27 +87,32 @@ function buyMediumPotion(count) {
             if (potionInventory[i].name === 'mediumPotion') {
                 potionInventory[i].amount += count;
                 break;
-            }
-            else if (i === potionInventory.length - 1) {
+            } else if (i === potionInventory.length - 1) {
                 potionInventory.push(potionList.mediumPotion);
                 potionInventory[i + 1].amount += count;
                 break;
             }
-        };
+        }
 
         updateHtml();
-        var potionType = "Medium Potions";
-        Log("<span id=\"potionBuy\" class =\"bold\" style=\"color:green; display:none;\">You bought : " + count + " " + potionType + ".<br />" + "</span>");
+        var potionType = 'Medium Potions';
+        Log(
+            '<span id="potionBuy" class ="bold" style="color:green; display:none;">You bought : ' +
+                count +
+                ' ' +
+                potionType +
+                '.<br />' +
+                '</span>'
+        );
         potionBuyLog();
-    };
+    }
     shopOther();
-    createPotionInventory()
-};
+    createPotionInventory();
+}
 
 //Buy Mega potions
 function buySuperPotion(count) {
     if (potionBuy(superPotionStatus, count)) {
-
         var potionInventory = player.properties.potionInventory;
         if (potionInventory.length < 1) {
             potionInventory.push(potionList.superPotion);
@@ -99,22 +121,28 @@ function buySuperPotion(count) {
             if (potionInventory[i].name === 'superPotion') {
                 potionInventory[i].amount += count;
                 break;
-            }
-            else if (i === potionInventory.length - 1) {
+            } else if (i === potionInventory.length - 1) {
                 potionInventory.push(potionList.superPotion);
                 potionInventory[i + 1].amount += count;
                 break;
             }
-        };
+        }
 
         updateHtml();
-        var potionType = "Super Potions";
-        Log("<span id=\"potionBuy\" class =\"bold\" style=\"color:green; display:none;\">You bought : " + count + " " + potionType + ".<br />" + "</span>");
+        var potionType = 'Super Potions';
+        Log(
+            '<span id="potionBuy" class ="bold" style="color:green; display:none;">You bought : ' +
+                count +
+                ' ' +
+                potionType +
+                '.<br />' +
+                '</span>'
+        );
         potionBuyLog();
-    };
+    }
     shopOther();
-    createPotionInventory()
-};
+    createPotionInventory();
+}
 
 export const backpackStatus = {};
 backpackStatus.price = 100;
@@ -131,17 +159,22 @@ function buyStuff(type, count) {
     for (var i = 0; i < count; i++) {
         priceToPay += priceTemp;
         priceTemp = Math.round(priceTemp * type.multiplier);
-    };
+    }
 
     if (player.properties.gold >= priceToPay) {
         type.price = priceTemp;
         player.properties.gold -= priceToPay;
         return true;
-    };
-    Log("<span id=\"notEnoughMoney\" class =\"bold\" style=\"color:red; display:none;\">You do not have enough money to buy this. You need : " + (priceToPay - player.properties.gold) + " more gold.<br />" + "</span>");
+    }
+    Log(
+        '<span id="notEnoughMoney" class ="bold" style="color:red; display:none;">You do not have enough money to buy this. You need : ' +
+            (priceToPay - player.properties.gold) +
+            ' more gold.<br />' +
+            '</span>'
+    );
     notEnoughMoneyLog();
     return false;
-};
+}
 
 //Buy backpack
 function buyBackpack(count) {
@@ -149,22 +182,34 @@ function buyBackpack(count) {
         player.properties.backpackUpgrade += count;
         updateHtml();
         CreateInventoryWeaponHtml();
-        Log("<span id=\"inventoryBuy\" class =\"bold\" style=\"color:green; display:none;\">Inventory slots upgraded by: " + count + ", now you have: " + player.functions.inventory() + " inventory slots.<br />" + "</span>");
+        Log(
+            '<span id="inventoryBuy" class ="bold" style="color:green; display:none;">Inventory slots upgraded by: ' +
+                count +
+                ', now you have: ' +
+                player.functions.inventory() +
+                ' inventory slots.<br />' +
+                '</span>'
+        );
         inventoryBuyLog();
-    };
+    }
     shopOther();
-};
+}
 
 //Buy Stat points
 function buyStat(count) {
     if (buyStuff(statStatus, count)) {
         player.properties.stats += count;
         updateHtml();
-        Log("<span id=\"statBuy\" class =\"bold\" style=\"color:green; display:none;\">Your stat points increased by: " + count + ".<br />" + "</span>");
+        Log(
+            '<span id="statBuy" class ="bold" style="color:green; display:none;">Your stat points increased by: ' +
+                count +
+                '.<br />' +
+                '</span>'
+        );
         statBuyLog();
-    };
+    }
     shopOther();
-};
+}
 // The status objects are now real exports (imported by dynamicHtml/save). Only
 // the buy* handlers stay on window: they are inline-onclick dispatched via
 // item.type2 (onclick="' + type2 + '(...)"). potionBuy and buyStuff are

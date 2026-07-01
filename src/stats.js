@@ -1,26 +1,33 @@
-﻿"use strict";
+﻿'use strict';
 import { playerPassive } from './skills.js';
 import { characterRaces } from './gameObjects.js';
 import { player, equippedItems, Log, getThousands, fadeLog } from './core.js';
 import { CreatePlayerHotBar } from './potionsHotbar.js';
-import { CreateWeaponSkillHtml, CreateMonsterHtml, CreatePlayerSkillsHtml, primaryStatUpdate, secondaryStatUpdate } from './dynamicHtml.js';
+import {
+    CreateWeaponSkillHtml,
+    CreateMonsterHtml,
+    CreatePlayerSkillsHtml,
+    primaryStatUpdate,
+    secondaryStatUpdate,
+} from './dynamicHtml.js';
 function updateHtml() {
-    if (player.properties.stats >= 1) { // Show "plus" image when player level up
-        document.getElementById("Strength").style.visibility = "visible";
-        document.getElementById("Endurance").style.visibility = "visible";
-        document.getElementById("Agility").style.visibility = "visible";
-        document.getElementById("Dexterity").style.visibility = "visible";
-        document.getElementById("Wisdom").style.visibility = "visible";
-        document.getElementById("Intelligence").style.visibility = "visible";
-        document.getElementById("Luck").style.visibility = "visible";
+    if (player.properties.stats >= 1) {
+        // Show "plus" image when player level up
+        document.getElementById('Strength').style.visibility = 'visible';
+        document.getElementById('Endurance').style.visibility = 'visible';
+        document.getElementById('Agility').style.visibility = 'visible';
+        document.getElementById('Dexterity').style.visibility = 'visible';
+        document.getElementById('Wisdom').style.visibility = 'visible';
+        document.getElementById('Intelligence').style.visibility = 'visible';
+        document.getElementById('Luck').style.visibility = 'visible';
     } else {
-        document.getElementById("Strength").style.visibility = "hidden";
-        document.getElementById("Endurance").style.visibility = "hidden";
-        document.getElementById("Agility").style.visibility = "hidden";
-        document.getElementById("Dexterity").style.visibility = "hidden";
-        document.getElementById("Wisdom").style.visibility = "hidden";
-        document.getElementById("Intelligence").style.visibility = "hidden";
-        document.getElementById("Luck").style.visibility = "hidden";
+        document.getElementById('Strength').style.visibility = 'hidden';
+        document.getElementById('Endurance').style.visibility = 'hidden';
+        document.getElementById('Agility').style.visibility = 'hidden';
+        document.getElementById('Dexterity').style.visibility = 'hidden';
+        document.getElementById('Wisdom').style.visibility = 'hidden';
+        document.getElementById('Intelligence').style.visibility = 'hidden';
+        document.getElementById('Luck').style.visibility = 'hidden';
     }
     var level;
     var maxExperience;
@@ -36,74 +43,195 @@ function updateHtml() {
     var damage;
     var stats;
     var spellPower;
-    var mana
+    var mana;
 
-    strength = document.getElementById("totalStrength");
-    endurance = document.getElementById("totalEndurance");
-    agility = document.getElementById("totalAgility");
-    dexterity = document.getElementById("totalDexterity");
-    wisdom = document.getElementById("totalWisdom");
-    intelligence = document.getElementById("totalIntelligence");
-    luck = document.getElementById("totalLuck");
-    damage = document.getElementById("damage");
-    stats = document.getElementById("stats");
-    spellPower = document.getElementById("spellPower");
-    mana = document.getElementById("mana");
+    strength = document.getElementById('totalStrength');
+    endurance = document.getElementById('totalEndurance');
+    agility = document.getElementById('totalAgility');
+    dexterity = document.getElementById('totalDexterity');
+    wisdom = document.getElementById('totalWisdom');
+    intelligence = document.getElementById('totalIntelligence');
+    luck = document.getElementById('totalLuck');
+    damage = document.getElementById('damage');
+    stats = document.getElementById('stats');
+    spellPower = document.getElementById('spellPower');
+    mana = document.getElementById('mana');
 
+    strength.innerHTML =
+        '<span class=\'cursorHelp\' data-toggle="tooltip" data-placement="top" title="Total Strength">' +
+        player.functions.totalStrength() +
+        '</span>' +
+        '<a class="tooltipA">' +
+        '<p class="glyphicon glyphicon-info-sign"></p>' +
+        '<span style="text-align:left;right:0;left:-160px;bottom:80px;width:200px;">' +
+        'Base: ' +
+        player.properties.baseStrength +
+        '<br />Equipment: ' +
+        player.functions.totalStrengthBonus() +
+        '<br />Multiplier: ' +
+        ((player.functions.masteryStrength() + player.properties.raceAllStats / 100) * 100).toFixed(
+            0
+        ) +
+        '%' +
+        '</span></a> ';
 
-    strength.innerHTML = "<span class='cursorHelp' data-toggle=\"tooltip\" data-placement=\"top\" title=\"Total Strength\">" + player.functions.totalStrength() + "</span>" +
-        "<a class=\"tooltipA\">" + "<p class=\"glyphicon glyphicon-info-sign\"></p>" + "<span style=\"text-align:left;right:0;left:-160px;bottom:80px;width:200px;\">" + "Base: " + player.properties.baseStrength +
-        "<br />Equipment: " + player.functions.totalStrengthBonus() +
-        "<br />Multiplier: " + ((player.functions.masteryStrength() + (player.properties.raceAllStats / 100)) * 100).toFixed(0) + "%" + "</span></a> ";
+    endurance.innerHTML =
+        '<span class=\'cursorHelp\' data-toggle="tooltip" data-placement="top" title="Total Endurance">' +
+        player.functions.totalEndurance() +
+        '</span>' +
+        '<a class="tooltipA">' +
+        '<p class="glyphicon glyphicon-info-sign"></p>' +
+        '<span style="text-align:left;right:0;left:-160px;bottom:80px;width:200px;">' +
+        'Base: ' +
+        player.properties.baseEndurance +
+        '<br />Equipment: ' +
+        player.functions.totalEnduranceBonus() +
+        '<br />Multiplier: ' +
+        (
+            (player.functions.masteryEndurance() + player.properties.raceAllStats / 100) *
+            100
+        ).toFixed(0) +
+        '%' +
+        '</span></a> ';
 
-    endurance.innerHTML = "<span class='cursorHelp' data-toggle=\"tooltip\" data-placement=\"top\" title=\"Total Endurance\">" + player.functions.totalEndurance() + "</span>" +
-        "<a class=\"tooltipA\">" + "<p class=\"glyphicon glyphicon-info-sign\"></p>" + "<span style=\"text-align:left;right:0;left:-160px;bottom:80px;width:200px;\">" + "Base: " + player.properties.baseEndurance +
-        "<br />Equipment: " + player.functions.totalEnduranceBonus() +
-        "<br />Multiplier: " + ((player.functions.masteryEndurance() + (player.properties.raceAllStats / 100)) * 100).toFixed(0) + "%" + "</span></a> ";
+    agility.innerHTML =
+        '<span class=\'cursorHelp\' data-toggle="tooltip" data-placement="top" title="Total Agility">' +
+        player.functions.totalAgility() +
+        '</span>' +
+        '<a class="tooltipA">' +
+        '<p class="glyphicon glyphicon-info-sign"></p>' +
+        '<span style="text-align:left;right:0;left:-160px;bottom:80px;width:200px;">' +
+        'Base: ' +
+        player.properties.baseAgility +
+        '<br />Equipment: ' +
+        player.functions.totalAgilityBonus() +
+        '<br />Multiplier: ' +
+        ((player.functions.masteryAgility() + player.properties.raceAllStats / 100) * 100).toFixed(
+            0
+        ) +
+        '%' +
+        '</span></a> ';
 
-    agility.innerHTML = "<span class='cursorHelp' data-toggle=\"tooltip\" data-placement=\"top\" title=\"Total Agility\">" + player.functions.totalAgility() + "</span>" +
-        "<a class=\"tooltipA\">" + "<p class=\"glyphicon glyphicon-info-sign\"></p>" + "<span style=\"text-align:left;right:0;left:-160px;bottom:80px;width:200px;\">" + "Base: " + player.properties.baseAgility +
-        "<br />Equipment: " + player.functions.totalAgilityBonus() +
-        "<br />Multiplier: " + ((player.functions.masteryAgility() + (player.properties.raceAllStats / 100)) * 100).toFixed(0) + "%" + "</span></a> ";
+    dexterity.innerHTML =
+        '<span class=\'cursorHelp\' data-toggle="tooltip" data-placement="top" title="Total Dexterity">' +
+        player.functions.totalDexterity() +
+        '</span>' +
+        '<a class="tooltipA">' +
+        '<p class="glyphicon glyphicon-info-sign"></p>' +
+        '<span style="text-align:left;right:0;left:-160px;bottom:80px;width:200px;">' +
+        'Base: ' +
+        player.properties.baseDexterity +
+        '<br />Equipment: ' +
+        player.functions.totalDexterityBonus() +
+        '<br />Multiplier: ' +
+        (
+            (player.functions.masteryDexterity() + player.properties.raceAllStats / 100) *
+            100
+        ).toFixed(0) +
+        '%' +
+        '</span></a> ';
 
-    dexterity.innerHTML = "<span class='cursorHelp' data-toggle=\"tooltip\" data-placement=\"top\" title=\"Total Dexterity\">" + player.functions.totalDexterity() + "</span>" +
-        "<a class=\"tooltipA\">" + "<p class=\"glyphicon glyphicon-info-sign\"></p>" + "<span style=\"text-align:left;right:0;left:-160px;bottom:80px;width:200px;\">" + "Base: " + player.properties.baseDexterity +
-        "<br />Equipment: " + player.functions.totalDexterityBonus() +
-        "<br />Multiplier: " + ((player.functions.masteryDexterity() + (player.properties.raceAllStats / 100)) * 100).toFixed(0) + "%" + "</span></a> ";
+    wisdom.innerHTML =
+        '<span class=\'cursorHelp\' data-toggle="tooltip" data-placement="top" title="Total Wisdom">' +
+        player.functions.totalWisdom() +
+        '</span>' +
+        '<a class="tooltipA">' +
+        '<p class="glyphicon glyphicon-info-sign"></p>' +
+        '<span style="text-align:left;right:0;left:-160px;bottom:80px;width:200px;">' +
+        'Base: ' +
+        player.properties.baseWisdom +
+        '<br />Equipment: ' +
+        player.functions.totalWisdomBonus() +
+        '<br />Multiplier: ' +
+        ((player.functions.masteryWisdom() + player.properties.raceAllStats / 100) * 100).toFixed(
+            0
+        ) +
+        '%' +
+        '</span></a> ';
 
-    wisdom.innerHTML = "<span class='cursorHelp' data-toggle=\"tooltip\" data-placement=\"top\" title=\"Total Wisdom\">" + player.functions.totalWisdom() + "</span>" +
-        "<a class=\"tooltipA\">" + "<p class=\"glyphicon glyphicon-info-sign\"></p>" + "<span style=\"text-align:left;right:0;left:-160px;bottom:80px;width:200px;\">" + "Base: " + player.properties.baseWisdom +
-        "<br />Equipment: " + player.functions.totalWisdomBonus() +
-        "<br />Multiplier: " + ((player.functions.masteryWisdom() + (player.properties.raceAllStats / 100)) * 100).toFixed(0) + "%" + "</span></a> ";
+    intelligence.innerHTML =
+        '<span class=\'cursorHelp\' data-toggle="tooltip" data-placement="top" title="Total Intelligence">' +
+        player.functions.totalIntelligence() +
+        '</span>' +
+        '<a class="tooltipA">' +
+        '<p class="glyphicon glyphicon-info-sign"></p>' +
+        '<span style="text-align:left;right:0;left:-160px;bottom:80px;width:200px;">' +
+        'Base: ' +
+        player.properties.baseIntelligence +
+        '<br />Equipment: ' +
+        player.functions.totalIntelligenceBonus() +
+        '<br />Multiplier: ' +
+        (
+            (player.functions.masteryIntelligence() + player.properties.raceAllStats / 100) *
+            100
+        ).toFixed(0) +
+        '%' +
+        '</span></a> ';
 
-    intelligence.innerHTML = "<span class='cursorHelp' data-toggle=\"tooltip\" data-placement=\"top\" title=\"Total Intelligence\">" + player.functions.totalIntelligence() + "</span>" +
-        "<a class=\"tooltipA\">" + "<p class=\"glyphicon glyphicon-info-sign\"></p>" + "<span style=\"text-align:left;right:0;left:-160px;bottom:80px;width:200px;\">" + "Base: " + player.properties.baseIntelligence +
-        "<br />Equipment: " + player.functions.totalIntelligenceBonus() +
-        "<br />Multiplier: " + ((player.functions.masteryIntelligence() + (player.properties.raceAllStats / 100)) * 100).toFixed(0) + "%" + "</span></a> ";
+    luck.innerHTML =
+        '<span class=\'cursorHelp\' data-toggle="tooltip" data-placement="top" title="Total Luck">' +
+        player.functions.totalLuck() +
+        '</span>' +
+        '<a class="tooltipA">' +
+        '<p class="glyphicon glyphicon-info-sign"></p>' +
+        '<span style="text-align:left;right:0;left:-160px;bottom:80px;width:200px;">' +
+        'Base: ' +
+        player.properties.baseLuck +
+        '<br />Equipment: ' +
+        player.functions.totalLuckBonus() +
+        '<br />Multiplier: ' +
+        ((1 + player.properties.raceAllStats / 100) * 100).toFixed(0) +
+        '%' +
+        '</span></a> ';
 
-    luck.innerHTML = "<span class='cursorHelp' data-toggle=\"tooltip\" data-placement=\"top\" title=\"Total Luck\">" + player.functions.totalLuck() + "</span>" +
-        "<a class=\"tooltipA\">" + "<p class=\"glyphicon glyphicon-info-sign\"></p>" + "<span style=\"text-align:left;right:0;left:-160px;bottom:80px;width:200px;\">" + "Base: " + player.properties.baseLuck +
-        "<br />Equipment: " + player.functions.totalLuckBonus() +
-        "<br />Multiplier: " + ((1 + (player.properties.raceAllStats / 100)) * 100).toFixed(0) + "%" + "</span></a> ";
+    damage.innerHTML =
+        '<span class=\'cursorHelp\' data-toggle="tooltip" data-placement="top" title="Total Damage">' +
+        player.functions.minDamage().toFixed(0) +
+        '-' +
+        player.functions.maxDamage().toFixed(0) +
+        '</span>' +
+        '<a class="tooltipA">' +
+        '<p class="glyphicon glyphicon-info-sign"></p>' +
+        '<span style="text-align:left;right:0;left:-160px;bottom:80px;width:200px;">' +
+        'Multiplier: ' +
+        (player.functions.bonusDamage() + player.properties.raceDamage) +
+        '%</span></a> ';
 
-    damage.innerHTML = "<span class='cursorHelp' data-toggle=\"tooltip\" data-placement=\"top\" title=\"Total Damage\">"
-        + player.functions.minDamage().toFixed(0) + "-" + player.functions.maxDamage().toFixed(0) + "</span>" +
-        "<a class=\"tooltipA\">" + "<p class=\"glyphicon glyphicon-info-sign\"></p>" + "<span style=\"text-align:left;right:0;left:-160px;bottom:80px;width:200px;\">" + "Multiplier: " + (player.functions.bonusDamage() + player.properties.raceDamage) + "%</span></a> ";
+    stats.innerHTML =
+        '<span class=\'cursorHelp\' style=\'margin-right:20px;\' data-toggle="tooltip" data-placement="top" title="Total Stat Points">' +
+        player.properties.stats +
+        '</span>';
 
-    stats.innerHTML = "<span class='cursorHelp' style='margin-right:20px;' data-toggle=\"tooltip\" data-placement=\"top\" title=\"Total Stat Points\">"
-        + player.properties.stats + "</span>";
+    spellPower.innerHTML =
+        '<span class=\'cursorHelp\' data-toggle="tooltip" data-placement="top" title="Total Spell Power">' +
+        player.functions.spellPower().toFixed(0) +
+        '</span>' +
+        '<a class="tooltipA">' +
+        '<p class="glyphicon glyphicon-info-sign"></p>' +
+        '<span style="text-align:left;right:0;left:-160px;bottom:80px;width:200px;">' +
+        '(Int x 2) + (Wis x 0.5)<br />Base Bonus: ' +
+        player.functions.baseSpellPower() +
+        '<br />' +
+        'Multiplier: ' +
+        player.functions.bonusSpellPower() * 100 +
+        '%</span></a> ';
+    mana.innerHTML =
+        '<span data-toggle="tooltip" data-placement="top" title="Total Mana">' +
+        player.properties.mana.toFixed(0) +
+        '/' +
+        player.functions.maxMana().toFixed(0) +
+        '</span>' +
+        '<a class="tooltipA">' +
+        '<p class="glyphicon glyphicon-info-sign"></p>' +
+        '<span style="text-align:left;right:0;left:-160px;bottom:80px;width:200px;">' +
+        'Multiplier: ' +
+        (player.functions.bonusMana() + player.properties.raceMaxMana) +
+        '%</span></a> ';
 
-    spellPower.innerHTML = "<span class='cursorHelp' data-toggle=\"tooltip\" data-placement=\"top\" title=\"Total Spell Power\">"
-        + player.functions.spellPower().toFixed(0) + "</span>" +
-        "<a class=\"tooltipA\">" + "<p class=\"glyphicon glyphicon-info-sign\"></p>" + "<span style=\"text-align:left;right:0;left:-160px;bottom:80px;width:200px;\">" + "(Int x 2) + (Wis x 0.5)<br />Base Bonus: " + player.functions.baseSpellPower() + "<br />" + "Multiplier: " + (player.functions.bonusSpellPower() * 100) + "%</span></a> ";
-    mana.innerHTML = "<span data-toggle=\"tooltip\" data-placement=\"top\" title=\"Total Mana\">"
-        + (player.properties.mana).toFixed(0) + "/" + (player.functions.maxMana()).toFixed(0) + "</span>" +
-        "<a class=\"tooltipA\">" + "<p class=\"glyphicon glyphicon-info-sign\"></p>" + "<span style=\"text-align:left;right:0;left:-160px;bottom:80px;width:200px;\">" + "Multiplier: " + (player.functions.bonusMana() + player.properties.raceMaxMana) + "%</span></a> ";
-
-    level = document.getElementById("level");
-    maxExperience = document.getElementById("maxexperience");
-    experience = document.getElementById("experience");
-    gold = document.getElementById("gold");
+    level = document.getElementById('level');
+    maxExperience = document.getElementById('maxexperience');
+    experience = document.getElementById('experience');
+    gold = document.getElementById('gold');
 
     level.innerHTML = player.properties.level;
     maxExperience.innerHTML = player.properties.maxExperience;
@@ -114,30 +242,41 @@ function updateHtml() {
     secondaryStatUpdate();
     CreateWeaponSkillHtml();
     playerHealthBar();
-};
+}
 
 function expPercent() {
-    var exppercent = ((player.properties.experience / player.properties.maxExperience) * 100).toFixed(2); //Player experience in % values at the top bar
-    var exppercentFloor = (Math.floor((player.properties.experience / player.properties.maxExperience) * 100)); //Player experience in % values at the top bar
-    var divArray = document.getElementById("progressBar");
-    divArray.style.width = ((exppercentFloor) + "%");
-    document.getElementById("exppercent").innerHTML = exppercent + "%";
-};
+    var exppercent = (
+        (player.properties.experience / player.properties.maxExperience) *
+        100
+    ).toFixed(2); //Player experience in % values at the top bar
+    var exppercentFloor = Math.floor(
+        (player.properties.experience / player.properties.maxExperience) * 100
+    ); //Player experience in % values at the top bar
+    var divArray = document.getElementById('progressBar');
+    divArray.style.width = exppercentFloor + '%';
+    document.getElementById('exppercent').innerHTML = exppercent + '%';
+}
 
 function healthPercent() {
-    var healthPercentValue = (Math.floor((player.properties.health / player.functions.maxhealth()) * 100));
-    var divArray = document.getElementById("progressBar2");
-    divArray.style.width = ((healthPercentValue) + "%");
-};
+    var healthPercentValue = Math.floor(
+        (player.properties.health / player.functions.maxhealth()) * 100
+    );
+    var divArray = document.getElementById('progressBar2');
+    divArray.style.width = healthPercentValue + '%';
+}
 
 function playerHealthBar() {
-    document.getElementById("health").innerHTML = player.properties.health + "/" + player.functions.maxhealth();
-};
+    document.getElementById('health').innerHTML =
+        player.properties.health + '/' + player.functions.maxhealth();
+}
 
-function manaRegen() { //Mana regen
-    if (player.properties.mana < player.functions.maxMana()) player.properties.mana += player.functions.manaRegen();
-    if (player.properties.mana > player.functions.maxMana()) player.properties.mana = player.functions.maxMana();
-};
+function manaRegen() {
+    //Mana regen
+    if (player.properties.mana < player.functions.maxMana())
+        player.properties.mana += player.functions.manaRegen();
+    if (player.properties.mana > player.functions.maxMana())
+        player.properties.mana = player.functions.maxMana();
+}
 
 function levelUp() {
     for (var hero in characterRaces) {
@@ -152,28 +291,28 @@ function levelUp() {
                 player.properties.baseIntelligence += heroRace.intelligence();
                 player.properties.baseLuck += heroRace.luck();
                 player.properties.skillPoints += 1;
-            };
-        };
-    };
+            }
+        }
+    }
     CreateMonsterHtml();
     updateHtml();
     CreatePlayerSkillsHtml();
     CreatePlayerHotBar();
-};
+}
 
 function loadIsEquipped() {
-    if (equippedItems.weapon.subType === "sword") {
+    if (equippedItems.weapon.subType === 'sword') {
         player.properties.isSword = true;
-    } else if (equippedItems.weapon.subType === "axe") {
+    } else if (equippedItems.weapon.subType === 'axe') {
         player.properties.isAxe = true;
-    } else if (equippedItems.weapon.subType === "mace") {
+    } else if (equippedItems.weapon.subType === 'mace') {
         player.properties.isMace = true;
-    } else if (equippedItems.weapon.subType === "staff") {
+    } else if (equippedItems.weapon.subType === 'staff') {
         player.properties.isStaff = true;
-    } else if (equippedItems.weapon.subType === "ranged") {
+    } else if (equippedItems.weapon.subType === 'ranged') {
         player.properties.isRanged = true;
     }
-};
+}
 
 function resetIsEquipped() {
     player.properties.isSword = false;
@@ -181,7 +320,7 @@ function resetIsEquipped() {
     player.properties.isMace = false;
     player.properties.isStaff = false;
     player.properties.isRanged = false;
-};
+}
 
 //Upgrading player stats
 
@@ -191,22 +330,21 @@ function upgradeStrength(event) {
         if (player.properties.stats >= 100) {
             player.properties.stats = player.properties.stats - 100;
             player.properties.baseStrength += 100;
-        };
-    };
+        }
+    }
     if (event.ctrlKey || event.altKey) {
         if (player.properties.stats >= 10) {
             player.properties.stats = player.properties.stats - 10;
             player.properties.baseStrength += 10;
-
         }
     } else if (!event.shiftKey && !event.ctrlKey) {
         if (player.properties.stats >= 1) {
             player.properties.stats = player.properties.stats - 1;
             player.properties.baseStrength += 1;
-        };
-    };
+        }
+    }
     updateHtml();
-};
+}
 
 //Endurance
 function upgradeEndurance(event) {
@@ -214,22 +352,21 @@ function upgradeEndurance(event) {
         if (player.properties.stats >= 100) {
             player.properties.stats = player.properties.stats - 100;
             player.properties.baseEndurance += 100;
-        };
-    };
+        }
+    }
     if (event.ctrlKey || event.altKey) {
         if (player.properties.stats >= 10) {
             player.properties.stats = player.properties.stats - 10;
             player.properties.baseEndurance += 10;
-
         }
     } else if (!event.shiftKey && !event.ctrlKey) {
         if (player.properties.stats >= 1) {
             player.properties.stats = player.properties.stats - 1;
             player.properties.baseEndurance += 1;
-        };
-    };
+        }
+    }
     updateHtml();
-};
+}
 
 //Agility
 function upgradeAgility(event) {
@@ -237,22 +374,21 @@ function upgradeAgility(event) {
         if (player.properties.stats >= 100) {
             player.properties.stats = player.properties.stats - 100;
             player.properties.baseAgility += 100;
-        };
-    };
+        }
+    }
     if (event.ctrlKey || event.altKey) {
         if (player.properties.stats >= 10) {
             player.properties.stats = player.properties.stats - 10;
             player.properties.baseAgility += 10;
-
         }
     } else if (!event.shiftKey && !event.ctrlKey) {
         if (player.properties.stats >= 1) {
             player.properties.stats = player.properties.stats - 1;
             player.properties.baseAgility += 1;
-        };
-    };
+        }
+    }
     updateHtml();
-};
+}
 
 //Dexterity
 function upgradeDexterity(event) {
@@ -260,22 +396,21 @@ function upgradeDexterity(event) {
         if (player.properties.stats >= 100) {
             player.properties.stats = player.properties.stats - 100;
             player.properties.baseDexterity += 100;
-        };
-    };
+        }
+    }
     if (event.ctrlKey || event.altKey) {
         if (player.properties.stats >= 10) {
             player.properties.stats = player.properties.stats - 10;
             player.properties.baseDexterity += 10;
-
         }
     } else if (!event.shiftKey && !event.ctrlKey) {
         if (player.properties.stats >= 1) {
             player.properties.stats = player.properties.stats - 1;
             player.properties.baseDexterity += 1;
-        };
-    };
+        }
+    }
     updateHtml();
-};
+}
 
 //Wisdom
 function upgradeWisdom(event) {
@@ -283,22 +418,21 @@ function upgradeWisdom(event) {
         if (player.properties.stats >= 100) {
             player.properties.stats = player.properties.stats - 100;
             player.properties.baseWisdom += 100;
-        };
-    };
+        }
+    }
     if (event.ctrlKey || event.altKey) {
         if (player.properties.stats >= 10) {
             player.properties.stats = player.properties.stats - 10;
             player.properties.baseWisdom += 10;
-
         }
     } else if (!event.shiftKey && !event.ctrlKey) {
         if (player.properties.stats >= 1) {
             player.properties.stats = player.properties.stats - 1;
             player.properties.baseWisdom += 1;
-        };
-    };
+        }
+    }
     updateHtml();
-};
+}
 
 //Intelligence
 function upgradeIntelligence(event) {
@@ -306,22 +440,21 @@ function upgradeIntelligence(event) {
         if (player.properties.stats >= 100) {
             player.properties.stats = player.properties.stats - 100;
             player.properties.baseIntelligence += 100;
-        };
-    };
+        }
+    }
     if (event.ctrlKey || event.altKey) {
         if (player.properties.stats >= 10) {
             player.properties.stats = player.properties.stats - 10;
             player.properties.baseIntelligence += 10;
-
         }
     } else if (!event.shiftKey && !event.ctrlKey) {
         if (player.properties.stats >= 1) {
             player.properties.stats = player.properties.stats - 1;
             player.properties.baseIntelligence += 1;
-        };
-    };
+        }
+    }
     updateHtml();
-};
+}
 
 //Luck
 function upgradeLuck(event) {
@@ -329,24 +462,21 @@ function upgradeLuck(event) {
         if (player.properties.stats >= 100) {
             player.properties.stats = player.properties.stats - 100;
             player.properties.baseLuck += 100;
-        };
-    };
+        }
+    }
     if (event.ctrlKey || event.altKey) {
         if (player.properties.stats >= 10) {
             player.properties.stats = player.properties.stats - 10;
             player.properties.baseLuck += 10;
-
         }
     } else if (!event.shiftKey && !event.ctrlKey) {
         if (player.properties.stats >= 1) {
             player.properties.stats = player.properties.stats - 1;
             player.properties.baseLuck += 1;
-        };
-    };
+        }
+    }
     updateHtml();
-};
-
-
+}
 
 function upgradePassive(skillName) {
     if (playerPassive.hasOwnProperty(skillName)) {
@@ -357,29 +487,54 @@ function upgradePassive(skillName) {
                     if (selectedSkill.requirements() === true) {
                         selectedSkill.level += 1;
                         player.properties.skillPoints -= 1;
-                        Log("<span id=\"skillLog\" class =\"bold\" style=\"color:green; display:none;\">" + "Upgraded skill." + "<br />" + "</span>");
+                        Log(
+                            '<span id="skillLog" class ="bold" style="color:green; display:none;">' +
+                                'Upgraded skill.' +
+                                '<br />' +
+                                '</span>'
+                        );
                     } else {
-                        Log("<span id=\"skillLog\" class =\"bold\" style=\"color:red; display:none;\">" + "You do not meet requirements for this skill." + "<br />" + "</span>");
+                        Log(
+                            '<span id="skillLog" class ="bold" style="color:red; display:none;">' +
+                                'You do not meet requirements for this skill.' +
+                                '<br />' +
+                                '</span>'
+                        );
                     }
                 } else {
-                    Log("<span id=\"skillLog\" class =\"bold\" style=\"color:red; display:none;\">" + "Your level is not high enough." + "<br />" + "</span>");
+                    Log(
+                        '<span id="skillLog" class ="bold" style="color:red; display:none;">' +
+                            'Your level is not high enough.' +
+                            '<br />' +
+                            '</span>'
+                    );
                 }
             } else {
-                Log("<span id=\"skillLog\" class =\"bold\" style=\"color:red; display:none;\">" + "Not enough skill points." + "<br />" + "</span>");
+                Log(
+                    '<span id="skillLog" class ="bold" style="color:red; display:none;">' +
+                        'Not enough skill points.' +
+                        '<br />' +
+                        '</span>'
+                );
             }
         } else {
-            Log("<span id=\"skillLog\" class =\"bold\" style=\"color:blue; display:none;\">" + "Skill has reached max level." + "<br />" + "</span>");
-        };
-    };
+            Log(
+                '<span id="skillLog" class ="bold" style="color:blue; display:none;">' +
+                    'Skill has reached max level.' +
+                    '<br />' +
+                    '</span>'
+            );
+        }
+    }
     skillLog();
     CreatePlayerSkillsHtml();
     CreatePlayerHotBar();
     updateHtml();
-};
+}
 
 function skillLog() {
     fadeLog('skillLog', 100, 1000, 500);
-};
+}
 
 // Re-expose top-level functions on window: these were auto-globals as a classic
 // script and are called by inline onclick handlers (upgrade*, etc.) and by
@@ -390,10 +545,21 @@ function skillLog() {
 // upgrade* stat buttons (generated as 'upgrade'+type+'(event)') and upgradePassive
 // (generated onclick).
 export {
-    updateHtml, expPercent, healthPercent, playerHealthBar, manaRegen, levelUp,
+    updateHtml,
+    expPercent,
+    healthPercent,
+    playerHealthBar,
+    manaRegen,
+    levelUp,
     loadIsEquipped,
 };
 Object.assign(window, {
-    upgradeStrength, upgradeEndurance, upgradeAgility, upgradeDexterity,
-    upgradeWisdom, upgradeIntelligence, upgradeLuck, upgradePassive,
+    upgradeStrength,
+    upgradeEndurance,
+    upgradeAgility,
+    upgradeDexterity,
+    upgradeWisdom,
+    upgradeIntelligence,
+    upgradeLuck,
+    upgradePassive,
 });
