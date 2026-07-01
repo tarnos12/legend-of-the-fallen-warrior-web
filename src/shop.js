@@ -2,7 +2,7 @@
 import { player, Log, potionBuyLog, notEnoughMoneyLog, inventoryBuyLog, statBuyLog } from './core.js';
 import { updateHtml } from './stats.js';
 import { createPotionInventory, potionList } from './potionsHotbar.js';
-import { shopOther } from './dynamicHtml.js';
+import { shopOther, CreateInventoryWeaponHtml } from './dynamicHtml.js';
 // Shop status objects: exported and mutated in place. dynamicHtml resolves them
 // through an imported name->object map (was window[item.type3]); save.js restores
 // backpackStatus/statStatus via Object.assign (in place, was bare reassignment).

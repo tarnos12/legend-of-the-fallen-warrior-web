@@ -1822,6 +1822,9 @@ export {
     characterCreationHtml, checkHeroRace, primaryStatUpdate, secondaryStatUpdate,
     EquippedItemsEmpty, checkIfEquippedEmpty, displayShopItems, ShopBuyButtons,
     refillShopInterval, shopOther, testss, activeBuffsHtml, saveGameSlot,
+    // Also exported (kept on window below too for their inline onclick) because
+    // they are additionally called cross-module by bare name:
+    CreateInventoryWeaponHtml, changedTabmonster,
 };
 Object.assign(window, {
     changeMonsterPage, CreateInventoryWeaponHtml, newGameSlot, loadGameSlot,

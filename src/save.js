@@ -12,7 +12,7 @@ import { quest } from './quest.js';
 import { createPotionInventory, CreatePlayerHotBar } from './potionsHotbar.js';
 import { updateBar } from './battle.js';
 import { backpackStatus, statStatus } from './shop.js';
-import { CreateWeaponSkillHtml, CreateMonsterHtml, checkBoxHtml, unequipItemLoad, CreatePlayerSkillsHtml, removeStartingScreen, characterCreationHtml, primaryStatUpdate, secondaryStatUpdate, EquippedItemsEmpty, checkIfEquippedEmpty, refillShopInterval, shopOther, saveGameSlot } from './dynamicHtml.js';
+import { CreateWeaponSkillHtml, CreateMonsterHtml, checkBoxHtml, unequipItemLoad, CreatePlayerSkillsHtml, removeStartingScreen, characterCreationHtml, primaryStatUpdate, secondaryStatUpdate, EquippedItemsEmpty, checkIfEquippedEmpty, refillShopInterval, shopOther, saveGameSlot, CreateInventoryWeaponHtml } from './dynamicHtml.js';
 // Map a save slot (0-3) to its localStorage key. Slot 0 historically uses the
 // bare key "EncodedSave"; slots 1-3 append the number.
 function saveKeyForSlot(slot) {
@@ -244,7 +244,7 @@ function resetallSavesCheck() {
         reset(3)
     };
 };
-function reset(slot) {
+export function reset(slot) {
     localStorage.removeItem(saveKeyForSlot(slot));
     console.log('test')
     pageReload();
