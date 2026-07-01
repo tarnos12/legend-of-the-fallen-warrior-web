@@ -1064,7 +1064,11 @@ function displayCraftedItem() {
 
 function craftingBackground() {
     for (var i = 0; i < itemSubTypeArrayCss.length; i++) {
-        $("#" + itemSubTypeArrayCss[i]).parents().eq(2).addClass('backgroundRed');
+        // jQuery .parents().eq(2) = the 3rd element ancestor (parent^3).
+        var craftEl = document.getElementById(itemSubTypeArrayCss[i]);
+        var craftAnc = (craftEl && craftEl.parentElement && craftEl.parentElement.parentElement)
+            ? craftEl.parentElement.parentElement.parentElement : null;
+        if (craftAnc) craftAnc.classList.add('backgroundRed');
     }
     itemSubTypeArrayCss = [];
 };

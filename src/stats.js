@@ -1,7 +1,7 @@
 ﻿"use strict";
 import { playerPassive } from './skills.js';
 import { characterRaces } from './gameObjects.js';
-import { player, equippedItems, Log, getThousands } from './core.js';
+import { player, equippedItems, Log, getThousands, fadeLog } from './core.js';
 import { CreatePlayerHotBar } from './potionsHotbar.js';
 import { CreateWeaponSkillHtml, CreateMonsterHtml, CreatePlayerSkillsHtml, primaryStatUpdate, secondaryStatUpdate } from './dynamicHtml.js';
 function updateHtml() {
@@ -378,7 +378,7 @@ function upgradePassive(skillName) {
 };
 
 function skillLog() {
-    $("#skillLog").delay(100).fadeIn().delay(1000).fadeOut(500, function() { $(this).remove(); });
+    fadeLog('skillLog', 100, 1000, 500);
 };
 
 // Re-expose top-level functions on window: these were auto-globals as a classic

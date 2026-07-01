@@ -1149,5 +1149,5 @@ export {
     player, equippedItems, defaultValues, playerInventory, logData, currentGameVersion,
     Log, createEquippedItemsObject, copyPlayerProperties, potionBuyLog,
     notEnoughMoneyLog, inventoryBuyLog, statBuyLog, itemDropLog, levelUpLog,
-    deathLog, getNumberMultiplierofFive, getTen, getThousands, compare,
+    deathLog, getNumberMultiplierofFive, getTen, getThousands, compare, fadeLog,
 };
