@@ -13,6 +13,7 @@ import { updateHtml } from './stats.js';
 import { createPotionInventory } from './potionsHotbar.js';
 import { getItemType } from './itemDrop.js';
 import { pageReload } from './save.js';
+import { potionStatus, mediumPotionStatus, superPotionStatus, backpackStatus, statStatus } from './shop.js';
 //Create player Weapon skill html
 var weaponTabActive = 'swordTest';
 function changeTabWeapon(index) {
@@ -1552,6 +1553,10 @@ function shopOther() {
     html += '<div class="row">';
     html += '<div class="col-xs-12">';
     html += '<div class="row">';
+    // Resolve item.type3 (e.g. "backpackStatus") to its status object. Built at
+    // runtime (not module scope) so the circular shop<->dynamicHtml imports are
+    // initialised. Replaces the former window[item.type3] dynamic global lookup.
+    var shopStatusByName = { potionStatus, mediumPotionStatus, superPotionStatus, backpackStatus, statStatus };
     for (var key in shopOtherList) {
         if (shopOtherList.hasOwnProperty(key)) {
             var itemType = shopOtherList[key];
@@ -1559,7 +1564,7 @@ function shopOther() {
             html += '<div class="col-xs-12">';
             html += '<div class="c3">';
             html += '<img src=' + itemType.image + ' alt="Buy"><br />';
-            html += itemType.type + ' - ' + window[itemTypePrice].price + ' Gold<br />';
+            html += itemType.type + ' - ' + shopStatusByName[itemTypePrice].price + ' Gold<br />';
             html += '<button type="button" class="buy" onclick="' + itemType.type2 + "(" + 1 + ")" + '">' + "Buy" + '</button>';
             html += '<button type="button" class="buy" onclick="' + itemType.type2 + "(" + 10 + ")" + '">' + "Buy 10" + '</button>';
             html += '<button type="button" class="buy" onclick="' + itemType.type2 + "(" + 100 + ")" + '">' + "Buy 100" + '</button>';

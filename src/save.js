@@ -11,6 +11,7 @@ import { playerReviveCheck } from './intervalFunctions.js';
 import { quest } from './quest.js';
 import { createPotionInventory, CreatePlayerHotBar } from './potionsHotbar.js';
 import { updateBar } from './battle.js';
+import { backpackStatus, statStatus } from './shop.js';
 import { CreateWeaponSkillHtml, CreateMonsterHtml, checkBoxHtml, unequipItemLoad, CreatePlayerSkillsHtml, removeStartingScreen, characterCreationHtml, primaryStatUpdate, secondaryStatUpdate, EquippedItemsEmpty, checkIfEquippedEmpty, refillShopInterval, shopOther, saveGameSlot } from './dynamicHtml.js';
 // Map a save slot (0-3) to its localStorage key. Slot 0 historically uses the
 // bare key "EncodedSave"; slots 1-3 append the number.
@@ -157,8 +158,9 @@ function load(slot) {
             };
         };
 
-        if (typeof savegame.backpackStatus !== "undefined") backpackStatus = savegame.backpackStatus;
-        if (typeof savegame.statStatus !== "undefined") statStatus = savegame.statStatus;
+        // mutate the exported objects in place (imported read-only bindings)
+        if (typeof savegame.backpackStatus !== "undefined") Object.assign(backpackStatus, savegame.backpackStatus);
+        if (typeof savegame.statStatus !== "undefined") Object.assign(statStatus, savegame.statStatus);
         if (typeof savegame.inventory !== "undefined") {
             // mutate the exported array in place (it's an imported read-only binding)
             playerInventory.length = 0;

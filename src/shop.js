@@ -3,11 +3,14 @@ import { player, Log, potionBuyLog, notEnoughMoneyLog, inventoryBuyLog, statBuyL
 import { updateHtml } from './stats.js';
 import { createPotionInventory, potionList } from './potionsHotbar.js';
 import { shopOther } from './dynamicHtml.js';
-var potionStatus = {};
+// Shop status objects: exported and mutated in place. dynamicHtml resolves them
+// through an imported name->object map (was window[item.type3]); save.js restores
+// backpackStatus/statStatus via Object.assign (in place, was bare reassignment).
+export const potionStatus = {};
 potionStatus.price = 20;
-var mediumPotionStatus = {};
+export const mediumPotionStatus = {};
 mediumPotionStatus.price = 100;
-var superPotionStatus = {};
+export const superPotionStatus = {};
 superPotionStatus.price = 500;
 
 //Buy Stuff -_-
@@ -113,11 +116,11 @@ function buySuperPotion(count) {
     createPotionInventory()
 };
 
-window.backpackStatus = {};
+export const backpackStatus = {};
 backpackStatus.price = 100;
 backpackStatus.multiplier = 1.04;
 
-window.statStatus = {};
+export const statStatus = {};
 statStatus.price = 500;
 statStatus.multiplier = 1.01;
 
@@ -162,14 +165,10 @@ function buyStat(count) {
     };
     shopOther();
 };
-// potionStatus/medium/super stay on window: dynamicHtml resolves them by name via
-// window[item.type3].price. backpackStatus/statStatus are window.* above (save.js
-// load() reassigns them). The buy* handlers stay on window: they are inline-onclick
-// dispatched via item.type2 (onclick="' + type2 + '(...)"). potionBuy and buyStuff
-// are internal-only helpers -> not exposed.
-window.potionStatus = potionStatus;
-window.mediumPotionStatus = mediumPotionStatus;
-window.superPotionStatus = superPotionStatus;
+// The status objects are now real exports (imported by dynamicHtml/save). Only
+// the buy* handlers stay on window: they are inline-onclick dispatched via
+// item.type2 (onclick="' + type2 + '(...)"). potionBuy and buyStuff are
+// internal-only helpers -> not exposed.
 window.buySmallPotion = buySmallPotion;
 window.buyMediumPotion = buyMediumPotion;
 window.buySuperPotion = buySuperPotion;
