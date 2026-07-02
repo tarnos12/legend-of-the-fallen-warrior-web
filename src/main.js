@@ -11,6 +11,10 @@ import './systems/quest.js';
 import './systems/intervalFunctions.js';
 import './systems/itemDrop.js';
 import './systems/itemSell.js';
+// Equip/unequip/sort + game-control onclick handlers (split out of core/core.js);
+// side-effect imports so they register on window.
+import './systems/equip.js';
+import './systems/gameControls.js';
 import './core/save.js';
 import './data/shop.js';
 import './systems/potionsHotbar.js';
