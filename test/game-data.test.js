@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { player, currentGameVersion, defaultValues } from '../src/core/core.js';
+import { currentGameVersion, defaultValues, player } from '../src/core/core.js';
 import { monsterList, MakeMonsterList } from '../src/data/monsterList.js';
 import { characterRaces } from '../src/data/gameObjects.js';
 import { state } from '../src/core/state.js';

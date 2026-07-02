@@ -9,7 +9,8 @@ import {
     emptyItemSlotInfo,
     loadingEquippedItems,
 } from '../data/gameObjects.js';
-import { player, equippedItems, playerInventory, compare } from '../core/core.js';
+import { equippedItems, player, playerInventory } from '../core/core.js';
+import { compare } from '../core/format.js';
 import { createPotionInventory } from '../systems/potionsHotbar.js';
 import { testss } from './uiCommon.js';
 

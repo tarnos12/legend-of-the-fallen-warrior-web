@@ -1,7 +1,9 @@
 ﻿'use strict';
 import { playerPassive } from '../data/skills.js';
 import { characterRaces } from '../data/gameObjects.js';
-import { player, equippedItems, Log, getThousands, fadeLog } from '../core/core.js';
+import { equippedItems, player } from '../core/core.js';
+import { Log, fadeLog } from '../core/log.js';
+import { getThousands } from '../core/format.js';
 import { CreatePlayerHotBar } from './potionsHotbar.js';
 import { CreateMonsterHtml } from '../ui/monsterUI.js';
 import {

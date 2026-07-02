@@ -782,18 +782,3 @@ export {
     createEquippedItemsObject,
     copyPlayerProperties,
 };
-// Log + formatter helpers moved to their own modules; re-exported here until the
-// importers are migrated to import them directly.
-export {
-    Log,
-    logData,
-    fadeLog,
-    potionBuyLog,
-    notEnoughMoneyLog,
-    inventoryBuyLog,
-    statBuyLog,
-    itemDropLog,
-    levelUpLog,
-    deathLog,
-} from './log.js';
-export { getNumberMultiplierofFive, getTen, getThousands, compare } from './format.js';

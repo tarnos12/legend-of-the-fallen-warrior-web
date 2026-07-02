@@ -33,7 +33,7 @@ import './ui/panelsUI.js';
 import './ui/inventoryUI.js';
 import './ui/shopUI.js';
 import './data/gameObjects.js';
-import { createEquippedItemsObject, copyPlayerProperties } from './core/core.js';
+import { copyPlayerProperties, createEquippedItemsObject } from './core/core.js';
 import './systems/stats.js';
 import { createHerbs, createMinerals, playerProfessionHtml } from './systems/professions.js';
 import { testss } from './ui/uiCommon.js';

@@ -9,13 +9,9 @@ import {
     itemBaseMod,
     itemModifiers,
 } from '../data/gameObjects.js';
-import {
-    player,
-    playerInventory,
-    Log,
-    itemDropLog,
-    getNumberMultiplierofFive,
-} from '../core/core.js';
+import { player, playerInventory } from '../core/core.js';
+import { Log, itemDropLog } from '../core/log.js';
+import { getNumberMultiplierofFive } from '../core/format.js';
 import { CreateInventoryWeaponHtml } from '../ui/inventoryUI.js';
 import { itemShopAccessory, itemShopArmor, itemShopWeapon } from '../ui/shopUI.js';
 import { state } from '../core/state.js';

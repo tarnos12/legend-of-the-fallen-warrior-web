@@ -4,7 +4,7 @@
 // slot lookup tables. equipItem/unequipItem/sortInventory are inline-onclick
 // handlers (registered on window below); getStartingItem is exported for
 // changeRace (systems/gameControls.js).
-import { player, equippedItems, playerInventory, createEquippedItemsObject } from '../core/core.js';
+import { createEquippedItemsObject, equippedItems, player, playerInventory } from '../core/core.js';
 import { updateHtml } from './stats.js';
 import { CreatePlayerHotBar } from './potionsHotbar.js';
 import { getItemType } from './itemDrop.js';
