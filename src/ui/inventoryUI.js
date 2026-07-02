@@ -4,7 +4,11 @@
 // inventory tab state. itemTooltipTest is exported because shopUI.js reuses it.
 // CreateInventoryWeaponHtml is both re-exported (barrel) and put on window (some
 // callers reference it by bare name / inline onclick).
-import { InventoryItemTypes, emptyItemSlotInfo, loadingEquippedItems } from '../data/gameObjects.js';
+import {
+    InventoryItemTypes,
+    emptyItemSlotInfo,
+    loadingEquippedItems,
+} from '../data/gameObjects.js';
 import { player, equippedItems, playerInventory, compare } from '../core/core.js';
 import { createPotionInventory } from '../systems/potionsHotbar.js';
 import { testss } from './uiCommon.js';

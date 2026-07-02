@@ -21,12 +21,19 @@ import './systems/potionsHotbar.js';
 import './data/skills.js';
 import './data/weaponMastery.js';
 import './data/monsterList.js';
-import './ui/dynamicHtml.js';
+// UI layer: side-effect imports so each focused module registers its inline-onclick
+// handlers on window. (The old dynamicHtml.js barrel that used to do this is gone.)
+// uiCommon + characterUI are additionally imported by name further below.
+import './ui/monsterUI.js';
+import './ui/panelsUI.js';
+import './ui/inventoryUI.js';
+import './ui/shopUI.js';
 import './data/gameObjects.js';
 import { createEquippedItemsObject, copyPlayerProperties } from './core/core.js';
 import './systems/stats.js';
 import { createHerbs, createMinerals, playerProfessionHtml } from './systems/professions.js';
-import { startLogo, startingScreen, testss } from './ui/dynamicHtml.js';
+import { testss } from './ui/uiCommon.js';
+import { startLogo, startingScreen } from './ui/characterUI.js';
 
 // Game bootstrap (Phase 3 ESM). Previously these ran inline at parse-time inside
 // the classic dynamicHtml.js / main.js / professions.js scripts. They were

@@ -9,13 +9,15 @@ import {
     itemBaseMod,
     itemModifiers,
 } from '../data/gameObjects.js';
-import { player, playerInventory, Log, itemDropLog, getNumberMultiplierofFive } from '../core/core.js';
 import {
-    itemShopWeapon,
-    itemShopArmor,
-    itemShopAccessory,
-    CreateInventoryWeaponHtml,
-} from '../ui/dynamicHtml.js';
+    player,
+    playerInventory,
+    Log,
+    itemDropLog,
+    getNumberMultiplierofFive,
+} from '../core/core.js';
+import { CreateInventoryWeaponHtml } from '../ui/inventoryUI.js';
+import { itemShopAccessory, itemShopArmor, itemShopWeapon } from '../ui/shopUI.js';
 import { state } from '../core/state.js';
 import { updateHtml } from './stats.js';
 export function monsterItemDrop(monster) {

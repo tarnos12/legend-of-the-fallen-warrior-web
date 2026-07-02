@@ -19,12 +19,9 @@ import { playerRevive } from './intervalFunctions.js';
 import { quest } from './quest.js';
 import { monsterItemDrop } from './itemDrop.js';
 import { pageReload, reset } from '../core/save.js';
-import {
-    CreateWeaponSkillHtml,
-    CreateMonsterHtml,
-    testss,
-    activeBuffsHtml,
-} from '../ui/dynamicHtml.js';
+import { testss } from '../ui/uiCommon.js';
+import { CreateMonsterHtml } from '../ui/monsterUI.js';
+import { CreateWeaponSkillHtml, activeBuffsHtml } from '../ui/panelsUI.js';
 function startBattle(monster) {
     //Add buttons <Attack><Defense><Spell><Item><Run?> -->"Spell" change name based on character class later on: Spell/Skill/Runes/Combo/etc...
     //Display enemy at the top/or left/ AND  player at the bottom/or right side

@@ -3,21 +3,23 @@ import { weaponMastery } from '../data/weaponMastery.js';
 import { playerPassive, weaponSkillList } from '../data/skills.js';
 import { loadingEquippedItems, monsterAreas, characterRaces } from '../data/gameObjects.js';
 import { monsterList, MakeMonsterList } from '../data/monsterList.js';
-import { itemShopWeapon, itemShopArmor, itemShopAccessory } from '../ui/dynamicHtml.js';
+import { CreateMonsterHtml, changedTabmonster } from '../ui/monsterUI.js';
 import {
-    CreateWeaponSkillHtml,
-    CreateMonsterHtml,
     CreatePlayerSkillsHtml,
-    removeStartingScreen,
-    checkHeroRace,
+    CreateWeaponSkillHtml,
     primaryStatUpdate,
     secondaryStatUpdate,
-    checkIfEquippedEmpty,
-    displayShopItems,
+} from '../ui/panelsUI.js';
+import { CreateInventoryWeaponHtml, checkIfEquippedEmpty } from '../ui/inventoryUI.js';
+import {
     ShopBuyButtons,
-    CreateInventoryWeaponHtml,
-    changedTabmonster,
-} from '../ui/dynamicHtml.js';
+    displayShopItems,
+    itemShopAccessory,
+    itemShopArmor,
+    itemShopWeapon,
+} from '../ui/shopUI.js';
+import { checkHeroRace, removeStartingScreen } from '../ui/characterUI.js';
+
 import { state } from './state.js';
 import { updateHtml } from '../systems/stats.js';
 import { quest } from '../systems/quest.js';
@@ -1160,7 +1162,6 @@ function copyPlayerProperties() {
     }
 }
 // copyPlayerProperties() init call moved to initGame() in src/main.js (Phase 3 ESM)
-
 
 function getNumberMultiplierofFive(n) {
     if (n > 100) {

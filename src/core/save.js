@@ -33,23 +33,22 @@ import { quest } from '../systems/quest.js';
 import { createPotionInventory, CreatePlayerHotBar } from '../systems/potionsHotbar.js';
 import { updateBar } from '../systems/battle.js';
 import { backpackStatus, statStatus } from '../data/shop.js';
+import { CreateMonsterHtml } from '../ui/monsterUI.js';
 import {
-    CreateWeaponSkillHtml,
-    CreateMonsterHtml,
-    checkBoxHtml,
-    unequipItemLoad,
     CreatePlayerSkillsHtml,
-    removeStartingScreen,
-    characterCreationHtml,
+    CreateWeaponSkillHtml,
+    checkBoxHtml,
     primaryStatUpdate,
     secondaryStatUpdate,
+} from '../ui/panelsUI.js';
+import {
+    CreateInventoryWeaponHtml,
     EquippedItemsEmpty,
     checkIfEquippedEmpty,
-    refillShopInterval,
-    shopOther,
-    saveGameSlot,
-    CreateInventoryWeaponHtml,
-} from '../ui/dynamicHtml.js';
+    unequipItemLoad,
+} from '../ui/inventoryUI.js';
+import { refillShopInterval, shopOther } from '../ui/shopUI.js';
+import { characterCreationHtml, removeStartingScreen, saveGameSlot } from '../ui/characterUI.js';
 // Map a save slot (0-3) to its localStorage key. Slot 0 historically uses the
 // bare key "EncodedSave"; slots 1-3 append the number.
 function saveKeyForSlot(slot) {

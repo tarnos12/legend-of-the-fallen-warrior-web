@@ -3,13 +3,13 @@ import { playerPassive } from '../data/skills.js';
 import { characterRaces } from '../data/gameObjects.js';
 import { player, equippedItems, Log, getThousands, fadeLog } from '../core/core.js';
 import { CreatePlayerHotBar } from './potionsHotbar.js';
+import { CreateMonsterHtml } from '../ui/monsterUI.js';
 import {
-    CreateWeaponSkillHtml,
-    CreateMonsterHtml,
     CreatePlayerSkillsHtml,
+    CreateWeaponSkillHtml,
     primaryStatUpdate,
     secondaryStatUpdate,
-} from '../ui/dynamicHtml.js';
+} from '../ui/panelsUI.js';
 function updateHtml() {
     if (player.properties.stats >= 1) {
         // Show "plus" image when player level up

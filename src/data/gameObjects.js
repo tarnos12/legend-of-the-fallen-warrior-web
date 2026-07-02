@@ -1,6 +1,6 @@
 ﻿'use strict';
 import { player } from '../core/core.js';
-import { secondaryStatUpdate } from '../ui/dynamicHtml.js';
+import { secondaryStatUpdate } from '../ui/panelsUI.js';
 var itemToCraft = [
     {
         weapon: ['sword', 'axe', 'mace', 'staff', 'ranged'],

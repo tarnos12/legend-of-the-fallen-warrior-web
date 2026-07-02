@@ -4,7 +4,7 @@ import { itemToCraft } from '../data/gameObjects.js';
 import { player, getNumberMultiplierofFive } from '../core/core.js';
 import { potionList } from './potionsHotbar.js';
 import { getItemType } from './itemDrop.js';
-import { testss } from '../ui/dynamicHtml.js';
+import { testss } from '../ui/uiCommon.js';
 var craftCost = [
     {
         type: 'Common',

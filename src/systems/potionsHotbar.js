@@ -1,7 +1,8 @@
 ﻿'use strict';
 import { player } from '../core/core.js';
 import { updateHtml } from './stats.js';
-import { testss, activeBuffsHtml } from '../ui/dynamicHtml.js';
+import { testss } from '../ui/uiCommon.js';
+import { activeBuffsHtml } from '../ui/panelsUI.js';
 
 // potionList is a real export (read by professions.js and shop.js), populated in
 // place by the IIFE below instead of `window.potionList = new Object()`.
@@ -430,7 +431,6 @@ function usePotion(index) {
     activeBuffsHtml();
     updateHtml();
 }
-
 
 // ES module (Phase 3): bare reads of classic globals resolve through the global
 // createPotionInventory/CreatePlayerHotBar are exported (imported by their
