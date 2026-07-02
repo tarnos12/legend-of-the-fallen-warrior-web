@@ -226,7 +226,6 @@ function EquippedItemsEmpty() {
 }
 
 function checkIfEquippedEmpty() {
-    var html = '';
     for (var item in equippedItems) {
         var itemType = equippedItems[item];
         if (itemType.isEquipped === true) {

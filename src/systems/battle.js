@@ -106,7 +106,6 @@ function playerSpellDiv(monster) {
             if (skill.type === 'damage') {
                 if (weaponSkillList[weapon][skillKey].levelReq <= weaponMastery[weapon].level) {
                     skillAmount++;
-                    var damage = skill.damageDisplay();
                     var skillName = skill.name.replace(/'/g, "\\'");
                     var name = "' " + skillName + ".'";
                     var type = "' " + skill.type2 + " damage'";

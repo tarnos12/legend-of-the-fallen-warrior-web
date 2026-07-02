@@ -9,7 +9,6 @@ import { CreateMonsterHtml } from '../ui/monsterUI.js';
 import {
     CreatePlayerSkillsHtml,
     CreateWeaponSkillHtml,
-    primaryStatUpdate,
     secondaryStatUpdate,
 } from '../ui/panelsUI.js';
 function updateHtml() {
@@ -314,14 +313,6 @@ function loadIsEquipped() {
     } else if (equippedItems.weapon.subType === 'ranged') {
         player.properties.isRanged = true;
     }
-}
-
-function resetIsEquipped() {
-    player.properties.isSword = false;
-    player.properties.isAxe = false;
-    player.properties.isMace = false;
-    player.properties.isStaff = false;
-    player.properties.isRanged = false;
 }
 
 //Upgrading player stats

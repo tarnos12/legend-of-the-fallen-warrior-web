@@ -117,6 +117,6 @@ self-registers its inline-onclick handlers via `Object.assign(window, {...})`.
 npm run dev       # Vite dev server (port 5173, or PORT env)
 npm run build     # production build to dist/
 npm test          # vitest run (15 tests, jsdom)
-npm run lint      # eslint src test (no-undef = error; warnings are legacy noise)
+npm run lint      # eslint src test (no-undef + no-unused-vars = error; must be clean)
 npm run format    # prettier
 ```

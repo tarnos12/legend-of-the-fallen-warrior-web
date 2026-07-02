@@ -6,123 +6,6 @@ import { getNumberMultiplierofFive } from '../core/format.js';
 import { potionList } from './potionsHotbar.js';
 import { getItemType } from './itemDrop.js';
 import { testss } from '../ui/uiCommon.js';
-var craftCost = [
-    {
-        type: 'Common',
-        levelReq: 1,
-        costTypeAmount: 1,
-        costType: [
-            {
-                type: 'Thaumerite',
-                cost: 10,
-            },
-        ],
-        displayName: [
-            {
-                name: 'Thaumerite',
-            },
-        ],
-    },
-    {
-        type: 'Uncommon',
-        levelReq: 5,
-        costTypeAmount: 2,
-        costType: [
-            {
-                type: 'Thaumerite',
-                cost: 10,
-            },
-            {
-                type: 'LiteCyan',
-                cost: 10,
-            },
-        ],
-        displayName: [
-            {
-                name: 'Thaumerite',
-            },
-            {
-                name: 'Lite Cyan',
-            },
-        ],
-    },
-    {
-        type: 'Rare',
-        levelReq: 10,
-        costTypeAmount: 2,
-        costType: [
-            {
-                type: 'LiteCyan',
-                cost: 10,
-            },
-            {
-                type: 'OhmStone',
-                cost: 10,
-            },
-        ],
-        displayName: [
-            {
-                name: 'Lite Cyan',
-            },
-            {
-                name: 'Ohm Stone',
-            },
-        ],
-    },
-    {
-        type: 'Epic',
-        levelReq: 15,
-        costTypeAmount: 2,
-        costType: [
-            {
-                type: 'OhmStone',
-                cost: 10,
-            },
-            {
-                type: 'Techtite',
-                cost: 10,
-            },
-        ],
-        displayName: [
-            {
-                name: 'Ohm Stone',
-            },
-            {
-                name: 'Techtite',
-            },
-        ],
-    },
-    {
-        type: 'Legendary',
-        levelReq: 20,
-        costTypeAmount: 3,
-        costType: [
-            {
-                type: 'Techtite',
-                cost: 10,
-            },
-            {
-                type: 'XilBond',
-                cost: 10,
-            },
-            {
-                type: 'VulcanatedIron',
-                cost: 10,
-            },
-        ],
-        displayName: [
-            {
-                name: 'Techtite',
-            },
-            {
-                name: 'Xil Bond',
-            },
-            {
-                name: 'Vulcanated Iron',
-            },
-        ],
-    },
-];
 var mineralListArray = [
     //Ore
     {
@@ -177,17 +60,6 @@ var mineralListArray = [
     {
         name: 'LillyWisp',
         displayName: 'Lilly Wisp',
-    },
-];
-var craftItemTypes = [
-    {
-        type: 'weapon',
-    },
-    {
-        type: 'armor',
-    },
-    {
-        type: 'accessory',
     },
 ];
 var mineralList = {};
@@ -548,7 +420,6 @@ function gather(monsterStat, type) {
     var monsterStats = monsterStat.Stats;
     var name = monsterStats.name;
     var professionType = playerProfession[type];
-    var professionLevel = professionType.level;
     var resourceGain = 1 + playerPassive[type + 'Amount'].bonusTotal();
     var maxResources = 1000 + playerPassive.storage.bonusTotal();
     var criticalGather = Math.floor(Math.random() * 100 + 1);
@@ -655,8 +526,6 @@ function unlockHerb() {
 
 function createAlchemyHtml() {
     var html = '';
-    var alchemy = playerProfession.alchemy;
-    var alchemyLevel = alchemy.level;
     var potion = {};
     html += '<div class="row">';
     html += '<div class="col-xs-12 c3">';
@@ -977,7 +846,6 @@ function professionGatherHtml() {
  *                                                                                               |
  *------------------------------------------------------------------------------------------------
  */
-var craftedItemHolder = [];
 var itemTypeTab = 'weapon';
 function changeItemType(index) {
     itemTypeTab = index;
@@ -989,7 +857,6 @@ function changeItemBonus(index) {
 }
 function craftingHtml() {
     var html = '';
-    var crafting = playerProfession.crafting;
 
     html += '<div class="row">';
     html += '<div class="col-xs-12 border marginBottom" style="margin-left:-20px;">';
@@ -1007,7 +874,6 @@ function craftingHtml() {
 var currentItemToCraft = 'weapon';
 var currentItemQualityToCraft = 'Beginner';
 var craftingLevelReq = '';
-var totalCraftingLevelReq = '';
 function craftingHtmlButtons() {
     var html = '';
     var profession = playerProfession.crafting;
@@ -1103,7 +969,6 @@ function displayCraftedItem() {
     var craftingItemType = document.getElementsByName('craftingItem');
     var profession = playerProfession.crafting;
     var craftedItemLevel = Math.floor(player.properties.lastEnemyLevel);
-    var currentBonus = 0;
     var currentCraftingType = '';
     var mineralType = '';
     var mineralAmount = '';

@@ -294,11 +294,9 @@ export function createPotionInventory() {
             var potion = playerPotionList[item];
             var potionType = potion.name;
             var displayName = potion.displayName;
-            var potionUse = potion.use;
             var potionAmount = potion.amount;
             var potionName = potion.name.capitalizeFirstLetter();
             var potionEffect = potion.effect;
-            var potionHeal = potion.bonus;
             var index = item;
             html += '<div class="row">';
             html += '<div class="col-xs-6">';
@@ -341,7 +339,6 @@ export function CreatePlayerHotBar() {
         // 8 = hotbar slots;
         var potionAmount = hotBarItem[i].amount;
         var potionName = hotBarItem[i].name;
-        var potionType = hotBarItem[i].type;
         var displayName = hotBarItem[i].displayName;
         var displayBonus = hotBarItem[i].displayBonus;
         var potionEffect = hotBarItem[i].effect;
@@ -417,7 +414,6 @@ function usePotion(index) {
             player.properties.health = player.functions.maxhealth();
         }
     } else if (bonus === 'buff' && potion.amount > 0) {
-        var buff = potion.effect;
         player.buffs[potion.propertyName] = {};
         player.buffs[potion.propertyName].amount = potion.effect / 100;
         player.buffs[potion.propertyName].timer = potion.timer;

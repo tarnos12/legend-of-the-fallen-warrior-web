@@ -42,5 +42,5 @@ state, shared `state`, save) · `src/data/` (game definitions) · `src/systems/`
 ## Verify every change
 
 `npm run build` (catches module-graph errors the dev console misses) · `npm test`
-(15 tests, jsdom) · `npm run lint` (0 errors expected; warnings are legacy noise) ·
+(jsdom) · `npm run lint` (must be completely clean — 0 errors, 0 warnings) ·
 live check in the Vite preview (mute `#myAudio` first).
