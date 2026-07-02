@@ -1,0 +1,12 @@
+# Build output and deps
+dist/
+node_modules/
+package-lock.json
+
+# Vendored / third-party (leave as shipped)
+public/
+jquery/
+vendor/
+
+# Reference-only dead file (kept in git history)
+public/js/itemList.js
