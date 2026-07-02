@@ -27,25 +27,6 @@ import { CreatePlayerHotBar } from '../systems/potionsHotbar.js';
 import { getItemType } from '../systems/itemDrop.js';
 import { updateBar } from '../systems/battle.js';
 
-//Player log
-function Log(data) {
-    var i;
-    if (logData.length < maxLogLines) {
-        logData[logData.length] = data;
-        logData.length++;
-    } else {
-        for (i = 0; i < logData.length - 1; i++) {
-            logData[i] = logData[i + 1];
-        }
-        logData[logData.length - 1] = data;
-    }
-    var logTemp = '';
-    for (i = logData.length - 1; i >= 0; i--) {
-        logTemp += logData[i];
-    }
-    document.getElementById('logConsole').innerHTML = logTemp;
-}
-
 var currentGameVersion = 1.8;
 var defaultValues = {
     properties: {},
@@ -786,15 +767,6 @@ function createEquippedItemsObject(typeOfTheItem) {
 
 // createEquippedItemsObject('all') init call moved to initGame() in src/main.js (Phase 3 ESM)
 
-var maxLogLines = 12;
-// Genuinely shared mutable state (reassigned and/or read across files: battle.js,
-// save.js, itemDrop/itemSell, dynamicHtml). As an ES module a `var` would be
-// module-scoped. logData (the console ring-buffer) and playerInventory are
-// mutated in place and exported; their few "reset" sites assign .length = 0
-// instead of a new object/array, so they never need reassignment across modules.
-var logData = {
-    length: 0,
-};
 var playerInventory = [];
 // Reassigned primitives (battleTurn, damageTaken, the checkBox* flags,
 // checkedShopItem, hardcoreMode) now live on the shared `state` object in
@@ -822,64 +794,6 @@ function disableButtons() {
         el.classList.toggle('backgroundRed');
     });
     number = number === 1 ? 2 : 1;
-}
-
-// Vanilla replacement for the jQuery notification animation
-// `$("#id").delay(delayIn).fadeIn().delay(holdMs).fadeOut(fadeOutMs, remove)`.
-// The elements are created hidden (style="display:none") via Log(); this fades
-// them in (opacity 0->1 over ~400ms, jQuery's fadeIn default), holds, fades out,
-// then removes. No-ops safely if the element is absent (matches jQuery, which
-// silently skips an empty selector).
-function fadeLog(id, delayIn, holdMs, fadeOutMs) {
-    var el = document.getElementById(id);
-    if (!el) return;
-    var FADE_IN = 400;
-    setTimeout(function () {
-        if (!el.isConnected) return;
-        el.style.transition = 'opacity ' + FADE_IN + 'ms';
-        el.style.opacity = '0';
-        el.style.display = '';
-        // Trigger the fade-in on a later tick so the transition runs. Use
-        // setTimeout, NOT requestAnimationFrame: rAF is paused in background/
-        // hidden tabs (which would leave the notification stuck at opacity 0),
-        // whereas setTimeout + CSS transitions keep working.
-        setTimeout(function () {
-            if (el.isConnected) el.style.opacity = '1';
-        }, 20);
-        setTimeout(function () {
-            if (!el.isConnected) return;
-            el.style.transition = 'opacity ' + fadeOutMs + 'ms';
-            el.style.opacity = '0';
-            setTimeout(function () {
-                if (el.isConnected) el.remove();
-            }, fadeOutMs);
-        }, FADE_IN + holdMs);
-    }, delayIn);
-}
-function potionBuyLog() {
-    fadeLog('potionBuy', 200, 3000, 5000);
-}
-function notEnoughMoneyLog() {
-    fadeLog('notEnoughMoney', 200, 3000, 5000);
-}
-function inventoryBuyLog() {
-    fadeLog('inventoryBuy', 200, 3000, 5000);
-}
-function statBuyLog() {
-    fadeLog('statBuy', 200, 3000, 5000);
-}
-function itemDropLog() {
-    fadeLog('itemDropNew', 200, 3000, 5000);
-}
-
-function levelUpLog() {
-    fadeLog('levelUpLog', 1800, 3000, 5000);
-}
-function deathLog() {
-    fadeLog('playerDead', 200, 3000, 2000);
-    fadeLog('playerDead2', 100, 3000, 2000);
-    fadeLog('goldLost', 400, 3000, 2000);
-    fadeLog('expLost', 400, 3000, 2000);
 }
 
 //Equip item function
@@ -1163,28 +1077,6 @@ function copyPlayerProperties() {
 }
 // copyPlayerProperties() init call moved to initGame() in src/main.js (Phase 3 ESM)
 
-function getNumberMultiplierofFive(n) {
-    if (n > 100) {
-        return 100;
-    } else if (n > 4) return Math.ceil(n / 5.0) * 5;
-    else if (n < 0) return Math.floor(n / 5.0) * 5;
-    else return 1;
-}
-
-function getTen(n) {
-    if (n > 8) return Math.ceil(n / 8.0) * 10;
-    else if (n < 0) return Math.floor(n / 8.0) * 10;
-    else return 10;
-}
-function getThousands(n) {
-    if (n > 9999 && n < 1000000) {
-        return Math.floor(n / 1000) + 'K';
-    } else if (n > 999999) {
-        return Math.floor(n / 1000000) + 'M';
-    } else {
-        return Math.floor(n);
-    }
-}
 var monsterKillCount = []; // core.js-only
 function changeDifficulty(type, rebirth) {
     for (var key in monsterList) {
@@ -1217,17 +1109,6 @@ function rebirth(level) {
     }
     changeDifficulty('Hero', true);
     changedTabmonster(0);
-}
-
-function compare(z, x, other) {
-    //Other such as %...
-    if (z > x) {
-        return '<font color="#50bd27">+ ' + Math.floor(z - x) + other + '</font>';
-    } else if (z < x) {
-        return '<font color="red">' + Math.floor(z - x) + other + '</font>';
-    } else {
-        return Math.floor(z) + other;
-    }
 }
 
 function getStartingItem(itemType) {
@@ -1283,11 +1164,16 @@ export {
     equippedItems,
     defaultValues,
     playerInventory,
-    logData,
     currentGameVersion,
-    Log,
     createEquippedItemsObject,
     copyPlayerProperties,
+};
+// Log + formatter helpers moved to their own modules; re-exported here until the
+// importers are migrated to import them directly.
+export {
+    Log,
+    logData,
+    fadeLog,
     potionBuyLog,
     notEnoughMoneyLog,
     inventoryBuyLog,
@@ -1295,9 +1181,5 @@ export {
     itemDropLog,
     levelUpLog,
     deathLog,
-    getNumberMultiplierofFive,
-    getTen,
-    getThousands,
-    compare,
-    fadeLog,
-};
+} from './log.js';
+export { getNumberMultiplierofFive, getTen, getThousands, compare } from './format.js';
