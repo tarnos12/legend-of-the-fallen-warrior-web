@@ -6,27 +6,27 @@
 // <script> tags in index.html and execute before this module runs (module
 // scripts are deferred). As each file is converted, its <script> tag is removed
 // from index.html and an import is added below.
-import './battle.js';
-import './quest.js';
-import './intervalFunctions.js';
-import './itemDrop.js';
-import './itemSell.js';
-import './save.js';
-import './shop.js';
-import './potionsHotbar.js';
+import './systems/battle.js';
+import './systems/quest.js';
+import './systems/intervalFunctions.js';
+import './systems/itemDrop.js';
+import './systems/itemSell.js';
+import './core/save.js';
+import './data/shop.js';
+import './systems/potionsHotbar.js';
 
 // Core files (data/logic/UI) being migrated from the classic <script> tags in
 // index.html, in their original relative load order. Each still self-exposes its
 // publics on window so not-yet-converted classic files keep working.
-import './skills.js';
-import './weaponMastery.js';
-import './monsterList.js';
-import './dynamicHtml.js';
-import './gameObjects.js';
-import { createEquippedItemsObject, copyPlayerProperties } from './core.js';
-import './stats.js';
-import { createHerbs, createMinerals, playerProfessionHtml } from './professions.js';
-import { startLogo, startingScreen, testss } from './dynamicHtml.js';
+import './data/skills.js';
+import './data/weaponMastery.js';
+import './data/monsterList.js';
+import './ui/dynamicHtml.js';
+import './data/gameObjects.js';
+import { createEquippedItemsObject, copyPlayerProperties } from './core/core.js';
+import './systems/stats.js';
+import { createHerbs, createMinerals, playerProfessionHtml } from './systems/professions.js';
+import { startLogo, startingScreen, testss } from './ui/dynamicHtml.js';
 
 // Game bootstrap (Phase 3 ESM). Previously these ran inline at parse-time inside
 // the classic dynamicHtml.js / main.js / professions.js scripts. They were

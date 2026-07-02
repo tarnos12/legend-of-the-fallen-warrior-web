@@ -1,5 +1,5 @@
 ﻿'use strict';
-import { player } from './core.js';
+import { player } from '../core/core.js';
 
 // Phase 3 ESM: monsterList is a real export, mutated in place. MakeMonsterList
 // rebuilds it (formerly `window.monsterList = new Object()`); it now repopulates

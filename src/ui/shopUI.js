@@ -5,9 +5,9 @@
 // from inventoryUI.js. itemBuy/rerollShopItems are inline-onclick handlers on window;
 // the stock arrays + render fns are re-exported via dynamicHtml.js for core/itemDrop/
 // save. The potion*/backpack/statStatus imports resolve the shopOther price lookup.
-import { getItemType } from './itemDrop.js';
-import { player, playerInventory } from './core.js';
-import { state } from './state.js';
+import { getItemType } from '../systems/itemDrop.js';
+import { player, playerInventory } from '../core/core.js';
+import { state } from '../core/state.js';
 import { itemTooltipTest, CreateInventoryWeaponHtml } from './inventoryUI.js';
 import {
     potionStatus,
@@ -15,7 +15,7 @@ import {
     superPotionStatus,
     backpackStatus,
     statStatus,
-} from './shop.js';
+} from '../data/shop.js';
 
 export const itemShopWeapon = [];
 export const itemShopArmor = [];

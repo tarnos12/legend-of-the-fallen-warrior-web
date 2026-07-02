@@ -1,7 +1,7 @@
 ﻿'use strict';
-import { monsterAreas } from './gameObjects.js';
-import { monsterList } from './monsterList.js';
-import { CreateMonsterHtml } from './dynamicHtml.js';
+import { monsterAreas } from '../data/gameObjects.js';
+import { monsterList } from '../data/monsterList.js';
+import { CreateMonsterHtml } from '../ui/dynamicHtml.js';
 var monsterUnlock = {
     VarikSoldier: false,
     VarikMarksmen: false,

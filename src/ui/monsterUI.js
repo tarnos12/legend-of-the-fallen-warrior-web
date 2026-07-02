@@ -4,9 +4,9 @@
 // selection state (monsterTabActiveNum, currentMonster). CreateMonsterHtml +
 // changedTabmonster are imported cross-module (battle/core/quest/save/stats);
 // changeMonsterPage + changedTabmonster are inline-onclick handlers on window.
-import { monsterAreas } from './gameObjects.js';
-import { player, getThousands } from './core.js';
-import { monsterList } from './monsterList.js';
+import { monsterAreas } from '../data/gameObjects.js';
+import { player, getThousands } from '../core/core.js';
+import { monsterList } from '../data/monsterList.js';
 import { testss } from './uiCommon.js';
 
 var monsterTabActiveNum = 0;

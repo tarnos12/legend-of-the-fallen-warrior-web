@@ -1,9 +1,9 @@
 'use strict';
-import { weaponMastery } from './weaponMastery.js';
-import { playerPassive, weaponSkillList } from './skills.js';
-import { loadingEquippedItems, monsterAreas, characterRaces } from './gameObjects.js';
-import { monsterList, MakeMonsterList } from './monsterList.js';
-import { itemShopWeapon, itemShopArmor, itemShopAccessory } from './dynamicHtml.js';
+import { weaponMastery } from '../data/weaponMastery.js';
+import { playerPassive, weaponSkillList } from '../data/skills.js';
+import { loadingEquippedItems, monsterAreas, characterRaces } from '../data/gameObjects.js';
+import { monsterList, MakeMonsterList } from '../data/monsterList.js';
+import { itemShopWeapon, itemShopArmor, itemShopAccessory } from '../ui/dynamicHtml.js';
 import {
     CreateWeaponSkillHtml,
     CreateMonsterHtml,
@@ -17,13 +17,13 @@ import {
     ShopBuyButtons,
     CreateInventoryWeaponHtml,
     changedTabmonster,
-} from './dynamicHtml.js';
+} from '../ui/dynamicHtml.js';
 import { state } from './state.js';
-import { updateHtml } from './stats.js';
-import { quest } from './quest.js';
-import { CreatePlayerHotBar } from './potionsHotbar.js';
-import { getItemType } from './itemDrop.js';
-import { updateBar } from './battle.js';
+import { updateHtml } from '../systems/stats.js';
+import { quest } from '../systems/quest.js';
+import { CreatePlayerHotBar } from '../systems/potionsHotbar.js';
+import { getItemType } from '../systems/itemDrop.js';
+import { updateBar } from '../systems/battle.js';
 
 //Player log
 function Log(data) {

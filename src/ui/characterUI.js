@@ -7,9 +7,9 @@
 // loadGameSlot, backToStartingScreen, changeMusicImage, getAgeButton, getAge)
 // self-register on window. characterCreationHtml/checkHeroRace still use
 // string-concatenation on purpose (imperative per-stat glyph builders).
-import { characterRaces, raceStats } from './gameObjects.js';
-import { player } from './core.js';
-import { pageReload } from './save.js';
+import { characterRaces, raceStats } from '../data/gameObjects.js';
+import { player } from '../core/core.js';
+import { pageReload } from '../core/save.js';
 
 //Adds a logo to the starting screen
 function startLogo() {

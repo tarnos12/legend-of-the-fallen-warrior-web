@@ -1,10 +1,10 @@
 ﻿'use strict';
-import { playerPassive } from './skills.js';
-import { itemToCraft } from './gameObjects.js';
-import { player, getNumberMultiplierofFive } from './core.js';
+import { playerPassive } from '../data/skills.js';
+import { itemToCraft } from '../data/gameObjects.js';
+import { player, getNumberMultiplierofFive } from '../core/core.js';
 import { potionList } from './potionsHotbar.js';
 import { getItemType } from './itemDrop.js';
-import { testss } from './dynamicHtml.js';
+import { testss } from '../ui/dynamicHtml.js';
 var craftCost = [
     {
         type: 'Common',

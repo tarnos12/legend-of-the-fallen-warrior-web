@@ -1,7 +1,7 @@
 ﻿'use strict';
-import { weaponMastery } from './weaponMastery.js';
-import { weaponSkillList } from './skills.js';
-import { characterRaces } from './gameObjects.js';
+import { weaponMastery } from '../data/weaponMastery.js';
+import { weaponSkillList } from '../data/skills.js';
+import { characterRaces } from '../data/gameObjects.js';
 import {
     player,
     equippedItems,
@@ -11,20 +11,20 @@ import {
     deathLog,
     getTen,
     getThousands,
-} from './core.js';
-import { monsterList } from './monsterList.js';
-import { state } from './state.js';
+} from '../core/core.js';
+import { monsterList } from '../data/monsterList.js';
+import { state } from '../core/state.js';
 import { updateHtml, manaRegen, levelUp } from './stats.js';
 import { playerRevive } from './intervalFunctions.js';
 import { quest } from './quest.js';
 import { monsterItemDrop } from './itemDrop.js';
-import { pageReload, reset } from './save.js';
+import { pageReload, reset } from '../core/save.js';
 import {
     CreateWeaponSkillHtml,
     CreateMonsterHtml,
     testss,
     activeBuffsHtml,
-} from './dynamicHtml.js';
+} from '../ui/dynamicHtml.js';
 function startBattle(monster) {
     //Add buttons <Attack><Defense><Spell><Item><Run?> -->"Spell" change name based on character class later on: Spell/Skill/Runes/Combo/etc...
     //Display enemy at the top/or left/ AND  player at the bottom/or right side

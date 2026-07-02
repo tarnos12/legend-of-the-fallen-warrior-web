@@ -1,7 +1,7 @@
 ﻿'use strict';
-import { weaponMastery } from './weaponMastery.js';
-import { playerPassive } from './skills.js';
-import { characterRaces } from './gameObjects.js';
+import { weaponMastery } from '../data/weaponMastery.js';
+import { playerPassive } from '../data/skills.js';
+import { characterRaces } from '../data/gameObjects.js';
 import {
     playerProfession,
     unlockMineral,
@@ -9,7 +9,7 @@ import {
     createAlchemyHtml,
     playerProfessionHtml,
     craftingHtml,
-} from './professions.js';
+} from '../systems/professions.js';
 import {
     player,
     equippedItems,
@@ -18,7 +18,7 @@ import {
     Log,
     currentGameVersion,
 } from './core.js';
-import { monsterList, MakeMonsterList } from './monsterList.js';
+import { monsterList, MakeMonsterList } from '../data/monsterList.js';
 import { state } from './state.js';
 import {
     updateHtml,
@@ -27,12 +27,12 @@ import {
     playerHealthBar,
     manaRegen,
     loadIsEquipped,
-} from './stats.js';
-import { playerReviveCheck } from './intervalFunctions.js';
-import { quest } from './quest.js';
-import { createPotionInventory, CreatePlayerHotBar } from './potionsHotbar.js';
-import { updateBar } from './battle.js';
-import { backpackStatus, statStatus } from './shop.js';
+} from '../systems/stats.js';
+import { playerReviveCheck } from '../systems/intervalFunctions.js';
+import { quest } from '../systems/quest.js';
+import { createPotionInventory, CreatePlayerHotBar } from '../systems/potionsHotbar.js';
+import { updateBar } from '../systems/battle.js';
+import { backpackStatus, statStatus } from '../data/shop.js';
 import {
     CreateWeaponSkillHtml,
     CreateMonsterHtml,
@@ -49,7 +49,7 @@ import {
     shopOther,
     saveGameSlot,
     CreateInventoryWeaponHtml,
-} from './dynamicHtml.js';
+} from '../ui/dynamicHtml.js';
 // Map a save slot (0-3) to its localStorage key. Slot 0 historically uses the
 // bare key "EncodedSave"; slots 1-3 append the number.
 function saveKeyForSlot(slot) {

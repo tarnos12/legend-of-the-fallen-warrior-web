@@ -1,7 +1,7 @@
 ﻿'use strict';
-import { playerPassive } from './skills.js';
-import { characterRaces } from './gameObjects.js';
-import { player, equippedItems, Log, getThousands, fadeLog } from './core.js';
+import { playerPassive } from '../data/skills.js';
+import { characterRaces } from '../data/gameObjects.js';
+import { player, equippedItems, Log, getThousands, fadeLog } from '../core/core.js';
 import { CreatePlayerHotBar } from './potionsHotbar.js';
 import {
     CreateWeaponSkillHtml,
@@ -9,7 +9,7 @@ import {
     CreatePlayerSkillsHtml,
     primaryStatUpdate,
     secondaryStatUpdate,
-} from './dynamicHtml.js';
+} from '../ui/dynamicHtml.js';
 function updateHtml() {
     if (player.properties.stats >= 1) {
         // Show "plus" image when player level up

@@ -1,8 +1,8 @@
 import { describe, it, expect } from 'vitest';
-import { player, currentGameVersion, defaultValues } from '../src/core.js';
-import { monsterList, MakeMonsterList } from '../src/monsterList.js';
-import { characterRaces } from '../src/gameObjects.js';
-import { state } from '../src/state.js';
+import { player, currentGameVersion, defaultValues } from '../src/core/core.js';
+import { monsterList, MakeMonsterList } from '../src/data/monsterList.js';
+import { characterRaces } from '../src/data/gameObjects.js';
+import { state } from '../src/core/state.js';
 
 describe('save-wipe guard (versionCheck landmine)', () => {
     // versionCheck() in save.js wipes the save whenever

@@ -8,15 +8,15 @@ import {
     itemRarity,
     itemBaseMod,
     itemModifiers,
-} from './gameObjects.js';
-import { player, playerInventory, Log, itemDropLog, getNumberMultiplierofFive } from './core.js';
+} from '../data/gameObjects.js';
+import { player, playerInventory, Log, itemDropLog, getNumberMultiplierofFive } from '../core/core.js';
 import {
     itemShopWeapon,
     itemShopArmor,
     itemShopAccessory,
     CreateInventoryWeaponHtml,
-} from './dynamicHtml.js';
-import { state } from './state.js';
+} from '../ui/dynamicHtml.js';
+import { state } from '../core/state.js';
 import { updateHtml } from './stats.js';
 export function monsterItemDrop(monster) {
     var itemDropNumber = 0;

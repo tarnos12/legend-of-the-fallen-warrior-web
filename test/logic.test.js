@@ -7,8 +7,8 @@ import {
     equippedItems,
     createEquippedItemsObject,
     playerInventory,
-} from '../src/core.js';
-import { getItemType } from '../src/itemDrop.js';
+} from '../src/core/core.js';
+import { getItemType } from '../src/systems/itemDrop.js';
 
 // Some game functions call Log(), which writes to #logConsole; provide it.
 beforeAll(() => {

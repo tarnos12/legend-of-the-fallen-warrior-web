@@ -4,12 +4,12 @@
 // cross-module (battle/core/save/stats/gameObjects/potionsHotbar) and re-exported
 // via dynamicHtml.js for backward compatibility. Pure render functions — no
 // inline-onclick handlers, so nothing to register on window.
-import { weaponMastery } from './weaponMastery.js';
-import { playerPassive, weaponSkillList } from './skills.js';
-import { primaryStatInfo, secondaryStatInfo, weaponTypeObject } from './gameObjects.js';
-import { player } from './core.js';
-import { state } from './state.js';
-import { updateHtml } from './stats.js';
+import { weaponMastery } from '../data/weaponMastery.js';
+import { playerPassive, weaponSkillList } from '../data/skills.js';
+import { primaryStatInfo, secondaryStatInfo, weaponTypeObject } from '../data/gameObjects.js';
+import { player } from '../core/core.js';
+import { state } from '../core/state.js';
+import { updateHtml } from '../systems/stats.js';
 import { testss } from './uiCommon.js';
 
 function CreateWeaponSkillHtml() {

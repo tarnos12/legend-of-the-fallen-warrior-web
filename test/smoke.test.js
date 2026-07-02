@@ -4,7 +4,7 @@ import { describe, it, expect } from 'vitest';
 // skills, gameObjects, monsterList, dynamicHtml, stats, battle, itemDrop, quest,
 // professions, potionsHotbar, shop, state). This verifies the whole ESM graph
 // evaluates cleanly in jsdom without throwing at import time.
-import * as core from '../src/core.js';
+import * as core from '../src/core/core.js';
 
 describe('module graph loads', () => {
     it('exports core game state + helpers', () => {

@@ -1,6 +1,6 @@
 ﻿'use strict';
-import { player, playerInventory } from './core.js';
-import { state } from './state.js';
+import { player, playerInventory } from '../core/core.js';
+import { state } from '../core/state.js';
 var total = 0;
 var inventoryId = [];
 function sellAllItems() {
