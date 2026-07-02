@@ -271,35 +271,30 @@ function characterCreationHtml() {
     characterCreationCreateBackground2();
     if (player.properties.heroRace === '') {
         // If you press "New game" race property will be empty, allowing you to pick a race, otherwise you will load a game with a race already picked :)
-        var html = '';
-        var html2 = '';
-        html2 += '<div class="row">';
-        html2 += '<div class="col-xs-6 col-xs-offset-3">';
-        html2 +=
-            'Press ' +
-            '<p class="glyphicon glyphicon-info-sign" style="color:black"></p>' +
-            ' for more info about a class.';
-        html2 += '</div></div>';
-        html += '<div class="row">';
-        html += '<div class="col-xs-12 col-xs-offset-1">';
-        html += '<div class="row">';
+        let html = '';
+        const html2 =
+            `<div class="row">` +
+            `<div class="col-xs-6 col-xs-offset-3">` +
+            `Press <p class="glyphicon glyphicon-info-sign" style="color:black"></p> for more info about a class.` +
+            `</div></div>`;
+        html += `<div class="row">`;
+        html += `<div class="col-xs-12 col-xs-offset-1">`;
+        html += `<div class="row">`;
         for (var hero in characterRaces) {
             if (characterRaces.hasOwnProperty(hero)) {
                 var heroRace = characterRaces[hero];
-                var onclickevent = "changeRace('" + heroRace.name + "', '" + hero + "');";
-                html += '<div class="col-xs-6 col-xs-offset-2">';
-                html += '<img src="images/races/' + heroRace.image() + '.png">';
-                html += heroRace.name + ' ';
+                var onclickevent = `changeRace('${heroRace.name}', '${hero}');`;
+                html += `<div class="col-xs-6 col-xs-offset-2">`;
+                html += `<img src="images/races/${heroRace.image()}.png">`;
+                html += `${heroRace.name} `;
                 html +=
-                    '<a class="tooltips">' +
-                    '<p class="glyphicon glyphicon-info-sign" style="color:black"></p>' +
-                    '<span style="width:350px; left: 110px; bottom:-30px; text-align:left;">' +
-                    '<div class="row">' +
-                    '<div class="col-xs-10 col-xs-offset-1">' +
-                    heroRace.name +
-                    '</div></div>' +
-                    '<div class="row">' +
-                    '<div class="col-xs-5" style="padding-left:46px;">';
+                    `<a class="tooltips">` +
+                    `<p class="glyphicon glyphicon-info-sign" style="color:black"></p>` +
+                    `<span style="width:350px; left: 110px; bottom:-30px; text-align:left;">` +
+                    `<div class="row">` +
+                    `<div class="col-xs-10 col-xs-offset-1">${heroRace.name}</div></div>` +
+                    `<div class="row">` +
+                    `<div class="col-xs-5" style="padding-left:46px;">`;
                 for (var stat in heroRace) {
                     if (heroRace.hasOwnProperty(stat)) {
                         if (
@@ -307,25 +302,26 @@ function characterCreationHtml() {
                                 stat
                             ) !== -1
                         ) {
-                            html += stat.substring(0, 3).capitalizeFirstLetter() + ': ';
-                            for (var i = 0; i < heroRace[stat](); i++) {
-                                if (heroRace[stat]() >= 6) {
-                                    html += '<font color="orange">+</font>';
-                                } else if (heroRace[stat]() >= 4) {
-                                    html += '<font color="green">+</font>';
-                                } else if (heroRace[stat]() === 3) {
-                                    html += '<font color="blue">+</font>';
-                                } else if (heroRace[stat]() < 3) {
-                                    html += '<font color="red">+</font>';
+                            const count = heroRace[stat]();
+                            html += `${stat.substring(0, 3).capitalizeFirstLetter()}: `;
+                            for (var i = 0; i < count; i++) {
+                                if (count >= 6) {
+                                    html += `<font color="orange">+</font>`;
+                                } else if (count >= 4) {
+                                    html += `<font color="green">+</font>`;
+                                } else if (count === 3) {
+                                    html += `<font color="blue">+</font>`;
+                                } else if (count < 3) {
+                                    html += `<font color="red">+</font>`;
                                 }
                             }
-                            html += '<br />';
+                            html += `<br />`;
                         }
                     }
                 }
-                html += '</div>';
-                html += '<div class="col-xs-7">';
-                html += 'Bonuses:<br />';
+                html += `</div>`;
+                html += `<div class="col-xs-7">`;
+                html += `Bonuses:<br />`;
                 for (stat in heroRace) {
                     // var stat is being declared already, so this one is without a 'var'...
                     if (heroRace.hasOwnProperty(stat)) {
@@ -336,49 +332,43 @@ function characterCreationHtml() {
                         ) {
                             var string = stat.substring('race'.length);
                             if (stat === 'raceAccuracy' && heroRace[stat]() > 111) {
-                                html += 'Never Miss<br />';
+                                html += `Never Miss<br />`;
                             } else if (
                                 stat === 'raceEvasion' &&
                                 heroRace[stat]() === "Can't evade"
                             ) {
-                                html += "Can't Evade";
+                                html += `Can't Evade`;
                             } else {
-                                html += string.replace(/([a-z])([A-Z])/g, '$1 $2') + ': '; //remove part of the string which start from lower case "race", and add space before each upper case, changing raceMaxMana to "Max Mana"
+                                html += `${string.replace(/([a-z])([A-Z])/g, '$1 $2')}: `; //remove part of the string which start from lower case "race", and add space before each upper case, changing raceMaxMana to "Max Mana"
                                 if (heroRace[stat]() > 0) {
-                                    html += '+';
+                                    html += `+`;
                                 }
-                                html += heroRace[stat]() + '%' + '<br />';
+                                html += `${heroRace[stat]()}%<br />`;
                             }
                         }
                     }
                 }
-                html += '<br /><img src="images/races/' + heroRace.image() + '.png">';
-                html += '</div>';
-                html += '</div>';
-                html += '<div class="row">';
-                html += '<div class="col-xs-10 col-xs-offset-1">';
-                html += '<br /><font color="#CC6633">' + heroRace.lore() + '</font>';
-                html += '</div>' + '</div>' + '</span>' + '</a>';
-                html += '</div>';
-                html += '<div class="col-xs-2">';
-                html +=
-                    '<button type="button" style="margin-bottom:5px;" class="btn btn-default border" class="' +
-                    heroRace.name +
-                    '" onclick="' +
-                    onclickevent +
-                    '">Choose</button>'; //changeRace function ._.
-                html += '</div>';
+                html += `<br /><img src="images/races/${heroRace.image()}.png">`;
+                html += `</div>`;
+                html += `</div>`;
+                html += `<div class="row">`;
+                html += `<div class="col-xs-10 col-xs-offset-1">`;
+                html += `<br /><font color="#CC6633">${heroRace.lore()}</font>`;
+                html += `</div></div></span></a>`;
+                html += `</div>`;
+                html += `<div class="col-xs-2">`;
+                html += `<button type="button" style="margin-bottom:5px;" class="btn btn-default border" class="${heroRace.name}" onclick="${onclickevent}">Choose</button>`; //changeRace function ._.
+                html += `</div>`;
             }
         }
-        html += '<div class="row">';
-        html += '<div class="col-xs-2 col-xs-offset-5">';
-        html +=
-            '<button type="button" class="btn btn-default border startBackButtonMargin" onclick="newGameSlot()">Go Back</button>';
-        html += '</div>';
-        html += '</div>';
-        html += '</div>';
-        html += '</div>';
-        html += '</div>';
+        html += `<div class="row">`;
+        html += `<div class="col-xs-2 col-xs-offset-5">`;
+        html += `<button type="button" class="btn btn-default border startBackButtonMargin" onclick="newGameSlot()">Go Back</button>`;
+        html += `</div>`;
+        html += `</div>`;
+        html += `</div>`;
+        html += `</div>`;
+        html += `</div>`;
         document.getElementById('raceCreation').innerHTML = html;
         document.getElementById('raceText').innerHTML = html2;
     }
@@ -387,46 +377,43 @@ function characterCreationHtml() {
     checkHeroRace();
 }
 function checkHeroRace() {
-    var html = '';
+    let html = '';
     for (var hero in characterRaces) {
         var heroRace = characterRaces[hero];
         if (player.properties.heroRace === heroRace.name) {
             html +=
-                '<a href="#" class="tooltipA">' +
-                '<img src="images/races/' +
-                heroRace.image() +
-                '.png">' +
-                '<span style="width:350px; right: 10%; top:10px; text-align:left;">' +
-                '<div class="row">' +
-                '<div class="col-xs-10 col-xs-offset-1">' +
-                heroRace.name +
-                '</div></div>' +
-                '<div class="row">' +
-                '<div class="col-xs-5" style="padding-left:46px;">';
+                `<a href="#" class="tooltipA">` +
+                `<img src="images/races/${heroRace.image()}.png">` +
+                `<span style="width:350px; right: 10%; top:10px; text-align:left;">` +
+                `<div class="row">` +
+                `<div class="col-xs-10 col-xs-offset-1">${heroRace.name}</div></div>` +
+                `<div class="row">` +
+                `<div class="col-xs-5" style="padding-left:46px;">`;
             for (var stat in heroRace) {
                 if (
                     'strength, endurance, agility, dexterity, wisdom, intelligence, luck'.indexOf(
                         stat
                     ) != -1
                 ) {
-                    html += stat.substring(0, 3).capitalizeFirstLetter() + ': ';
-                    for (var i = 0; i < heroRace[stat](); i++) {
-                        if (heroRace[stat]() >= 6) {
-                            html += '<font color="orange">+</font>';
-                        } else if (heroRace[stat]() >= 4) {
-                            html += '<font color="green">+</font>';
-                        } else if (heroRace[stat]() === 3) {
-                            html += '<font color="blue">+</font>';
-                        } else if (heroRace[stat]() < 3) {
-                            html += '<font color="red">+</font>';
+                    const count = heroRace[stat]();
+                    html += `${stat.substring(0, 3).capitalizeFirstLetter()}: `;
+                    for (var i = 0; i < count; i++) {
+                        if (count >= 6) {
+                            html += `<font color="orange">+</font>`;
+                        } else if (count >= 4) {
+                            html += `<font color="green">+</font>`;
+                        } else if (count === 3) {
+                            html += `<font color="blue">+</font>`;
+                        } else if (count < 3) {
+                            html += `<font color="red">+</font>`;
                         }
                     }
-                    html += '<br />';
+                    html += `<br />`;
                 }
             }
-            html += '</div>';
-            html += '<div class="col-xs-7">';
-            html += 'Bonuses:<br />';
+            html += `</div>`;
+            html += `<div class="col-xs-7">`;
+            html += `Bonuses:<br />`;
             for (var stat in heroRace) {
                 if (
                     'raceAllStats, raceGoldDrop, raceExpRate, raceDropRate, raceEvasion, raceDamage, raceHealth, raceAccuracy, raceDefense, raceManaRegen, raceMaxMana, raceCriticalChance, raceSpellPower'.indexOf(
@@ -435,25 +422,25 @@ function checkHeroRace() {
                 ) {
                     var string = stat.substring('race'.length);
                     if (stat === 'raceAccuracy' && heroRace[stat]() > 111) {
-                        html += 'Never Miss<br />';
+                        html += `Never Miss<br />`;
                     } else if (stat === 'raceEvasion' && heroRace[stat]() === "Can't evade") {
-                        html += "Can't Evade";
+                        html += `Can't Evade`;
                     } else {
-                        html += string.replace(/([a-z])([A-Z])/g, '$1 $2') + ': ';
+                        html += `${string.replace(/([a-z])([A-Z])/g, '$1 $2')}: `;
                         if (heroRace[stat]() > 0) {
-                            html += '+';
+                            html += `+`;
                         }
-                        html += heroRace[stat]() + '%' + '<br />';
+                        html += `${heroRace[stat]()}%<br />`;
                     }
                 }
             }
-            html += '<br /><img src="images/races/' + heroRace.image() + '.png">';
-            html += '</div>';
-            html += '</div>';
-            html += '<div class="row">';
-            html += '<div class="col-xs-10 col-xs-offset-1">';
-            html += '<br /><font color="#CC6633">' + heroRace.lore() + '</font>';
-            html += '</div>' + '</div>' + '</span>' + '</a>';
+            html += `<br /><img src="images/races/${heroRace.image()}.png">`;
+            html += `</div>`;
+            html += `</div>`;
+            html += `<div class="row">`;
+            html += `<div class="col-xs-10 col-xs-offset-1">`;
+            html += `<br /><font color="#CC6633">${heroRace.lore()}</font>`;
+            html += `</div></div></span></a>`;
         }
     }
     document.getElementById('characterRace').innerHTML = html;
