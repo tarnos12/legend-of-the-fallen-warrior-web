@@ -257,80 +257,45 @@ function checkEquippedItemType(newItem, check) {
 }
 
 function itemTooltipTest(item) {
-    var html = '';
     var equippedItemStat = equippedItems[item.subType];
     if (item.itemType === 'weapon') {
         equippedItemStat = equippedItems[item.itemType];
     }
-    html += '<font color="' + item.color + '"><strong>' + item.name + '</strong></font>' + '<br />';
+    let html = `<font color="${item.color}"><strong>${item.name}</strong></font><br />`;
     if (item.itemType === 'weapon') {
-        html +=
-            '<div class="borderBottom borderTop">Weapon class: ' +
-            item.subType.capitalizeFirstLetter() +
-            '<br />';
+        html += `<div class="borderBottom borderTop">Weapon class: ${item.subType.capitalizeFirstLetter()}<br />`;
         if (item['Bonus damage'] > 0) {
-            html +=
-                '<strong><font color="#2175D9">' +
-                'Damage: ' +
-                item.MinDamage +
-                ' to ' +
-                item.MaxDamage +
-                '</font></strong>' +
-                '</div>';
+            html += `<strong><font color="#2175D9">Damage: ${item.MinDamage} to ${item.MaxDamage}</font></strong></div>`;
         } else {
-            html += 'Damage: ' + item.MinDamage + ' to ' + item.MaxDamage + '</div>';
+            html += `Damage: ${item.MinDamage} to ${item.MaxDamage}</div>`;
         }
-        html +=
-            'Average Damage: ' + compare(item.AverageDamage, equippedItemStat.AverageDamage, '');
-        html +=
-            '<div class="borderBottom borderTop">Critical Chance: ' +
-            compare(item['Critical chance'], equippedItemStat['Critical chance'], '%') +
-            '</div>';
+        html += `Average Damage: ${compare(item.AverageDamage, equippedItemStat.AverageDamage, '')}`;
+        html += `<div class="borderBottom borderTop">Critical Chance: ${compare(item['Critical chance'], equippedItemStat['Critical chance'], '%')}</div>`;
     }
     if (item.itemType === 'armor') {
         if (item['Bonus armor'] > 0) {
-            html +=
-                '<div class="borderBottom borderTop"><strong><font color="#1e69c3">Defense: ' +
-                compare(item.defense.toFixed(0), equippedItemStat.defense.toFixed(0), '') +
-                '</font></strong></div>';
+            html += `<div class="borderBottom borderTop"><strong><font color="#1e69c3">Defense: ${compare(item.defense.toFixed(0), equippedItemStat.defense.toFixed(0), '')}</font></strong></div>`;
         } else {
-            html +=
-                '<div class="borderBottom borderTop">Defense: ' +
-                compare(item.defense, equippedItemStat.defense, '') +
-                ' </div>';
+            html += `<div class="borderBottom borderTop">Defense: ${compare(item.defense, equippedItemStat.defense, '')} </div>`;
         }
         if (item.subType === 'shield') {
-            html +=
-                '<div class="borderBottom borderTop">Chance to Block: ' +
-                item['Block chance'] +
-                '%' +
-                ' </div>';
+            html += `<div class="borderBottom borderTop">Chance to Block: ${item['Block chance']}% </div>`;
         }
         if (item['Bonus armor'] > 0) {
-            html +=
-                '<strong><font color="#7FCC7F">' +
-                'Bonus armor' +
-                ': ' +
-                compare(item['Bonus armor'], equippedItemStat['Bonus armor'], '%') +
-                '</font></strong>' +
-                '<br />';
+            html += `<strong><font color="#7FCC7F">Bonus armor: ${compare(item['Bonus armor'], equippedItemStat['Bonus armor'], '%')}</font></strong><br />`;
         }
-        html +=
-            'Damage reduction: ' +
-            (
+        html += `Damage reduction: ${(
+            100 -
+            ((player.properties.prestigeMultiplier * 500) /
+                (player.properties.prestigeMultiplier * 500 +
+                    (player.functions.defense() +
+                        (item.defense - equippedItems[item.subType].defense)))) *
                 100 -
+            (100 -
                 ((player.properties.prestigeMultiplier * 500) /
-                    (player.properties.prestigeMultiplier * 500 +
-                        (player.functions.defense() +
-                            (item.defense - equippedItems[item.subType].defense)))) *
-                    100 -
-                (100 -
-                    ((player.properties.prestigeMultiplier * 500) /
-                        (player.properties.prestigeMultiplier * 500 + player.functions.defense())) *
-                        100)
-            ).toFixed(2) +
-            '%' +
-            '<br />';
+                    (player.properties.prestigeMultiplier * 500 + player.functions.defense())) *
+                    100)
+        ).toFixed(2)}%<br />`;
     }
     for (var statName in item) {
         //Here stat will become the word Defense
@@ -343,58 +308,21 @@ function itemTooltipTest(item) {
                 //Getting the actual stat object from the word.
                 var selectedStat = item[statName];
                 var equippedItemTest = equippedItemStat[statName];
-                if (
+                // The four "%" stats format the delta with a percent sign; the rest plain.
+                const unit =
                     statName === 'Bonus damage' ||
                     statName === 'Magic find' ||
                     statName === 'Gold drop' ||
                     statName === 'Experience rate'
-                ) {
-                    if (selectedStat > 0) {
-                        html +=
-                            '<strong><font color="#0066FF">' +
-                            statName +
-                            ': ' +
-                            compare(selectedStat, equippedItemTest, '%') +
-                            '</font></strong>' +
-                            '<br />';
-                    }
-                    if (selectedStat === 0 && equippedItemTest > 0) {
-                        html +=
-                            '<strong><font color="#0066FF">' +
-                            statName +
-                            ': ' +
-                            compare(selectedStat, equippedItemTest, '%') +
-                            '</font></strong>' +
-                            '<br />';
-                    }
-                } else {
-                    if (selectedStat > 0) {
-                        html +=
-                            '<strong><font color="#0066FF">' +
-                            statName +
-                            ': ' +
-                            compare(selectedStat, equippedItemTest, '') +
-                            '</font></strong>' +
-                            '<br />';
-                    }
-                    if (selectedStat === 0 && equippedItemTest > 0) {
-                        html +=
-                            '<strong><font color="#0066FF">' +
-                            statName +
-                            ': ' +
-                            compare(selectedStat, equippedItemTest, '') +
-                            '</font></strong>' +
-                            '<br />';
-                    }
+                        ? '%'
+                        : '';
+                if (selectedStat > 0 || (selectedStat === 0 && equippedItemTest > 0)) {
+                    html += `<strong><font color="#0066FF">${statName}: ${compare(selectedStat, equippedItemTest, unit)}</font></strong><br />`;
                 }
             }
         }
     }
-    html += '<div class="borderBottom borderTop">';
-    html += 'Value: ' + item.Value + ' gold<br />';
-    html += 'Item level: ' + item.iLvl + '<br />';
-    html += '<font color="#CC6633">' + item.lore + '</font>';
-    html += '</div>';
+    html += `<div class="borderBottom borderTop">Value: ${item.Value} gold<br />Item level: ${item.iLvl}<br /><font color="#CC6633">${item.lore}</font></div>`;
     return html;
 }
 
