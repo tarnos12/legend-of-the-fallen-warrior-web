@@ -61,7 +61,9 @@ self-registers its inline-onclick handlers via `Object.assign(window, {...})`.
 
 | File | Owns | Notes |
 |---|---|---|
-| `core.js` | `player` (properties/functions/buffs), `equippedItems`, `playerInventory`, `defaultValues`, `logData`, `currentGameVersion`, `Log` + log-message helpers, number formatters (`getThousands`, `getTen`, `getNumberMultiplierofFive`, `compare`), `fadeLog` | Also registers gameplay onclick handlers (equipItem, unequipItem, sortInventory, sortShop, rebirth, changeRace, muteAudio, ...). The big one (~1300 lines). |
+| `core.js` | `player` (properties/functions/buffs), `equippedItems` + `createEquippedItemsObject`, `playerInventory`, `defaultValues` + `copyPlayerProperties`, `currentGameVersion` | Pure player state — no handlers, no rendering. Only imports its three data providers (weaponMastery, skills, gameObjects). |
+| `log.js` | `Log` + `logData` ring buffer (`#logConsole`), `fadeLog` fade animation, the named notification helpers (`potionBuyLog`, `deathLog`, `levelUpLog`, ...) | Self-contained (no game-state imports). |
+| `format.js` | Pure number/display formatters: `getThousands`, `getTen`, `getNumberMultiplierofFive`, `compare` (green/red delta markup) | No imports. |
 | `state.js` | `state` object holding shared **reassigned primitives** (battleTurn, damageTaken, hardcoreMode, checkedShopItem, checkBox\*, weapon/armor/accessoryAmount) | Primitives can't be live-rebound across modules, hence one shared object. Add new shared reassigned scalars here. |
 | `save.js` | Save/load/reset to `localStorage` (base64 `EncodedSave`, `EncodedSave1..3`), `pageReload`, version check | **Save-wipe guard:** `player.properties.gameVersion` must equal `currentGameVersion` or loads wipe. Covered by a test. |
 
@@ -80,6 +82,8 @@ self-registers its inline-onclick handlers via `Object.assign(window, {...})`.
 | File | Owns |
 |---|---|
 | `battle.js` | Combat loop (`startBattle` on window), damage, monster death/rewards, `playerDead`, `updateBar`. |
+| `equip.js` | Equip/unequip/sort logic + slot lookup tables; `getStartingItem` (used by changeRace). `equipItem`/`unequipItem`/`sortInventory` on window. |
+| `gameControls.js` | Player-facing controls: `disableButtons` (monster-button lockout), sell-filter checkboxes (`handleClick`), hardcore toggle, `changeRace`, audio (`myAudio`/`muteAudio`), `selectText`, `resetPassiveSkills`, shop-radio listener + `sortShop`, `changeDifficulty`, `rebirth` — all on window. |
 | `itemDrop.js` | Procedural item generation `getItemType`, monster drops `monsterItemDrop`. Fills `playerInventory` or the shopUI stock arrays. |
 | `itemSell.js` | Sell single/all items (`itemSell`, `sellAllItems` on window). |
 | `stats.js` | `updateHtml` (the everything-refresher), level/exp/health/mana bars, stat upgrade handlers (`upgrade*` on window). |

@@ -1,7 +1,8 @@
 ﻿'use strict';
 import { playerPassive } from '../data/skills.js';
 import { itemToCraft } from '../data/gameObjects.js';
-import { player, getNumberMultiplierofFive } from '../core/core.js';
+import { player } from '../core/core.js';
+import { getNumberMultiplierofFive } from '../core/format.js';
 import { potionList } from './potionsHotbar.js';
 import { getItemType } from './itemDrop.js';
 import { testss } from '../ui/uiCommon.js';

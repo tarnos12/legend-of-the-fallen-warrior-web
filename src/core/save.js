@@ -11,13 +11,13 @@ import {
     craftingHtml,
 } from '../systems/professions.js';
 import {
-    player,
-    equippedItems,
-    defaultValues,
-    playerInventory,
-    Log,
     currentGameVersion,
+    defaultValues,
+    equippedItems,
+    player,
+    playerInventory,
 } from './core.js';
+import { Log } from './log.js';
 import { monsterList, MakeMonsterList } from '../data/monsterList.js';
 import { state } from './state.js';
 import {

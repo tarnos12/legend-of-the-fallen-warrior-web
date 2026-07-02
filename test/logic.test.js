@@ -1,13 +1,11 @@
 import { describe, it, expect, beforeAll, beforeEach } from 'vitest';
 import {
-    getNumberMultiplierofFive,
-    getTen,
-    getThousands,
-    player,
-    equippedItems,
     createEquippedItemsObject,
+    equippedItems,
+    player,
     playerInventory,
 } from '../src/core/core.js';
+import { getNumberMultiplierofFive, getTen, getThousands } from '../src/core/format.js';
 import { getItemType } from '../src/systems/itemDrop.js';
 
 // Some game functions call Log(), which writes to #logConsole; provide it.

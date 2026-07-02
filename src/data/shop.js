@@ -1,12 +1,6 @@
 ﻿'use strict';
-import {
-    player,
-    Log,
-    potionBuyLog,
-    notEnoughMoneyLog,
-    inventoryBuyLog,
-    statBuyLog,
-} from '../core/core.js';
+import { player } from '../core/core.js';
+import { Log, inventoryBuyLog, notEnoughMoneyLog, potionBuyLog, statBuyLog } from '../core/log.js';
 import { updateHtml } from '../systems/stats.js';
 import { createPotionInventory, potionList } from '../systems/potionsHotbar.js';
 import { CreateInventoryWeaponHtml } from '../ui/inventoryUI.js';

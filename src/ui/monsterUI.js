@@ -5,7 +5,8 @@
 // changedTabmonster are imported cross-module (battle/core/quest/save/stats);
 // changeMonsterPage + changedTabmonster are inline-onclick handlers on window.
 import { monsterAreas } from '../data/gameObjects.js';
-import { player, getThousands } from '../core/core.js';
+import { player } from '../core/core.js';
+import { getThousands } from '../core/format.js';
 import { monsterList } from '../data/monsterList.js';
 import { testss } from './uiCommon.js';
 

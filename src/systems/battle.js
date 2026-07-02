@@ -2,16 +2,9 @@
 import { weaponMastery } from '../data/weaponMastery.js';
 import { weaponSkillList } from '../data/skills.js';
 import { characterRaces } from '../data/gameObjects.js';
-import {
-    player,
-    equippedItems,
-    logData,
-    Log,
-    levelUpLog,
-    deathLog,
-    getTen,
-    getThousands,
-} from '../core/core.js';
+import { equippedItems, player } from '../core/core.js';
+import { Log, deathLog, levelUpLog, logData } from '../core/log.js';
+import { getTen, getThousands } from '../core/format.js';
 import { monsterList } from '../data/monsterList.js';
 import { state } from '../core/state.js';
 import { updateHtml, manaRegen, levelUp } from './stats.js';
