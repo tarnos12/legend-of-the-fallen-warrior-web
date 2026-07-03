@@ -15,7 +15,7 @@ owns, and the conventions that keep it working.
 |---|---|
 | `index.html` | The page. Static DOM skeleton, classic `<script>` tags (jQuery/Bootstrap), and the module entry `<script type="module" src="/src/main.js">`. |
 | `src/` | All game code (ES modules), organized by layer — see below. |
-| `test/` | Vitest tests (jsdom). `smoke` (import graph), `logic` (helpers/equipment/item-gen), `game-data` (save-wipe guard, saves, monsters, races), `render` (byte-exact snapshots of every deterministic renderer — regenerate deliberately with `vitest run -u` after reviewing the diff), `derived-stats` (player/monster math snapshots), `save-roundtrip` (full save→load through the real functions against the real index.html DOM). `utils.js` holds the shared jsdom helpers (jQuery stub, index.html DOM loader, raw-innerHTML capture). |
+| `test/` | Vitest tests (jsdom). `smoke` (import graph), `logic` (helpers/equipment/item-gen), `game-data` (save-wipe guard, saves, monsters, races), `render` (byte-exact snapshots of every deterministic renderer — regenerate deliberately with `vitest run -u` after reviewing the diff), `derived-stats` (player/monster math snapshots), `save-roundtrip` (full save→load through the real functions against the real index.html DOM), `weapon-behavior` (combat profiles + loot affixes), `combat-sim` (the real canvas combat driven deterministically via a stubbed 2D context + `pump()`: wave auto-start/rewards, auto-progress, death step-back, waveUnlocks↔quest consistency), `offline` (away-time grants, caps, banner). `utils.js` holds the shared jsdom helpers (jQuery stub, index.html DOM loader, raw-innerHTML capture). |
 | `public/` | Static assets served as-is (jquery/, vendor/, js/bootstrap, sounds/). |
 | `images/` | Game art (items/monsters/races/skills/buffs/stat icons). |
 | `vite.config.mjs` | Vite + Vitest config (jsdom test environment lives here under the `test` key). |
@@ -52,7 +52,7 @@ self-registers its inline-onclick handlers via `Object.assign(window, {...})`.
 |---|---|---|---|
 | `uiCommon.js` | Bootstrap tooltip re-init; installs `String.prototype.capitalizeFirstLetter`; the shared image cache | `testss`, `getImage`, `imageCache` | — |
 | `loadingOverlay.js` | Boot loading screen: preloads all combat sprites behind the static `#loadingOverlay` (index.html) with a progress bar + %, removes it at 100%. Failed downloads count as progress and a 15 s failsafe removes it regardless — loading can never brick startup. Shares the `uiCommon` image cache with the combat canvas. | — | — |
-| `monsterUI.js` | Monster tabs/panel (`#monsterTabs`); current-monster + tab state | `CreateMonsterHtml`, `changedTabmonster` | `changeMonsterPage`, `changedTabmonster` |
+| `monsterUI.js` | Area progression panel (`#monsterTabs`): every wave of the current area with kill counts, the first locked wave with its live unlock requirement (from `data/waveUnlocks.js`), ??? beyond | `CreateMonsterHtml`, `changedTabmonster` (area select by index, used by rebirth) | — |
 | `panelsUI.js` | Stat/skill panels: `#weaponSkill`, `#checkBoxHtml`, `#playerSkills`, `#primaryStat`, `#secondaryStat`, `#activeBuffs` | `CreateWeaponSkillHtml`, `checkBoxHtml`, `CreatePlayerSkillsHtml`, `primaryStatUpdate`, `secondaryStatUpdate`, `activeBuffsHtml` | — |
 | `inventoryUI.js` | Inventory tabs (`#inventory`), equipped-item slots (`#equipHtml`), item tooltips; inventory tab state | `CreateInventoryWeaponHtml`, `unequipItemLoad`, `EquippedItemsEmpty`, `checkIfEquippedEmpty`, `itemTooltipTest` (reused by shopUI) | `CreateInventoryWeaponHtml` |
 | `shopUI.js` | Item shop (`#shopTabs`, `#shop*` panes, `#shopOther`); **owns the shop stock arrays** `itemShopWeapon/Armor/Accessory` (mutated in place, never reassigned) | stock arrays, `displayShopItems`, `ShopBuyButtons`, `refillShopInterval`, `shopOther` | `itemBuy`, `rerollShopItems` |
@@ -75,6 +75,7 @@ self-registers its inline-onclick handlers via `Object.assign(window, {...})`.
 |---|---|
 | `gameObjects.js` | Stat panel definitions (`primaryStatInfo`, `secondaryStatInfo`), item type/subtype/rarity/modifier tables, `monsterAreas`, `weaponTypeObject`, `characterRaces` + `raceStats`, equipment slot info (`loadingEquippedItems`, `emptyItemSlotInfo`, `InventoryItemTypes`), crafting (`itemToCraft`). |
 | `monsterList.js` | `monsterList` (mutate-in-place) + `MakeMonsterList()` (56 monsters). |
+| `waveUnlocks.js` | Display table of the wave-unlock kill thresholds, derived 1:1 from quest.js (which remains the source of truth; `test/combat-sim.test.js` asserts consistency). |
 | `skills.js` | `playerPassive` (35 passives), `weaponSkillList`. |
 | `weaponMastery.js` | `weaponMastery` per-weapon stat multipliers. |
 | `shop.js` | Shop "other" price/status objects (`potionStatus`, `mediumPotionStatus`, `superPotionStatus`, `backpackStatus`, `statStatus`) + buy handlers (buyStat, buyBackpack, buy\*Potion) on window. |
@@ -87,7 +88,8 @@ self-registers its inline-onclick handlers via `Object.assign(window, {...})`.
 | `equip.js` | Equip/unequip/sort logic + slot lookup tables; `getStartingItem` (used by changeRace). `equipItem`/`unequipItem`/`sortInventory` on window. |
 | `weaponBehavior.js` | `weaponCombatProfile(weapon?)`: how each weapon class behaves in canvas combat — sword fast+crit+parry, axe cleave, mace heavy+stun, staff splash, bow pierce — plus the item special-stat modifiers (`Attack speed`, `Extra targets`, `Stun chance`) so future item affixes change battle behavior with no combat-code changes. Unit-tested in `test/weapon-behavior.test.js`. |
 | `gameControls.js` | Player-facing controls: `disableButtons` (monster-button lockout), sell-filter checkboxes (`handleClick`), hardcore toggle, `changeRace`, audio (`myAudio`/`muteAudio`), `selectText`, `resetPassiveSkills`, shop-radio listener + `sortShop`, `changeDifficulty`, `rebirth` — all on window. |
-| `itemDrop.js` | Procedural item generation `getItemType`, monster drops `monsterItemDrop`. Fills `playerInventory` or the shopUI stock arrays. |
+| `itemDrop.js` | Procedural item generation `getItemType`, monster drops `monsterItemDrop` (quiet mode for offline bulk grants). Fills `playerInventory` or the shopUI stock arrays. Rare+ weapons can roll ONE behavior affix (`Attack speed` / `Stun chance` / `Extra targets`) read by `weaponBehavior.js`. |
+| `offline.js` | Offline progress: converts time since the save's `savedAt` stamp into real kills of the saved wave (grantKillRewards in quiet mode; caps 8h / 300 kills / 60s minimum), renders once, shows the "While you were away" banner. Called from `save.js` `load()` after versionCheck. |
 | `itemSell.js` | Sell single/all items (`itemSell`, `sellAllItems` on window). |
 | `stats.js` | `updateHtml` (the everything-refresher), level/exp/health/mana bars, stat upgrade handlers (`upgrade*` on window). |
 | `professions.js` | Gathering/alchemy/crafting (`playerProfession`, herbs/minerals, crafting HTML). |
