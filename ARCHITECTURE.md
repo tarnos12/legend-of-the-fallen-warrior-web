@@ -15,7 +15,7 @@ owns, and the conventions that keep it working.
 |---|---|
 | `index.html` | The page. Static DOM skeleton, classic `<script>` tags (jQuery/Bootstrap), and the module entry `<script type="module" src="/src/main.js">`. |
 | `src/` | All game code (ES modules), organized by layer — see below. |
-| `test/` | Vitest tests (jsdom). `smoke` (import graph), `logic` (helpers/equipment/item-gen), `game-data` (save-wipe guard, saves, monsters, races). |
+| `test/` | Vitest tests (jsdom). `smoke` (import graph), `logic` (helpers/equipment/item-gen), `game-data` (save-wipe guard, saves, monsters, races), `render` (byte-exact snapshots of every deterministic renderer — regenerate deliberately with `vitest run -u` after reviewing the diff), `derived-stats` (player/monster math snapshots), `save-roundtrip` (full save→load through the real functions against the real index.html DOM). `utils.js` holds the shared jsdom helpers (jQuery stub, index.html DOM loader, raw-innerHTML capture). |
 | `public/` | Static assets served as-is (jquery/, vendor/, js/bootstrap, sounds/). |
 | `images/` | Game art (items/monsters/races/skills/buffs/stat icons). |
 | `vite.config.mjs` | Vite + Vitest config (jsdom test environment lives here under the `test` key). |
@@ -117,6 +117,6 @@ self-registers its inline-onclick handlers via `Object.assign(window, {...})`.
 npm run dev       # Vite dev server (port 5173, or PORT env)
 npm run build     # production build to dist/
 npm test          # vitest run (15 tests, jsdom)
-npm run lint      # eslint src test (no-undef = error; warnings are legacy noise)
+npm run lint      # eslint src test (no-undef + no-unused-vars = error; must be clean)
 npm run format    # prettier
 ```

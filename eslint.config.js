@@ -23,8 +23,9 @@ export default [
             // The signal we care about: bare references to things that aren't
             // imported/declared — i.e. a missing import after the ESM refactor.
             'no-undef': 'error',
-            // Legacy code has some dead locals; surface them as warnings, not errors.
-            'no-unused-vars': ['warn', { args: 'none' }],
+            // The legacy dead locals were all cleaned up (2026-07); keep it at
+            // error so dead code can't creep back in.
+            'no-unused-vars': ['error', { args: 'none' }],
             // Deliberately relaxed for this legacy codebase (these are pervasive style
             // patterns, not bugs, and rewriting them risks gameplay changes):
             eqeqeq: 'off', // loose == used throughout
@@ -45,7 +46,7 @@ export default [
             globals: { ...globals.browser, ...globals.node },
         },
         rules: {
-            'no-unused-vars': 'warn',
+            'no-unused-vars': 'error',
         },
     },
     {

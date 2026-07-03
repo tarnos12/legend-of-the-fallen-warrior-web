@@ -281,17 +281,11 @@ function getItemBaseStats(monster, dropItem, isDrop, craftItemQuality) {
 }
 
 function getBaseItemMod(monster, dropItem, isDrop) {
-    var totalChance = 0;
-    var randomNumber = 0;
     var currentMods = 0;
     var randomMod;
     var newArray = [];
     var arrayIndex = 0;
-    var modChance = 0;
     var randomModAmount = Math.round(Math.random()); // Picks a number between 0 and 1, since we want max 1 "base bonus" on an item
-    modChance = itemBaseMod[itemBaseMod.length - 1];
-    totalChance = modChance.chance;
-    randomNumber = Math.floor(Math.random() * (totalChance - 1) + 1); // Get a random number based on highest possible chance
     newArray = itemBaseMod.slice(); // Copy an array so we can remove array values so we dont get double of the same bonus on the item
     if (currentMods < randomModAmount) {
         randomMod = newArray[Math.floor(Math.random() * newArray.length)]; // picks a random bonus
@@ -308,7 +302,6 @@ function getBaseItemMod(monster, dropItem, isDrop) {
 
 function getBonusItemMod(monster, dropItem, isDrop) {
     var itemLevel = dropItem.iLvl;
-    var itemLevelValue = 0;
     var currentMods = 0;
     var minMods = dropItem.minMods;
     var maxMods = dropItem.maxMods;
@@ -808,29 +801,6 @@ function getBonusItemMod(monster, dropItem, isDrop) {
         };
     };
 };*/
-//Random number, higher number is less likely to happen, and lower number is more common
-function getNum(min, max) {
-    // min inclusive, max exclusive
-    var num = Math.random();
-    num = 1 - Math.sin(num);
-    return Math.round(num * (max - min) + min);
-}
-
-function getItemValue(dropItem) {
-    return Math.floor(
-        dropItem.strength * 2 +
-            dropItem.endurance * 2 +
-            dropItem.agility * 2 +
-            dropItem.dexterity * 2 +
-            dropItem.wisdom * 2 +
-            dropItem.intelligence * 2 +
-            dropItem.luck * 2 +
-            dropItem.defense * 2 +
-            dropItem.expRate * 0.5 +
-            dropItem.goldRate * 0.5 +
-            dropItem.dropRate * 0.5
-    );
-}
 
 // monsterItemDrop (battle) and getItemType (core, dynamicHtml, professions) are
 // exported (inline above) and imported by their callers. The rest of the

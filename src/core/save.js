@@ -128,12 +128,11 @@ var executeIntervalFunctionsOnce = (function () {
     return function () {
         if (!executed) {
             executed = true;
-            var healthPercent2;
-            var expPercent2;
-            healthPercent2 = setInterval(function () {
+            // The interval ids were never kept/cleared; just start the loops.
+            setInterval(function () {
                 healthPercent();
             }, 100);
-            expPercent2 = setInterval(function () {
+            setInterval(function () {
                 expPercent();
             }, 100);
         }

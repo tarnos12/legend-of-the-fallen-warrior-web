@@ -24,8 +24,6 @@ export const itemShopAccessory = [];
 function getShopItem() {
     var shopItemAmount = 100;
     var shopItemLevel = player.properties.level;
-    var weaponLevelBonus = 5;
-    var armorLevelBonus = 5;
     for (var i = 0; i < shopItemAmount; i++) {
         if (
             itemShopWeapon.length < 20 ||

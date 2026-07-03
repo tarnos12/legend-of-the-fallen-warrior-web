@@ -226,7 +226,6 @@ function EquippedItemsEmpty() {
 }
 
 function checkIfEquippedEmpty() {
-    var html = '';
     for (var item in equippedItems) {
         var itemType = equippedItems[item];
         if (itemType.isEquipped === true) {
@@ -338,4 +337,8 @@ export {
     checkIfEquippedEmpty,
     itemTooltipTest,
 };
-Object.assign(window, { CreateInventoryWeaponHtml });
+// changedTabInventory is dispatched by the generated `onClick = changedTabInventory(k)`
+// on the inventory nav tabs, so it must be on window (it silently dropped off during
+// the ESM conversion, leaving tab clicks throwing a ReferenceError and the active-tab
+// state stuck at 0 across re-renders).
+Object.assign(window, { CreateInventoryWeaponHtml, changedTabInventory });

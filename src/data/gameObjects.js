@@ -1075,24 +1075,6 @@ var weaponTypeObject = [
     },
 ];
 
-var materiaType = [
-    {
-        type: 'materiaSlot_1',
-    },
-    {
-        type: 'materiaSlot_2',
-    },
-    {
-        type: 'materiaSlot_3',
-    },
-    {
-        type: 'materiaSlot_4',
-    },
-    {
-        type: 'materiaSlot_5',
-    },
-];
-
 var CharacterRace = function (
     name,
     baseStrength,
