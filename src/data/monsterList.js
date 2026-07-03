@@ -34,11 +34,10 @@ export function MakeMonsterList() {
         this.id = id;
         this.area = area;
         this.monsterHealth = function () {
+            // 75 = the original 150 halved (2026-07 pacing change: early
+            // fights took too long in the canvas wave combat).
             return Math.floor(
-                this.level *
-                    150 *
-                    this.difficultyMultiplier() *
-                    player.properties.prestigeMultiplier
+                this.level * 75 * this.difficultyMultiplier() * player.properties.prestigeMultiplier
             );
         };
         this.hp = this.monsterHealth();

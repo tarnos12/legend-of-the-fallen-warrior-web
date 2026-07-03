@@ -15,7 +15,7 @@
 import { player } from '../core/core.js';
 import { logData } from '../core/log.js';
 import { monsterList } from '../data/monsterList.js';
-import { characterRaces } from '../data/gameObjects.js';
+import { characterRaces, monsterAreas } from '../data/gameObjects.js';
 import {
     heroStrikeRoll,
     heroSpellRoll,
@@ -28,6 +28,7 @@ import { weaponCombatProfile } from '../systems/weaponBehavior.js';
 const GROUND = 235;
 const HERO_X = 95;
 const SPRITE = 64;
+const NEXT_WAVE_DELAY = 1.2; // seconds of idle between waves
 
 let canvas = null;
 let ctx = null;
@@ -36,6 +37,48 @@ let realStartBattle = null;
 let wave = null; // active wave state or null
 let stepTimer = 0;
 let lastTs = 0;
+let idleTimer = 0; // counts up between waves; wave auto-starts at NEXT_WAVE_DELAY
+
+// ---- Idle progression state (persisted on player.properties) ---------------
+// combatArea: selected area type ('' = first unlocked); combatWave: index into
+// the area's monster list (wave 1 = monster 1); combatAutoProgress: advance to
+// the next unlocked wave after a clear. Death steps one wave back instead, so
+// idle play never gets stuck.
+function unlockedAreas() {
+    return monsterAreas.filter((a) => a.isUnlocked === true);
+}
+
+function areaEntries(areaType) {
+    return Object.keys(monsterList)
+        .filter((key) => monsterList[key].area === areaType)
+        .sort((a, b) => monsterList[a].id - monsterList[b].id)
+        .map((key) => ({ key, monster: monsterList[key] }));
+}
+
+function currentAreaType() {
+    let areaType = player.properties.combatArea;
+    if (!unlockedAreas().some((a) => a.type === areaType)) {
+        areaType = (unlockedAreas()[0] || monsterAreas[0]).type;
+        player.properties.combatArea = areaType;
+    }
+    return areaType;
+}
+
+// Waves unlock in order (quest() flips isShown by kill count), so the shown
+// monsters are a prefix of the area list; the wave index is clamped to it.
+function clampWave(areaType) {
+    const entries = areaEntries(areaType);
+    const shownCount = entries.filter((e) => e.monster.isShown === true).length;
+    const max = Math.max(0, shownCount - 1);
+    if (player.properties.combatWave > max) player.properties.combatWave = max;
+    if (player.properties.combatWave < 0) player.properties.combatWave = 0;
+    return entries;
+}
+
+function currentWaveEntry() {
+    const entries = clampWave(currentAreaType());
+    return entries[player.properties.combatWave] || null;
+}
 
 const imageCache = {};
 function getImage(src) {
@@ -61,16 +104,26 @@ function heroImage() {
     return null;
 }
 
+// Start a wave of the given monster. When invoked with an explicit key (the
+// old Fight button / debug), the idle state follows: that monster's area and
+// wave become the selection.
 function startWave(monsterKey) {
     const monster = monsterList[monsterKey];
     if (!monster || !ctx) return;
     if (player.properties.isDead === true) {
         // Fight pressed while waiting for revive; the inline onclick already ran
-        // disableButtons(), so re-toggle it and stay idle.
+        // disableButtons(), so re-toggle it and stay idle (the loop restarts
+        // combat after the revive).
         draw();
-        drawCenterText('You are dead — wait for the revive...');
+        drawCenterText('You are dead — reviving...');
         if (typeof window.disableButtons === 'function') window.disableButtons();
         return;
+    }
+    if (monster.area !== player.properties.combatArea || currentWaveEntry()?.key !== monsterKey) {
+        player.properties.combatArea = monster.area;
+        const idx = areaEntries(monster.area).findIndex((e) => e.key === monsterKey);
+        player.properties.combatWave = Math.max(0, idx);
+        renderControls();
     }
     logData.length = 0;
     const logConsole = document.getElementById('logConsole');
@@ -112,9 +165,6 @@ function startWave(monsterKey) {
         heroHitFlash: 0,
         kills: 0,
     };
-    lastTs = 0;
-    clearTimeout(stepTimer);
-    stepTimer = setTimeout(step, 16);
 }
 
 function addFloat(x, y, txt, color) {
@@ -431,16 +481,34 @@ function draw() {
     ctx.stroke();
 
     if (!w) {
-        drawCenterText('Select a monster and press Fight');
+        if (player.properties.heroRace === '') {
+            drawCenterText('Create a character to begin');
+        } else if (player.properties.isDead === true) {
+            drawCenterText('You have died — reviving...');
+        } else {
+            drawCenterText('Next wave incoming...');
+        }
         return;
     }
 
-    // header
+    // header: area — wave x/y: monster xN — weapon
+    const entries = areaEntries(currentAreaType());
+    const areaName = (unlockedAreas().find((a) => a.type === currentAreaType()) || {}).displayName;
     ctx.fillStyle = '#4a3a08';
     ctx.font = 'bold 14px sans-serif';
     ctx.textAlign = 'left';
     ctx.fillText(
-        w.monster.displayName + ' x' + targetable().length + '  —  ' + w.weapon.subType,
+        (areaName ? areaName + ' — ' : '') +
+            'Wave ' +
+            (player.properties.combatWave + 1) +
+            '/' +
+            entries.length +
+            ': ' +
+            w.monster.displayName +
+            ' x' +
+            targetable().length +
+            '  —  ' +
+            w.weapon.subType,
         10,
         20
     );
@@ -545,25 +613,126 @@ function draw() {
 // substeps, so it runs at the same speed whether the tab ticks at 60fps or at
 // the browser's 1s background clamp (elapsed capped to avoid huge catch-ups).
 const SIM_STEP = 0.05;
+
+// Between waves: count idle time and auto-start the selected wave once the
+// hero exists, monsters are built, and the hero isn't waiting on a revive.
+function idleTick(dt) {
+    idleTimer += dt;
+    if (idleTimer < NEXT_WAVE_DELAY) return;
+    if (player.properties.heroRace === '') return;
+    if (player.properties.isDead === true) return;
+    if (Object.keys(monsterList).length === 0) return;
+    const entry = currentWaveEntry();
+    if (entry) {
+        // covers the first wave after character creation/load, when the bar
+        // hasn't been rendered with game data yet
+        const bar = document.getElementById('battleControls');
+        if (bar && bar.innerHTML === '') renderControls();
+        startWave(entry.key);
+    }
+}
+
+function tick(dt) {
+    if (wave) update(dt);
+    else idleTick(dt);
+}
+
 function step() {
     const ts = performance.now();
     if (!lastTs) lastTs = ts;
     let elapsed = Math.min(1.5, (ts - lastTs) / 1000);
     lastTs = ts;
-    while (wave && elapsed > 0) {
-        update(Math.min(SIM_STEP, elapsed));
+    while (elapsed > 0) {
+        tick(Math.min(SIM_STEP, elapsed));
         elapsed -= SIM_STEP;
     }
     draw();
-    if (wave) stepTimer = setTimeout(step, 16);
+    stepTimer = setTimeout(step, 16);
+    // Vite HMR re-evaluates this module in dev; kill any previous loop so two
+    // instances never tick side by side.
+    if (window.__battleCanvasLoop && window.__battleCanvasLoop !== stepTimer) {
+        clearTimeout(window.__battleCanvasLoop);
+    }
+    window.__battleCanvasLoop = stepTimer;
 }
 
-// Wave end. The Fight buttons were re-created enabled by the monster-panel
-// rerender (displayLogInfo on victory, playerDead's own displayLogInfo on
-// defeat), so no disableButtons() re-toggle is needed here.
+// Wave end + idle progression: a cleared wave advances to the next UNLOCKED
+// wave (quest kill thresholds flip isShown) when auto-progress is on; a death
+// steps one wave back so idle play never grinds against a wall.
 function endWave() {
+    const outcome = wave ? wave.outcome : null;
     wave = null;
+    idleTimer = 0;
+    if (outcome === 'victory' && player.properties.combatAutoProgress === true) {
+        const entries = areaEntries(currentAreaType());
+        const next = entries[player.properties.combatWave + 1];
+        if (next && next.monster.isShown === true) player.properties.combatWave++;
+    } else if (outcome === 'defeat') {
+        player.properties.combatWave = Math.max(0, player.properties.combatWave - 1);
+    }
+    renderControls();
     draw();
+}
+
+// ---- Control bar: area select, wave nav, auto-progress ---------------------
+function abortWave() {
+    // switching area/wave mid-fight abandons the current wave (no rewards)
+    wave = null;
+    idleTimer = NEXT_WAVE_DELAY; // restart immediately with the new selection
+}
+
+function renderControls() {
+    const bar = document.getElementById('battleControls');
+    if (!bar) return;
+    if (Object.keys(monsterList).length === 0 || player.properties.heroRace === '') {
+        bar.innerHTML = ''; // no game yet — the bar appears once a character exists
+        return;
+    }
+    const areaType = currentAreaType();
+    const entries = clampWave(areaType);
+    const waveIndex = player.properties.combatWave;
+    const current = entries[waveIndex];
+    const areaOptions = unlockedAreas()
+        .map(
+            (a) =>
+                `<option value="${a.type}"${a.type === areaType ? ' selected' : ''}>${a.displayName}</option>`
+        )
+        .join('');
+    bar.innerHTML =
+        `<label>Area: <select id="combatAreaSelect">${areaOptions}</select></label> ` +
+        `<button type="button" id="combatWavePrev" class="sell">◀</button>` +
+        `<span style="margin:0 6px;">Wave ${waveIndex + 1}/${entries.length}` +
+        (current ? ` — ${current.monster.displayName}` : '') +
+        `</span>` +
+        `<button type="button" id="combatWaveNext" class="sell">▶</button> ` +
+        `<label style="margin-left:10px;"><input type="checkbox" id="combatAutoProgress"` +
+        ` style="visibility:visible; position:relative;"` +
+        `${player.properties.combatAutoProgress === true ? ' checked' : ''}> Auto progress</label>`;
+    bar.querySelector('#combatAreaSelect').addEventListener('change', (e) => {
+        player.properties.combatArea = e.target.value;
+        player.properties.combatWave = 0;
+        abortWave();
+        renderControls();
+    });
+    bar.querySelector('#combatWavePrev').addEventListener('click', () => {
+        if (player.properties.combatWave > 0) {
+            player.properties.combatWave--;
+            abortWave();
+            renderControls();
+        }
+    });
+    bar.querySelector('#combatWaveNext').addEventListener('click', () => {
+        const list = clampWave(currentAreaType());
+        const shownCount = list.filter((e) => e.monster.isShown === true).length;
+        if (player.properties.combatWave < shownCount - 1) {
+            player.properties.combatWave++;
+            abortWave();
+            renderControls();
+        }
+    });
+    bar.querySelector('#combatAutoProgress').addEventListener('change', (e) => {
+        player.properties.combatAutoProgress = e.target.checked;
+    });
 }
 
 function init() {
@@ -572,13 +741,16 @@ function init() {
     ctx = canvas.getContext('2d');
 
     // The Fight button's generated onclick calls startBattle by name; route it
-    // here. The classic button combat stays available as realStartBattle.
+    // here (it selects that monster's area/wave). The classic button combat
+    // stays available as realStartBattle.
     realStartBattle = window.startBattle;
     window.startBattle = function (monsterKey) {
         startWave(monsterKey);
     };
 
+    renderControls();
     draw();
+    step(); // the loop runs permanently: combat is idle and self-restarting
 }
 
 init();
@@ -593,12 +765,14 @@ if (import.meta.env.DEV) {
         realStartBattle: () => realStartBattle,
         getProfile: () => weaponCombatProfile(),
         // advance the sim synchronously (hidden preview tabs get intensively
-        // timer-throttled, freezing the normal step loop between checks)
+        // timer-throttled, freezing the normal step loop between checks);
+        // drives the idle auto-start/progression too
         pump: (seconds) => {
             const n = Math.max(1, Math.round(seconds / SIM_STEP));
-            for (let i = 0; i < n && wave; i++) update(SIM_STEP);
+            for (let i = 0; i < n; i++) tick(SIM_STEP);
             draw();
         },
+        renderControls,
         // drop + equip a weapon of the given subType (and optional special
         // stats) for testing the behavior matrix, e.g.
         //   __battleCanvasDebug.giveWeapon('axe', { 'Stun chance': 50 })

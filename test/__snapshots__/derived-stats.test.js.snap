@@ -19,7 +19,7 @@ exports[`monster stats (fixed default player, Hero difficulty) > first/mid monst
   "def": 3,
   "level": 1,
   "maxDmg": 27,
-  "maxHp": 150,
+  "maxHp": 75,
   "minDmg": 22,
 }
 `;
@@ -29,7 +29,7 @@ exports[`monster stats (fixed default player, Hero difficulty) > first/mid monst
   "def": 15,
   "level": 5,
   "maxDmg": 135,
-  "maxHp": 750,
+  "maxHp": 375,
   "minDmg": 110,
 }
 `;

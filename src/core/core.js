@@ -61,6 +61,11 @@ var player = {
         difficulty: 'Hero',
         lastEnemyLevel: 1, // Used for crafting, it will change based on highest enemy level killed.
         monsterLevel: 0, //Used when reset game i.e. prestige ( It will be set for highest monster which will determine first monster level after prestige)
+        // Idle canvas-combat state (ui/battleCanvas.js). Old saves are backfilled
+        // with these defaults by load()'s missing-property pass.
+        combatArea: '', // '' = first unlocked area
+        combatWave: 0, // index into the area's monsters (wave 1 = index 0)
+        combatAutoProgress: true,
         potionInventory: [],
         //Minerals
         Thaumerite: 0,
