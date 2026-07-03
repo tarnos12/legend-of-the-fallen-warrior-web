@@ -305,19 +305,23 @@ function itemTooltipTest(item) {
         //Here stat will become the word Defense
         if (item.hasOwnProperty(statName)) {
             if (
-                'All attributes, Strength, Endurance, Agility, Dexterity, Wisdom, Intelligence, Luck, Evasion, Bonus damage, Bonus life, Bonus mana, Health regen, Mana regen, Magic find, Gold drop, Experience rate, Life gain on hit, Critical damage'.indexOf(
+                'All attributes, Strength, Endurance, Agility, Dexterity, Wisdom, Intelligence, Luck, Evasion, Bonus damage, Bonus life, Bonus mana, Health regen, Mana regen, Magic find, Gold drop, Experience rate, Life gain on hit, Critical damage, Attack speed, Extra targets, Stun chance'.indexOf(
                     statName
                 ) !== -1
             ) {
                 //Getting the actual stat object from the word.
                 var selectedStat = item[statName];
                 var equippedItemTest = equippedItemStat[statName];
-                // The four "%" stats format the delta with a percent sign; the rest plain.
+                // The "%" stats format the delta with a percent sign; the rest
+                // plain. Attack speed / Stun chance are the weapon-behavior
+                // special stats (see systems/weaponBehavior.js).
                 const unit =
                     statName === 'Bonus damage' ||
                     statName === 'Magic find' ||
                     statName === 'Gold drop' ||
-                    statName === 'Experience rate'
+                    statName === 'Experience rate' ||
+                    statName === 'Attack speed' ||
+                    statName === 'Stun chance'
                         ? '%'
                         : '';
                 if (selectedStat > 0 || (selectedStat === 0 && equippedItemTest > 0)) {

@@ -332,8 +332,10 @@ function playerDamage(monster, damage, name, type) {
 // whose death ends the fight. The classic button combat passes the shared
 // monsterList entry itself; the canvas combat passes a per-enemy clone (its
 // death/rewards are handled by the caller, so monsterKilled is skipped then).
-export function monsterAttack(monsterStats, target) {
+// `mods` (optional): parryBonus from the weapon behavior profile (sword).
+export function monsterAttack(monsterStats, target, mods) {
     if (target === undefined) target = monsterStats;
+    var parryBonus = mods && mods.parryBonus ? mods.parryBonus : 0;
     if (player.properties.health < player.functions.maxhealth()) {
         var regen = player.functions.hpregen();
         player.properties.health += regen;
@@ -348,7 +350,7 @@ export function monsterAttack(monsterStats, target) {
     var randomHitChance = Math.random();
     if (monsterHitChance > randomHitChance) {
         var randomNumber = Math.floor(Math.random() * 100 + 1);
-        if (player.functions.parryChance() > randomNumber) {
+        if (player.functions.parryChance() + parryBonus > randomNumber) {
             Log(
                 '<span class ="bold" style="color:purple;">You parry enemy attack!' +
                     '<br />' +
@@ -637,7 +639,12 @@ function monsterGold(monsterStats) {
 // crit/defense/lifesteal/mastery pipeline of playerAttack+playerCritCheck+
 // playerDamage, but without the turn exchange or hp mutation: the caller owns
 // the target hp pool (a per-enemy clone) and applies the returned damage.
-export function heroStrikeRoll(monsterStats) {
+// `mods` (optional) carries the weapon-behavior modifiers from
+// systems/weaponBehavior.js: damageMult (mace heavy hits) and critBonus
+// (sword finesse), both defaulting to neutral.
+export function heroStrikeRoll(monsterStats, mods) {
+    var damageMult = mods && mods.damageMult ? mods.damageMult : 1;
+    var critBonus = mods && mods.critBonus ? mods.critBonus : 0;
     var playerHitChance = (player.functions.accuracy() - monsterStats.eva) / 100;
     if (playerHitChance <= Math.random()) {
         Log('<span class ="bold" style="color:gray;">You missed!' + '<br />' + '</span>');
@@ -648,7 +655,7 @@ export function heroStrikeRoll(monsterStats) {
         Log('<span class ="bold" style="color:red;">Instant Killed enemy!' + '<br />' + '</span>');
         return { result: 'instakill' };
     }
-    var playerCriticalChance = player.functions.criticalChance() / 100;
+    var playerCriticalChance = (player.functions.criticalChance() + critBonus) / 100;
     var criticalDamage = 1;
     var damageType = ' physical damage';
     if (playerCriticalChance > Math.random()) {
@@ -662,6 +669,7 @@ export function heroStrikeRoll(monsterStats) {
     damage = Math.floor(
         damage *
             criticalDamage *
+            damageMult *
             ((player.properties.prestigeMultiplier * 500) /
                 (player.properties.prestigeMultiplier * 500 +
                     monsterStats.def() * player.functions.ignoreDefense()))

@@ -12,7 +12,7 @@
 // level-up, gold, item drop, kill count, quest, Warp), displayLogInfo once per
 // wave end (full heal, buff timers, monster panel rerender). Only the enemies'
 // hp pools are local clones — one wave enemy = one real kill.
-import { player, equippedItems } from '../core/core.js';
+import { player } from '../core/core.js';
 import { logData } from '../core/log.js';
 import { monsterList } from '../data/monsterList.js';
 import { characterRaces } from '../data/gameObjects.js';
@@ -23,6 +23,7 @@ import {
     grantKillRewards,
     displayLogInfo,
 } from '../systems/battle.js';
+import { weaponCombatProfile } from '../systems/weaponBehavior.js';
 
 const GROUND = 235;
 const HERO_X = 95;
@@ -60,14 +61,6 @@ function heroImage() {
     return null;
 }
 
-function weaponProfile() {
-    const weapon = equippedItems.weapon;
-    const subType = weapon && weapon.isEquipped === true ? weapon.subType : 'fists';
-    if (subType === 'ranged') return { subType, range: 260, cooldown: 1.1, projectile: true };
-    if (subType === 'staff') return { subType, range: 240, cooldown: 1.2, projectile: true };
-    return { subType, range: 52, cooldown: 0.9, projectile: false };
-}
-
 function startWave(monsterKey) {
     const monster = monsterList[monsterKey];
     if (!monster || !ctx) return;
@@ -94,6 +87,7 @@ function startWave(monsterKey) {
             speed: 65 + Math.random() * 45,
             state: 'run', // run -> fight -> die
             bouncePhase: Math.random() * Math.PI,
+            stunTimer: 0, // stunned enemies skip their round-robin attack turn
             fade: 1,
         });
     }
@@ -102,7 +96,9 @@ function startWave(monsterKey) {
         monsterKey,
         img: getImage('images/monsters/' + monster.name + '.png'),
         heroImg: heroImage(),
-        weapon: weaponProfile(),
+        // Recomputed every update so equipping a different weapon mid-wave
+        // (the inventory stays usable) takes effect immediately.
+        weapon: weaponCombatProfile(),
         enemies,
         heroAttackTimer: 0.4,
         enemyAttackTimer: 0.9,
@@ -164,8 +160,28 @@ function targetable() {
     return wave.enemies.filter((e) => e.state !== 'die');
 }
 
+// Secondary damage from cleave/pierce/splash: derived from the primary roll
+// (no re-roll, so lifesteal/mastery aren't multiplied by target count).
+function applySecondary(enemy, damage, color) {
+    enemy.hp -= damage;
+    addFloat(enemy.x, enemy.y - SPRITE, damage, color);
+    checkEnemyDeath(enemy);
+}
+
+// Roll the profile's stun on a landed primary hit.
+function maybeStun(enemy, profile) {
+    if (enemy.state !== 'die' && profile.stunChance > 0 && Math.random() < profile.stunChance) {
+        enemy.stunTimer = profile.stunSeconds;
+        addFloat(enemy.x, enemy.y - SPRITE - 16, 'STUN', '#ca8a04');
+    }
+}
+
 function update(dt) {
     const w = wave;
+    // re-resolve so equipping a different weapon mid-wave takes effect,
+    // including any special stats on the item (Extra targets, Stun chance...)
+    const prof = weaponCombatProfile();
+    w.weapon = prof;
 
     // enemies: run in, then bounce (visual); the wave attacks ROUND-ROBIN at
     // the old one-attack-per-turn rate, so a 5-enemy wave is a longer fight,
@@ -176,6 +192,7 @@ function update(dt) {
             continue;
         }
         if (w.outcome) continue;
+        e.stunTimer = Math.max(0, e.stunTimer - dt);
         if (e.state === 'run') {
             e.x -= e.speed * dt;
             e.bouncePhase += dt * 10;
@@ -183,18 +200,20 @@ function update(dt) {
                 e.x = HERO_X + 58;
                 e.state = 'fight';
             }
-        } else if (e.state === 'fight') {
+        } else if (e.state === 'fight' && e.stunTimer <= 0) {
             e.bouncePhase += dt * 6;
         }
     }
     if (!w.outcome) {
-        const fighters = w.enemies.filter((e) => e.state === 'fight');
+        // stunned enemies (mace / "Stun chance" items) skip their attack turn
+        const fighters = w.enemies.filter((e) => e.state === 'fight' && e.stunTimer <= 0);
         w.enemyAttackTimer -= dt;
         if (w.enemyAttackTimer <= 0 && fighters.length) {
             const attacker = fighters[Math.floor(Math.random() * fighters.length)];
             attacker.bouncePhase = 0; // sync the lunge with the hit
             const healthBefore = player.properties.health;
-            monsterAttack(w.monster, attacker); // evasion/parry/thorn/counter/block
+            // evasion/parry/thorn/counter/block; sword raises parry
+            monsterAttack(w.monster, attacker, { parryBonus: prof.parryBonus });
             const dealt = healthBefore - player.properties.health;
             if (dealt > 0) {
                 w.heroHitFlash = 0.25;
@@ -215,22 +234,50 @@ function update(dt) {
         w.heroLunge = Math.max(0, w.heroLunge - dt * 4);
         const targets = targetable();
         if (w.heroAttackTimer <= 0 && targets.length) {
-            const inRange = targets.filter((e) => e.x - HERO_X <= w.weapon.range + SPRITE);
+            const inRange = targets.filter((e) => e.x - HERO_X <= prof.range + SPRITE);
             if (inRange.length) {
                 const target = inRange[0];
-                if (w.weapon.projectile) {
+                if (prof.projectile) {
                     w.projectiles.push({
                         x: HERO_X + 30,
                         y: GROUND - SPRITE / 2,
                         speed: 340,
                         target,
-                        magic: w.weapon.subType === 'staff',
+                        magic: prof.magic,
+                        hits: 0,
+                        struck: new Set(),
                     });
                 } else {
                     w.heroLunge = 1;
-                    applyRoll(target, heroStrikeRoll(w.monster), false);
+                    const roll = heroStrikeRoll(w.monster, {
+                        damageMult: prof.damageMult,
+                        critBonus: prof.critBonus,
+                    });
+                    applyRoll(target, roll, false);
+                    if (roll.result === 'hit') {
+                        maybeStun(target, prof);
+                        // axe cleave: the swing carries into other engaged
+                        // enemies at falloff damage
+                        if (prof.maxTargets > 1) {
+                            const others = targets.filter(
+                                (e) => e !== target && e.state === 'fight'
+                            );
+                            for (let i = 0; i < others.length && i < prof.maxTargets - 1; i++) {
+                                applySecondary(
+                                    others[i],
+                                    Math.max(
+                                        1,
+                                        Math.floor(
+                                            roll.damage * Math.pow(prof.cleaveFalloff, i + 1)
+                                        )
+                                    ),
+                                    '#b91c1c'
+                                );
+                            }
+                        }
+                    }
                 }
-                w.heroAttackTimer = w.weapon.cooldown;
+                w.heroAttackTimer = prof.cooldown;
             }
         }
 
@@ -253,14 +300,68 @@ function update(dt) {
         }
     }
 
-    // projectiles roll on impact
+    // projectiles: bow arrows PIERCE through enemies along their path (damage
+    // falloff per enemy); staff bolts EXPLODE on first impact, splashing
+    // nearby enemies. Primary target gets the full roll pipeline; the rest
+    // take derived damage.
     for (const p of w.projectiles) {
         p.x += p.speed * dt;
-        if (p.target.state !== 'die' && p.x >= p.target.x - 14) {
-            if (!wave.outcome) applyRoll(p.target, heroStrikeRoll(w.monster), false);
+        if (w.outcome) {
             p.done = true;
+            continue;
         }
-        if (p.x > canvas.width || p.target.state === 'die') p.done = p.done || p.x >= p.target.x;
+        const reached = targetable().filter((e) => !p.struck.has(e) && p.x >= e.x - 14);
+        for (const enemy of reached) {
+            if (p.done) break;
+            p.struck.add(enemy);
+            if (p.hits === 0) {
+                p.primaryRoll = heroStrikeRoll(w.monster, {
+                    damageMult: prof.damageMult,
+                    critBonus: prof.critBonus,
+                });
+                applyRoll(enemy, p.primaryRoll, false);
+                if (p.primaryRoll.result === 'miss') {
+                    p.done = true; // the whole shot missed
+                    break;
+                }
+                if (p.primaryRoll.result === 'hit') maybeStun(enemy, prof);
+                p.hits = 1;
+                if (p.magic && prof.splashRadius > 0 && p.primaryRoll.result === 'hit') {
+                    // staff: explode on impact
+                    const near = targetable().filter(
+                        (e) => e !== enemy && Math.abs(e.x - enemy.x) <= prof.splashRadius
+                    );
+                    for (let i = 0; i < near.length && i < prof.maxTargets - 1; i++) {
+                        applySecondary(
+                            near[i],
+                            Math.max(1, Math.floor(p.primaryRoll.damage * prof.splashFalloff)),
+                            '#7c3aed'
+                        );
+                    }
+                    w.effects.push({
+                        x: enemy.x,
+                        y: GROUND - SPRITE / 2,
+                        age: 0,
+                        label: '',
+                    });
+                    p.done = true;
+                }
+                if (!prof.pierce) p.done = true;
+            } else if (prof.pierce && p.hits < prof.maxTargets) {
+                // bow: the arrow keeps flying through, weakening per enemy
+                applySecondary(
+                    enemy,
+                    Math.max(
+                        1,
+                        Math.floor(p.primaryRoll.damage * Math.pow(prof.pierceFalloff, p.hits))
+                    ),
+                    '#78350f'
+                );
+                p.hits++;
+                if (p.hits >= prof.maxTargets) p.done = true;
+            }
+        }
+        if (p.x > canvas.width) p.done = true;
     }
     w.projectiles = w.projectiles.filter((p) => !p.done);
 
@@ -374,11 +475,19 @@ function draw() {
     for (const e of w.enemies) {
         if (e.state === 'die' && e.fade <= 0) continue;
         ctx.globalAlpha = e.state === 'die' ? e.fade : 1;
-        const bounce = e.state === 'fight' ? Math.max(0, Math.sin(e.bouncePhase)) * -14 : 0;
+        const stunned = e.stunTimer > 0;
+        const bounce =
+            e.state === 'fight' && !stunned ? Math.max(0, Math.sin(e.bouncePhase)) * -14 : 0;
         const hop = e.state === 'run' ? Math.abs(Math.sin(e.bouncePhase)) * -5 : 0;
         drawSprite(w.img, e.x + bounce, e.y + hop, 0);
         if (e.state !== 'die') {
             drawBar(e.x - SPRITE / 2, e.y - SPRITE - 12, SPRITE, e.hp / e.maxHp, '#dc2626');
+            if (stunned) {
+                ctx.fillStyle = '#ca8a04';
+                ctx.font = 'bold 16px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText('✶ ✶', e.x, e.y - SPRITE - 18);
+            }
         }
         ctx.globalAlpha = 1;
     }
@@ -482,5 +591,26 @@ if (import.meta.env.DEV) {
         monsterKeys: () => Object.keys(monsterList).length,
         startWave,
         realStartBattle: () => realStartBattle,
+        getProfile: () => weaponCombatProfile(),
+        // advance the sim synchronously (hidden preview tabs get intensively
+        // timer-throttled, freezing the normal step loop between checks)
+        pump: (seconds) => {
+            const n = Math.max(1, Math.round(seconds / SIM_STEP));
+            for (let i = 0; i < n && wave; i++) update(SIM_STEP);
+            draw();
+        },
+        // drop + equip a weapon of the given subType (and optional special
+        // stats) for testing the behavior matrix, e.g.
+        //   __battleCanvasDebug.giveWeapon('axe', { 'Stun chance': 50 })
+        giveWeapon: async (subType, specialStats) => {
+            const { getItemType } = await import('../systems/itemDrop.js');
+            getItemType(player.properties.level, false, 'weapon', subType, 'Rare');
+            const item = (window.__lastGivenWeapon = (
+                await import('../core/core.js')
+            ).playerInventory.slice(-1)[0]);
+            Object.assign(item, specialStats || {});
+            window.equipItem(item.id);
+            return weaponCombatProfile();
+        },
     };
 }
