@@ -421,6 +421,36 @@ function getBonusItemMod(monster, dropItem, isDrop) {
         dropItem.MinDamage = Math.floor(1 + dropItem.MinDamage * weaponBonusDamage);
         dropItem.MaxDamage = Math.floor(2 + dropItem.MaxDamage * weaponBonusDamage);
         dropItem['AverageDamage'] = (dropItem.MinDamage + dropItem.MaxDamage) / 2;
+
+        // Weapon behavior affix: Rare+ weapons can roll ONE special stat that
+        // changes how the weapon fights in canvas combat (read by
+        // systems/weaponBehavior.js, displayed by the inventory tooltip).
+        // Rare 20% / Epic 35% / Legendary 50% chance; Legendary rolls stronger.
+        var affixChance = 0;
+        if (dropItem.itemRarity === 'Rare') affixChance = 20;
+        else if (dropItem.itemRarity === 'Epic') affixChance = 35;
+        else if (dropItem.itemRarity === 'Legendary') affixChance = 50;
+        if (affixChance > 0 && Math.floor(Math.random() * 100 + 1) <= affixChance) {
+            var legendaryAffix = dropItem.itemRarity === 'Legendary';
+            var affixPick = Math.floor(Math.random() * 3);
+            if (affixPick === 0) {
+                // 5-10%, Legendary 10-20%
+                dropItem['Attack speed'] = legendaryAffix
+                    ? 10 + Math.floor(Math.random() * 11)
+                    : 5 + Math.floor(Math.random() * 6);
+                dropItem.Value += dropItem['Attack speed'] * 15;
+            } else if (affixPick === 1) {
+                // 5-10%, Legendary 10-20%
+                dropItem['Stun chance'] = legendaryAffix
+                    ? 10 + Math.floor(Math.random() * 11)
+                    : 5 + Math.floor(Math.random() * 6);
+                dropItem.Value += dropItem['Stun chance'] * 15;
+            } else {
+                // +1 cleave/pierce/splash target
+                dropItem['Extra targets'] = 1;
+                dropItem.Value += 200;
+            }
+        }
     }
     if (dropItem.Value > 0) {
         var itemHolder = [];

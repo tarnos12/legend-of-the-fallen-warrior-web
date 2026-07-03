@@ -53,6 +53,57 @@ describe('weaponCombatProfile — class identities', () => {
     });
 });
 
+describe('weapon affix generation (itemDrop)', () => {
+    it('special stats only appear on Rare+ weapons and within their ranges', async () => {
+        const { getItemType } = await import('../src/systems/itemDrop.js');
+        const { player, playerInventory, createEquippedItemsObject, copyPlayerProperties } =
+            await import('../src/core/core.js');
+        copyPlayerProperties();
+        createEquippedItemsObject('all');
+        document.body.innerHTML =
+            '<div id="logConsole"></div><div id="updateInventorySlots"></div>';
+        player.properties.itemIdNumber = 1;
+        playerInventory.length = 0;
+        // 'Master' craft quality deterministically rolls Rare+ (top 3 tiers);
+        // 'Common' quality deterministically rolls Common.
+        for (let i = 0; i < 200; i++) getItemType(10, false, 'weapon', 'sword', 'Master');
+        const rarePlus = playerInventory.slice();
+        playerInventory.length = 0;
+        for (let i = 0; i < 100; i++) getItemType(10, false, 'weapon', 'sword', 'Common');
+        const commons = playerInventory.slice();
+        playerInventory.length = 0;
+
+        const specialOf = (item) =>
+            (item['Attack speed'] > 0 ? 1 : 0) +
+            (item['Stun chance'] > 0 ? 1 : 0) +
+            (item['Extra targets'] > 0 ? 1 : 0);
+
+        // Commons never roll behavior affixes
+        for (const item of commons) expect(specialOf(item)).toBe(0);
+
+        // Rare+ roll them regularly (expected ~25% of 200 -- zero is ~impossible)
+        let affixed = 0;
+        for (const item of rarePlus) {
+            expect(['Rare', 'Epic', 'Legendary']).toContain(item.itemRarity);
+            const count = specialOf(item);
+            expect(count).toBeLessThanOrEqual(1); // at most one affix
+            if (count === 1) {
+                affixed++;
+                if (item['Attack speed'] > 0) {
+                    expect(item['Attack speed']).toBeGreaterThanOrEqual(5);
+                    expect(item['Attack speed']).toBeLessThanOrEqual(20);
+                }
+                if (item['Stun chance'] > 0) {
+                    expect(item['Stun chance']).toBeGreaterThanOrEqual(5);
+                    expect(item['Stun chance']).toBeLessThanOrEqual(20);
+                }
+                if (item['Extra targets'] > 0) expect(item['Extra targets']).toBe(1);
+            }
+        }
+        expect(affixed).toBeGreaterThan(0);
+    });
+});
+
 describe('weaponCombatProfile — item special stats modify behavior', () => {
     it('Attack speed reduces the cooldown proportionally', () => {
         const base = weaponCombatProfile(equipped('sword'));
