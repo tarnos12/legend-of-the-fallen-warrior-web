@@ -56,6 +56,7 @@ self-registers its inline-onclick handlers via `Object.assign(window, {...})`.
 | `inventoryUI.js` | Inventory tabs (`#inventory`), equipped-item slots (`#equipHtml`), item tooltips; inventory tab state | `CreateInventoryWeaponHtml`, `unequipItemLoad`, `EquippedItemsEmpty`, `checkIfEquippedEmpty`, `itemTooltipTest` (reused by shopUI) | `CreateInventoryWeaponHtml` |
 | `shopUI.js` | Item shop (`#shopTabs`, `#shop*` panes, `#shopOther`); **owns the shop stock arrays** `itemShopWeapon/Armor/Accessory` (mutated in place, never reassigned) | stock arrays, `displayShopItems`, `ShopBuyButtons`, `refillShopInterval`, `shopOther` | `itemBuy`, `rerollShopItems` |
 | `characterUI.js` | Starting screen (`#buttonDiv`, `#gameLogo`), new/load save-slot grids (`#raceCreation`), race pick + race tooltip (`#characterRace`), save/load/reset buttons (`#saveGameSlot`) | `startLogo`, `startingScreen`, `removeStartingScreen`, `characterCreationHtml`, `checkHeroRace`, `saveGameSlot` | `newGameSlot`, `loadGameSlot`, `backToStartingScreen`, `changeMusicImage`, `getAgeButton`, `getAge` |
+| `battleCanvas.js` | **Prototype** canvas combat (`#battleCanvas` in index.html). While `#canvasBattleToggle` is checked it wraps `window.startBattle`: Fight runs a visual-only wave (1–5 monsters charge and bounce-attack; hero auto-attacks by weapon range, auto-casts spells). No game-state writes; unchecking restores real combat. setTimeout sim loop (rAF pauses in hidden tabs). | — | wraps `startBattle`; dev-only `__battleCanvasDebug` |
 
 ### `src/core/` — state & persistence
 
