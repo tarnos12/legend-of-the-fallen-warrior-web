@@ -90,6 +90,27 @@ function getImage(src) {
     return imageCache[src];
 }
 
+// Warm the cache for every monster + race sprite as soon as the game data
+// exists, so a first encounter never draws the grey placeholder while its
+// image is still downloading. (The old DOM combat never had this problem
+// because the monster panel's <img> had always fetched the sprite before a
+// fight; the canvas draws cold.) ~60 small local PNGs — negligible.
+let imagesPreloaded = false;
+function preloadCombatImages() {
+    if (imagesPreloaded || Object.keys(monsterList).length === 0) return;
+    imagesPreloaded = true;
+    for (const key in monsterList) {
+        getImage('images/monsters/' + monsterList[key].name + '.png');
+    }
+    for (const key in characterRaces) {
+        try {
+            getImage('images/races/' + characterRaces[key].image() + '.png');
+        } catch {
+            /* race age not picked yet — the hero image loads on first draw */
+        }
+    }
+}
+
 function heroImage() {
     for (const key in characterRaces) {
         const race = characterRaces[key];
@@ -125,6 +146,7 @@ function startWave(monsterKey) {
         player.properties.combatWave = Math.max(0, idx);
         renderControls();
     }
+    preloadCombatImages(); // covers manual Fight-button starts too
     logData.length = 0;
     const logConsole = document.getElementById('logConsole');
     if (logConsole) logConsole.innerHTML = '';
@@ -622,6 +644,7 @@ function idleTick(dt) {
     if (player.properties.heroRace === '') return;
     if (player.properties.isDead === true) return;
     if (Object.keys(monsterList).length === 0) return;
+    preloadCombatImages();
     const entry = currentWaveEntry();
     if (entry) {
         // covers the first wave after character creation/load, when the bar
@@ -764,6 +787,17 @@ if (import.meta.env.DEV) {
         startWave,
         realStartBattle: () => realStartBattle,
         getProfile: () => weaponCombatProfile(),
+        imageCacheStatus: () => {
+            const srcs = Object.keys(imageCache);
+            return {
+                total: srcs.length,
+                loaded: srcs.filter((s) => imageCache[s].complete && imageCache[s].naturalWidth > 0)
+                    .length,
+                failed: srcs.filter(
+                    (s) => imageCache[s].complete && imageCache[s].naturalWidth === 0
+                ),
+            };
+        },
         // advance the sim synchronously (hidden preview tabs get intensively
         // timer-throttled, freezing the normal step loop between checks);
         // drives the idle auto-start/progression too
