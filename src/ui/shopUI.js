@@ -238,8 +238,14 @@ function shopOther() {
         )
         .join('');
 
-    document.getElementById('shopOther').innerHTML =
-        `<div class="row"><div class="col-xs-12"><div class="row">${rows}</div></div></div>`;
+    // The pane only exists after createShopTabs() has run; loading a save on a
+    // fresh page calls shopOther() first. The original jQuery $('#shopOther')
+    // silently no-op'd then — keep that behavior (refillShopInterval builds the
+    // tabs right after load() and calls shopOther() again).
+    const pane = document.getElementById('shopOther');
+    if (pane) {
+        pane.innerHTML = `<div class="row"><div class="col-xs-12"><div class="row">${rows}</div></div></div>`;
+    }
 }
 
 var shopOtherList = [

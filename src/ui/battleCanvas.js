@@ -639,20 +639,34 @@ const SIM_STEP = 0.05;
 // Between waves: count idle time and auto-start the selected wave once the
 // hero exists, monsters are built, and the hero isn't waiting on a revive.
 function idleTick(dt) {
+    // Not in a fightable state: keep the timer at zero so it measures time
+    // actually spent waiting (otherwise sitting on the start screen counts
+    // toward the sprite-wait cap below and defeats it).
+    if (
+        player.properties.heroRace === '' ||
+        player.properties.isDead === true ||
+        Object.keys(monsterList).length === 0
+    ) {
+        idleTimer = 0;
+        return;
+    }
     idleTimer += dt;
     if (idleTimer < NEXT_WAVE_DELAY) return;
-    if (player.properties.heroRace === '') return;
-    if (player.properties.isDead === true) return;
-    if (Object.keys(monsterList).length === 0) return;
     preloadCombatImages();
     const entry = currentWaveEntry();
-    if (entry) {
-        // covers the first wave after character creation/load, when the bar
-        // hasn't been rendered with game data yet
-        const bar = document.getElementById('battleControls');
-        if (bar && bar.innerHTML === '') renderControls();
-        startWave(entry.key);
-    }
+    if (!entry) return;
+    // Loading a save starts combat moments after the 64-sprite preload kicks
+    // off, so hold this wave until ITS sprites are in (img.complete is also
+    // true for a failed load — the placeholder shows, nothing stalls; the 8s
+    // cap is a belt-and-braces guard against a hung request).
+    const monsterImg = getImage('images/monsters/' + entry.monster.name + '.png');
+    const heroImg = heroImage();
+    if (idleTimer < 8 && (!monsterImg.complete || (heroImg && !heroImg.complete))) return;
+    // covers the first wave after character creation/load, when the bar
+    // hasn't been rendered with game data yet
+    const bar = document.getElementById('battleControls');
+    if (bar && bar.innerHTML === '') renderControls();
+    startWave(entry.key);
 }
 
 function tick(dt) {
