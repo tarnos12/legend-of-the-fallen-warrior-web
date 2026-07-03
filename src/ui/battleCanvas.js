@@ -24,6 +24,7 @@ import {
     displayLogInfo,
 } from '../systems/battle.js';
 import { weaponCombatProfile } from '../systems/weaponBehavior.js';
+import { waveUnlocks } from '../data/waveUnlocks.js';
 import { getImage, imageCache } from './uiCommon.js';
 
 const GROUND = 235;
@@ -39,6 +40,8 @@ let wave = null; // active wave state or null
 let stepTimer = 0;
 let lastTs = 0;
 let idleTimer = 0; // counts up between waves; wave auto-starts at NEXT_WAVE_DELAY
+let celebrate = null; // { text, t } banner when a new wave/area unlocks
+let unlockWatch = { area: '', shown: -1, areas: -1 }; // change detection for the banner
 
 // ---- Idle progression state (persisted on player.properties) ---------------
 // combatArea: selected area type ('' = first unlocked); combatWave: index into
@@ -501,6 +504,7 @@ function draw() {
         } else {
             drawCenterText('Next wave incoming...');
         }
+        drawCelebration();
         return;
     }
 
@@ -618,6 +622,17 @@ function draw() {
             120
         );
     }
+    drawCelebration();
+}
+
+// "New wave/area unlocked!" banner, drawn over both fights and idle frames.
+function drawCelebration() {
+    if (!celebrate) return;
+    const alpha = Math.min(1, celebrate.t);
+    ctx.fillStyle = `rgba(133, 77, 14, ${alpha})`;
+    ctx.font = 'bold 22px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(celebrate.text, canvas.width / 2, 48);
 }
 
 // setTimeout-driven loop, NOT requestAnimationFrame: rAF is suspended in
@@ -661,6 +676,10 @@ function idleTick(dt) {
 }
 
 function tick(dt) {
+    if (celebrate) {
+        celebrate.t -= dt;
+        if (celebrate.t <= 0) celebrate = null;
+    }
     if (wave) update(dt);
     else idleTick(dt);
 }
@@ -698,6 +717,17 @@ function endWave() {
     } else if (outcome === 'defeat') {
         player.properties.combatWave = Math.max(0, player.properties.combatWave - 1);
     }
+    // celebrate unlocks the kills of this wave earned (quest() flipped them)
+    const areaType = currentAreaType();
+    const shownNow = areaEntries(areaType).filter((e) => e.monster.isShown === true).length;
+    const areasNow = unlockedAreas().length;
+    if (unlockWatch.area === areaType && unlockWatch.shown >= 0 && shownNow > unlockWatch.shown) {
+        celebrate = { text: 'New wave unlocked!', t: 3 };
+    }
+    if (unlockWatch.areas >= 0 && areasNow > unlockWatch.areas) {
+        celebrate = { text: 'New area unlocked!', t: 3 };
+    }
+    unlockWatch = { area: areaType, shown: shownNow, areas: areasNow };
     renderControls();
     draw();
 }
@@ -726,16 +756,37 @@ function renderControls() {
                 `<option value="${a.type}"${a.type === areaType ? ' selected' : ''}>${a.displayName}</option>`
         )
         .join('');
+    // next wave locked? show the exact kill requirement (quest.js thresholds,
+    // mirrored in data/waveUnlocks.js)
+    let lockedInfo = '';
+    const next = entries[waveIndex + 1];
+    if (next && next.monster.isShown !== true) {
+        const unlock = waveUnlocks[next.key];
+        if (unlock && monsterList[unlock.requires]) {
+            const need = monsterList[unlock.requires];
+            lockedInfo =
+                `<span style="margin-left:6px; opacity:0.8;">🔒 next: ` +
+                `${Math.min(need.killCount, unlock.kills)}/${unlock.kills} kills</span>`;
+        }
+    }
+    // the area boss was killed: the prestige Warp lives here now (formerly a
+    // button injected into the old monster panel)
+    const warpable = entries.find((e) => e.monster.lastEnemy === true && e.monster.killCount > 0);
+    const warpButton = warpable
+        ? ` <button type="button" id="combatWarp" class="sell" title="Prestige: restart at higher monster levels">Warp</button>`
+        : '';
     bar.innerHTML =
         `<label>Area: <select id="combatAreaSelect">${areaOptions}</select></label> ` +
         `<button type="button" id="combatWavePrev" class="sell">◀</button>` +
         `<span style="margin:0 6px;">Wave ${waveIndex + 1}/${entries.length}` +
         (current ? ` — ${current.monster.displayName}` : '') +
         `</span>` +
-        `<button type="button" id="combatWaveNext" class="sell">▶</button> ` +
-        `<label style="margin-left:10px;"><input type="checkbox" id="combatAutoProgress"` +
+        `<button type="button" id="combatWaveNext" class="sell">▶</button>` +
+        lockedInfo +
+        ` <label style="margin-left:10px;"><input type="checkbox" id="combatAutoProgress"` +
         ` style="visibility:visible; position:relative;"` +
-        `${player.properties.combatAutoProgress === true ? ' checked' : ''}> Auto progress</label>`;
+        `${player.properties.combatAutoProgress === true ? ' checked' : ''}> Auto progress</label>` +
+        warpButton;
     bar.querySelector('#combatAreaSelect').addEventListener('change', (e) => {
         player.properties.combatArea = e.target.value;
         player.properties.combatWave = 0;
@@ -761,6 +812,12 @@ function renderControls() {
     bar.querySelector('#combatAutoProgress').addEventListener('change', (e) => {
         player.properties.combatAutoProgress = e.target.checked;
     });
+    const warp = bar.querySelector('#combatWarp');
+    if (warp && warpable) {
+        warp.addEventListener('click', () => {
+            if (typeof window.rebirth === 'function') window.rebirth(warpable.monster.level);
+        });
+    }
 }
 
 function init() {

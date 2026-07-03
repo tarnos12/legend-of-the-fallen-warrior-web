@@ -1,126 +1,80 @@
 'use strict';
 
-// Monster-panel rendering, extracted from dynamicHtml.js. Owns the monster tab/
-// selection state (monsterTabActiveNum, currentMonster). CreateMonsterHtml +
-// changedTabmonster are imported cross-module (battle/core/quest/save/stats);
-// changeMonsterPage + changedTabmonster are inline-onclick handlers on window.
+// Area progression panel (formerly the monster-selection panel with Fight
+// buttons — selection moved to the canvas combat control bar). Renders the
+// current combat area's waves into #monsterTabs: kill counts for unlocked
+// waves, the exact unlock requirement for the next one, and ??? beyond that.
+// CreateMonsterHtml keeps its name/signature because half the game refreshes
+// it (battle kills, quests, saves, stat updates).
 import { monsterAreas } from '../data/gameObjects.js';
 import { player } from '../core/core.js';
-import { getThousands } from '../core/format.js';
 import { monsterList } from '../data/monsterList.js';
-import { testss } from './uiCommon.js';
+import { waveUnlocks } from '../data/waveUnlocks.js';
 
-var monsterTabActiveNum = 0;
-var currentMonster = 'monster001'; //Save current monster number, so I can pick it from array.
-
-function changedTabmonster(index) {
-    monsterTabActiveNum = index;
-    if (index === 0 || 1 + (index + index * 7) < 10) {
-        currentMonster = 'monster00' + (1 + (index + index * 7));
-    } else {
-        currentMonster = 'monster0' + (1 + (index + index * 7));
-    }
-    CreateMonsterHtml();
+function panelAreaType() {
+    const selected = player.properties.combatArea;
+    if (monsterAreas.some((a) => a.type === selected && a.isUnlocked === true)) return selected;
+    return (monsterAreas.find((a) => a.isUnlocked === true) || monsterAreas[0]).type;
 }
 
 function CreateMonsterHtml() {
-    const tabs = monsterAreas
-        .map((areaTab, k) => {
-            if (areaTab.isUnlocked !== true) return '';
-            const liClass = k === monsterTabActiveNum ? 'monsterNavBar active' : 'monsterNavBar';
-            return (
-                `<li class="${liClass}" onClick = changedTabmonster(${k})>` +
-                `<a href="#tab_${areaTab.type}" data-toggle="tab"><span class="icons ${areaTab.icon}" data-toggle="tooltip" data-placement="right" title="${areaTab.displayName}"></span>` +
-                `</a></li>`
-            );
+    const container = document.getElementById('monsterTabs');
+    if (!container) return;
+    if (Object.keys(monsterList).length === 0) {
+        container.innerHTML = '';
+        return;
+    }
+    const areaType = panelAreaType();
+    const area = monsterAreas.find((a) => a.type === areaType);
+    const entries = Object.keys(monsterList)
+        .filter((key) => monsterList[key].area === areaType)
+        .sort((a, b) => monsterList[a].id - monsterList[b].id);
+
+    let firstLockedShown = false;
+    const rows = entries
+        .map((key, i) => {
+            const monster = monsterList[key];
+            const waveNo = i + 1;
+            if (monster.isShown === true) {
+                const current =
+                    i === player.properties.combatWave ? ' style="font-weight:bold;"' : '';
+                return (
+                    `<div class="col-xs-12"${current}>` +
+                    `Wave ${waveNo}: ${monster.displayName} — Killed: ${monster.killCount}` +
+                    (monster.lastEnemy === true && monster.killCount > 0 ? ' ⚑' : '') +
+                    `</div>`
+                );
+            }
+            // first locked wave: show the exact requirement and live progress
+            const unlock = waveUnlocks[key];
+            if (!firstLockedShown && unlock && monsterList[unlock.requires]) {
+                firstLockedShown = true;
+                const need = monsterList[unlock.requires];
+                return (
+                    `<div class="col-xs-12" style="opacity:0.75;">` +
+                    `Wave ${waveNo}: 🔒 unlocks at ${unlock.kills} ${need.displayName} kills ` +
+                    `(${Math.min(need.killCount, unlock.kills)}/${unlock.kills})` +
+                    `</div>`
+                );
+            }
+            return `<div class="col-xs-12" style="opacity:0.4;">Wave ${waveNo}: ???</div>`;
         })
         .join('');
 
-    const monster = monsterList[currentMonster];
-    const area = monster.area;
-
-    const content = monsterAreas
-        .map((areaPane, j) => {
-            if (areaPane.isUnlocked !== true) return '';
-            const paneClass = j === monsterTabActiveNum ? 'tab-pane active' : 'tab-pane';
-
-            var buttons = '';
-            for (var key in monsterList) {
-                if (monsterList[key].area === areaPane.type && monsterList[key].isShown === true) {
-                    const selected = currentMonster === key ? 'buttonSelected ' : '';
-                    buttons += `<button class="${selected}monsterButtonDisable" style="margin-left:8px;" type="button" onclick="changeMonsterPage('${key}')">${monsterList[key].id}</button>`;
-                }
-            }
-
-            var display = '';
-            if (area === areaPane.type) {
-                const monsterPercent = (monster.hp / monster.maxHp) * 100;
-                const onclickevent = `startBattle('${currentMonster}');`;
-                display =
-                    `<div class="col-xs-10 col-xs-offset-1">` + //First Div
-                    `<div class="row">` + //First Row
-                    `<div class="col-xs-12 c3">` + //Second Div
-                    `<div id="${monster.id}">` +
-                    `<a href="#" class="tooltipA centerText" id="monsterButton">` +
-                    `<img style="cursor:help;" src="images/monsters/${monster.name}.png" alt="${monster.displayName}">` +
-                    `<span style="bottom:140px; left:-100px; pointer-events:none;">` +
-                    getMonsterTooltip(monster) +
-                    `</span></a>` +
-                    `<div class="progress" style="width:80%; margin-left:10%;">` +
-                    `<div style="width:${monsterPercent}%;" aria-valuemax="100" aria-valuemin="0" aria-valuenow="60" role="progressbar" class="progress-bar" id="${monster.name}1">` +
-                    `<span style="font-size:13px;">${monster.hp} HP</span>` +
-                    `</div></div>` +
-                    `<button id="monster${monster.id}"class="monster sell" onclick="${onclickevent} disableButtons();">Fight</button>` +
-                    `<div class="col-xs-12 c3">` +
-                    `<h4>Killed: ${monster.killCount}</h4>` +
-                    `</div>` +
-                    `<br /></div>` +
-                    `</div>` + //Close second Div
-                    `</div>`; //Close first Row / First Div
-            }
-
-            return (
-                `<div class="${paneClass}" id="tab_${areaPane.type}">` +
-                `<div class="panel panel-default">` +
-                `<div class="panel-heading" style="background-color:${player.properties.monsterBackground};">` +
-                `<h3 class="panel-title c3" >${areaPane.displayName}${player.properties.prestigeSuffix}[${Math.floor(player.properties.prestigeMultiplier - 1)}]</h3>` +
-                `</div>` +
-                `<div class="panel-body" id="${areaPane.type}" style="background-color:${player.properties.monsterBackground};">` +
-                `<div class="row">` +
-                `<div class="col-xs-12 c3">${buttons}</div>` +
-                display +
-                `</div>` +
-                `</div>` +
-                `</div>` +
-                `</div>`
-            );
-        })
-        .join('');
-
-    document.getElementById('monsterTabs').innerHTML =
-        `<ul class="nav nav-tabs">${tabs}</ul>` + `<div class="tab-content">${content}</div>`;
-    testss();
+    container.innerHTML =
+        `<div class="row" style="padding:4px 0;">` +
+        `<div class="col-xs-12 c3"><h4>${area ? area.displayName : ''}${player.properties.prestigeSuffix}</h4></div>` +
+        rows +
+        `</div>`;
 }
 
-function changeMonsterPage(name) {
-    currentMonster = name;
+// Select an area by index (kept for rebirth(), which resets to the first area).
+function changedTabmonster(index) {
+    const area = monsterAreas[index];
+    if (!area) return;
+    player.properties.combatArea = area.type;
+    player.properties.combatWave = 0;
     CreateMonsterHtml();
 }
 
-function getMonsterTooltip(monster) {
-    let html =
-        `<b>${monster.displayName}</b>` +
-        `<br />` +
-        `Level: ${monster.level}` +
-        `<br />` +
-        `Dmg: ${getThousands(monster.minDmg())} - ${getThousands(monster.maxDmg())}` +
-        `<br />` +
-        `Def: ${getThousands(monster.def() * player.functions.ignoreDefense())}`;
-    if (player.functions.ignoreDefense() < 1) {
-        html += `(Ignored ${100 - 100 * player.functions.ignoreDefense()}%)`;
-    }
-    return html;
-}
-
-export { CreateMonsterHtml, changedTabmonster, changeMonsterPage };
-Object.assign(window, { changeMonsterPage, changedTabmonster });
+export { CreateMonsterHtml, changedTabmonster };

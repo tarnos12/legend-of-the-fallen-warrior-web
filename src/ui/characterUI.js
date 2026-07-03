@@ -29,12 +29,12 @@ function startingScreen() {
         `<button type="button" style="margin-bottom:5px;" class="btn btn-default border" onclick="resetallSavesCheck();">Reset all saves</button>` +
         `<label><input type="checkbox" id="hardcoreMode" style ="visibility:visible; position:relative;" onclick="hardcoreModeCheck();">Hardcore Mode?</label>` +
         `</div>` +
-        `<button type="button" class="btn btn-default shopButton" onclick="muteAudio();changeMusicImage();""><span id="musicImage" class="glyphicon glyphicon-volume-up" aria-hidden="true"></span></button>` +
+        `<button type="button" class="btn btn-default shopButton" title="Mute music" onclick="muteAudio();changeMusicImage();"><span id="musicImage" class="glyphicon glyphicon-volume-up" aria-hidden="true"></span></button>` +
         `</div>` +
         `</div>` +
         `<div class="row" style="position:relative; left:-30%;">` +
         `<div class="col-xs-8 col-xs-offset-2">` +
-        `<h4>If you are unable to start a game, use button above to reset all saves.If you see this message first time, then you should reset your save, since its a new update which change a lot.</h4>` +
+        `<h4>If you are unable to start a game, use the button above to reset all saves. If you are seeing this message for the first time after an update, resetting your save is recommended.</h4>` +
         `</div>` +
         `</div>`;
     myAudio.volume = 0.1;

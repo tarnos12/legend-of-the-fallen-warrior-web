@@ -512,16 +512,8 @@ export function grantKillRewards(monsterStats) {
     monsterExperience(monsterStats);
     monsterStats.killCount++;
     quest();
-    if (monsterStats.lastEnemy === true) {
-        var monsterNumber = monsterStats.id; //Used to determine div which contain a monster
-        var monsterNumberEl = document.getElementById(monsterNumber);
-        if (monsterNumberEl)
-            monsterNumberEl.insertAdjacentHTML(
-                'beforeend',
-                "<button class='sell' onclick='rebirth(" + monsterStats.level + ")'>Warp</button>"
-            );
-        //rebirth(monsterStats.level);
-    }
+    // (The prestige Warp button lives in the combat control bar now, shown
+    // whenever an area boss — lastEnemy — has been killed.)
     player.properties.lastEnemyLevel = monsterStats.level;
 }
 //Weapon skill experience
