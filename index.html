@@ -60,29 +60,9 @@
     </script>
 </head>
 <body>
-    <script>
-        (function (i, s, o, g, r, a, m) {
-            i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function () {
-                (i[r].q = i[r].q || []).push(arguments)
-            }, i[r].l = 1 * new Date(); a = s.createElement(o),
-            m = s.getElementsByTagName(o)[0]; a.async = 1; a.src = g; m.parentNode.insertBefore(a, m)
-        })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
-
-        ga('create', 'UA-57991038-2', 'auto');
-        ga('send', 'pageview');
-        window.onerror = function(message, file, line) {
-           ga('send', 'event', 'Global', 'Exception', file + "(" + line + "): " + message);
-        }
-    </script>
-    <script src='https://storage.ko-fi.com/cdn/scripts/overlay-widget.js'></script>
-    <script>
-      kofiWidgetOverlay.draw('tarnos', {
-        'type': 'floating-chat',
-        'floating-chat.donateButton.text': 'Support me',
-        'floating-chat.donateButton.background-color': '#00b9fe',
-        'floating-chat.donateButton.text-color': '#fff'
-      });
-    </script>
+    <!-- Google Analytics + Ko-fi overlay widget removed for now (external scripts;
+         they hung headless captures and stall page load when their CDNs are slow).
+         Restore from git history (see this comment's commit) if wanted again. -->
     <div class="container-fluid darkBackground">
 
         <div id="dialogTest" title="Basic dialog">
