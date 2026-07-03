@@ -16,21 +16,26 @@ import { CreateInventoryWeaponHtml } from '../ui/inventoryUI.js';
 import { itemShopAccessory, itemShopArmor, itemShopWeapon } from '../ui/shopUI.js';
 import { state } from '../core/state.js';
 import { updateHtml } from './stats.js';
-export function monsterItemDrop(monster) {
+// quiet=true (offline progress) skips the notification and the full inventory
+// re-render per kill; the offline loop renders the inventory once at the end.
+export function monsterItemDrop(monster, quiet) {
     var itemDropNumber = 0;
     var randomItemChance = Math.floor(Math.random() * (1000 - 1) + 1);
     if (randomItemChance * player.functions.dropRate() >= 500) {
-        if (playerInventory.length <= player.functions.inventory()) {
+        // < not <= : pushing at length===cap overfilled the inventory by one
+        if (playerInventory.length < player.functions.inventory()) {
             getItemType(monster, true); // Call getItemType(monster); several times, for multiple item drop per monster kill/ random amount of items per kill...
             itemDropNumber += 1;
-            Log(
-                '<span id=\"itemDropNew\" class =\"bold\" style=\"color:orange; display:none;\">You found ' +
-                    itemDropNumber +
-                    ' items! <br />' +
-                    '</span>'
-            );
-            itemDropLog();
-        } else {
+            if (!quiet) {
+                Log(
+                    '<span id=\"itemDropNew\" class =\"bold\" style=\"color:orange; display:none;\">You found ' +
+                        itemDropNumber +
+                        ' items! <br />' +
+                        '</span>'
+                );
+                itemDropLog();
+            }
+        } else if (!quiet) {
             Log(
                 '<span id=\"inventoryFull\" style=\"color:red;\">' +
                     'Your inventory is full.<br />' +
@@ -38,7 +43,7 @@ export function monsterItemDrop(monster) {
             );
         }
     }
-    CreateInventoryWeaponHtml();
+    if (!quiet) CreateInventoryWeaponHtml();
 }
 
 export function getItemType(monster, isDrop, craftItemType, craftitemSubType, craftItemQuality) {

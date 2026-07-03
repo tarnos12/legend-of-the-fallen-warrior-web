@@ -507,11 +507,13 @@ function monsterKilled(monsterStats) {
 // Warp unlock) without the end-of-battle cleanup, so the canvas combat can
 // grant them once per enemy in a multi-enemy wave and run the cleanup
 // (displayLogInfo) once when the wave ends.
-export function grantKillRewards(monsterStats) {
+// quiet=true (offline progress) skips the per-kill DOM work (log lines, gold
+// counter, updateHtml, quest re-render); the caller renders once afterwards.
+export function grantKillRewards(monsterStats, quiet) {
     monsterStats.hp = monsterStats.maxHp;
-    monsterExperience(monsterStats);
+    monsterExperience(monsterStats, quiet);
     monsterStats.killCount++;
-    quest();
+    if (!quiet) quest();
     // (The prestige Warp button lives in the combat control bar now, shown
     // whenever an area boss — lastEnemy — has been killed.)
     player.properties.lastEnemyLevel = monsterStats.level;
@@ -578,7 +580,7 @@ export function updateBar() {
     }
 }
 //experience gained from killing a monster
-function monsterExperience(monsterStats) {
+function monsterExperience(monsterStats, quiet) {
     var expGain = monsterStats.baseExp() * player.functions.expRate();
     var level = player.properties.level;
     if (player.properties.experience < player.properties.maxExperience) {
@@ -598,7 +600,7 @@ function monsterExperience(monsterStats) {
                 '</span>'
         );
         levelUpLog();
-    } else {
+    } else if (!quiet) {
         Log(
             '<span id=\"expGain\" class =\"bold\">You gain:' +
                 Math.floor(expGain) +
@@ -607,11 +609,11 @@ function monsterExperience(monsterStats) {
                 '</span>'
         );
     }
-    monsterGold(monsterStats);
+    monsterGold(monsterStats, quiet);
 }
 
 //gold gained from killing a monster
-function monsterGold(monsterStats) {
+function monsterGold(monsterStats, quiet) {
     var goldDrop = player.properties.goldDrop;
     var monsterLvl = monsterStats.level;
     goldDrop = 0;
@@ -620,10 +622,10 @@ function monsterGold(monsterStats) {
     );
     goldDrop = Math.floor(randomGold * player.functions.goldRate());
     player.properties.gold += goldDrop;
-    document.getElementById('gold').innerHTML = player.properties.gold;
+    if (!quiet) document.getElementById('gold').innerHTML = player.properties.gold;
     player.properties.goldDrop = goldDrop;
-    monsterItemDrop(monsterLvl); // Call item drop function with monster level.
-    updateHtml();
+    monsterItemDrop(monsterLvl, quiet); // Call item drop function with monster level.
+    if (!quiet) updateHtml();
 }
 
 // ---- Canvas combat API -----------------------------------------------------

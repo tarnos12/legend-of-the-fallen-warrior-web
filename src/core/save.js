@@ -29,6 +29,7 @@ import {
     loadIsEquipped,
 } from '../systems/stats.js';
 import { playerReviveCheck } from '../systems/intervalFunctions.js';
+import { applyOfflineProgress } from '../systems/offline.js';
 import { quest } from '../systems/quest.js';
 import { createPotionInventory, CreatePlayerHotBar } from '../systems/potionsHotbar.js';
 import { updateBar } from '../systems/battle.js';
@@ -77,6 +78,7 @@ function saveGameFunction(saveType, slot) {
         //Other
         backpackStatus: backpackStatus,
         statStatus: statStatus,
+        savedAt: Date.now(), // offline-progress reference (systems/offline.js)
     };
     for (var key in equippedItems) {
         var item = equippedItems[key];
@@ -276,8 +278,14 @@ function load(slot) {
             newGame(slot);
         }
     }
-    autoSave(slot);
     versionCheck(slot);
+    // grant the time away as kills of the saved wave (real rewards); measured
+    // from the last save/autosave stamp. Runs after versionCheck so a wiped
+    // save can't earn anything.
+    if (savegame !== undefined && savegame.savedAt !== undefined) {
+        applyOfflineProgress(savegame.savedAt);
+    }
+    autoSave(slot);
 }
 
 function resetCheck() {
