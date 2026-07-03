@@ -44,3 +44,9 @@ state, shared `state`, save) · `src/data/` (game definitions) · `src/systems/`
 `npm run build` (catches module-graph errors the dev console misses) · `npm test`
 (jsdom) · `npm run lint` (must be completely clean — 0 errors, 0 warnings) ·
 live check in the Vite preview (mute `#myAudio` first).
+
+## Always give the user a test link
+
+After finishing work that changes the game, end the summary with the running
+dev-server URL (normally http://localhost:5173 — start it with `npm run dev` /
+the "game" preview config if it isn't up) so the user can try it immediately.
