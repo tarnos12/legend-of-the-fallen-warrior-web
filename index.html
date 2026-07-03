@@ -215,13 +215,9 @@
 
                                         <div class="row c4 border">
                                             <div class="col-xs-12">
-                                                <!-- Canvas combat prototype (ui/battleCanvas.js). While the toggle is
-                                                     on, Fight runs a visual-only wave here instead of real combat. -->
-                                                <div class="c3" style="margin-top:6px;">
-                                                    <label><input type="checkbox" id="canvasBattleToggle" checked
-                                                        style="visibility:visible; position:relative;"> Canvas combat (preview)</label>
-                                                </div>
-                                                <div id="canvasBattleWrap" style="display:none; text-align:center;">
+                                                <!-- Canvas combat arena (ui/battleCanvas.js): the Fight button routes
+                                                     here — waves of monsters vs the auto-attacking hero. -->
+                                                <div id="canvasBattleWrap" style="text-align:center; margin-top:6px;">
                                                     <canvas id="battleCanvas" width="700" height="280"
                                                         style="max-width:100%; border:1px solid #8a6d1a; background:#f3e2a0;"></canvas>
                                                 </div>

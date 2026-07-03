@@ -1,16 +1,28 @@
 'use strict';
 
-// Canvas combat PROTOTYPE (visual only — no game state is read-modified).
-// While the "#canvasBattleToggle" checkbox is checked, window.startBattle is
-// routed here: pressing Fight spawns 1-5 copies of the selected monster that
-// run at the hero and bounce-attack; the hero auto-attacks by equipped weapon
-// (melee lunge, or projectiles for ranged/staff) and auto-casts a spell every
-// few seconds. Unchecking the toggle restores the real combat untouched.
-// Damage numbers use the real player/monster stat functions, but all HP pools
-// here are local copies — nothing writes back to the game.
+// Canvas combat — THE combat system. window.startBattle (the Fight button) is
+// routed here: 1-5 copies of the selected monster charge the hero and bounce-
+// attack; the hero auto-attacks by equipped weapon (melee lunge, projectiles
+// for ranged/staff) and auto-casts the strongest affordable spell.
+//
+// All rules come from systems/battle.js (the classic button pipeline, kept
+// there intact): heroStrikeRoll/heroSpellRoll (hit/instakill/crit/defense/
+// lifesteal/mastery + mana), monsterAttack (evasion/parry/thorn/counter/block,
+// real player health, playerDead), grantKillRewards per enemy killed (exp/
+// level-up, gold, item drop, kill count, quest, Warp), displayLogInfo once per
+// wave end (full heal, buff timers, monster panel rerender). Only the enemies'
+// hp pools are local clones — one wave enemy = one real kill.
 import { player, equippedItems } from '../core/core.js';
+import { logData } from '../core/log.js';
 import { monsterList } from '../data/monsterList.js';
 import { characterRaces } from '../data/gameObjects.js';
+import {
+    heroStrikeRoll,
+    heroSpellRoll,
+    monsterAttack,
+    grantKillRewards,
+    displayLogInfo,
+} from '../systems/battle.js';
 
 const GROUND = 235;
 const HERO_X = 95;
@@ -18,8 +30,6 @@ const SPRITE = 64;
 
 let canvas = null;
 let ctx = null;
-let toggle = null;
-let wrap = null;
 let realStartBattle = null;
 
 let wave = null; // active wave state or null
@@ -58,30 +68,24 @@ function weaponProfile() {
     return { subType, range: 52, cooldown: 0.9, projectile: false };
 }
 
-function rollPlayerDamage() {
-    try {
-        const min = player.functions.minDamage();
-        const max = player.functions.maxDamage();
-        return Math.floor(Math.random() * (max - min + 1)) + min;
-    } catch {
-        return 5 + Math.floor(Math.random() * 5);
-    }
-}
-
 function startWave(monsterKey) {
     const monster = monsterList[monsterKey];
     if (!monster || !ctx) return;
+    if (player.properties.isDead === true) {
+        // Fight pressed while waiting for revive; the inline onclick already ran
+        // disableButtons(), so re-toggle it and stay idle.
+        draw();
+        drawCenterText('You are dead — wait for the revive...');
+        if (typeof window.disableButtons === 'function') window.disableButtons();
+        return;
+    }
+    logData.length = 0;
+    const logConsole = document.getElementById('logConsole');
+    if (logConsole) logConsole.innerHTML = '';
+
     const count = 1 + Math.floor(Math.random() * 5);
     const enemies = [];
     for (let i = 0; i < count; i++) {
-        let minDmg = 1;
-        let maxDmg = 2;
-        try {
-            minDmg = monster.minDmg();
-            maxDmg = monster.maxDmg();
-        } catch {
-            /* visual fallback */
-        }
         enemies.push({
             x: canvas.width + 30 + i * 55,
             y: GROUND - ((i % 3) - 1) * 16,
@@ -90,27 +94,18 @@ function startWave(monsterKey) {
             speed: 65 + Math.random() * 45,
             state: 'run', // run -> fight -> die
             bouncePhase: Math.random() * Math.PI,
-            attackTimer: 0.6 + Math.random() * 0.6,
-            minDmg,
-            maxDmg,
             fade: 1,
         });
     }
-    let heroHp = 500;
-    try {
-        heroHp = player.functions.maxhealth();
-    } catch {
-        /* visual fallback */
-    }
     wave = {
         monster,
+        monsterKey,
         img: getImage('images/monsters/' + monster.name + '.png'),
         heroImg: heroImage(),
         weapon: weaponProfile(),
         enemies,
-        heroHp,
-        heroMaxHp: heroHp,
         heroAttackTimer: 0.4,
+        enemyAttackTimer: 0.9,
         heroLunge: 0, // 0..1 lunge animation progress
         spellTimer: 3.5,
         projectiles: [],
@@ -119,6 +114,7 @@ function startWave(monsterKey) {
         outcome: null, // 'victory' | 'defeat'
         outcomeTimer: 0,
         heroHitFlash: 0,
+        kills: 0,
     };
     lastTs = 0;
     clearTimeout(stepTimer);
@@ -129,16 +125,38 @@ function addFloat(x, y, txt, color) {
     wave.floats.push({ x, y, txt, color, age: 0 });
 }
 
-function hitEnemy(enemy, dmg, isSpell) {
-    enemy.hp -= dmg;
-    addFloat(
-        enemy.x,
-        enemy.y - SPRITE,
-        (isSpell ? '✦' : '') + dmg,
-        isSpell ? '#c026d3' : '#b91c1c'
-    );
+// Apply a hero strike/spell result to an enemy clone and animate it.
+function applyRoll(enemy, roll, isSpell) {
+    if (roll.result === 'miss') {
+        addFloat(enemy.x, enemy.y - SPRITE, 'miss', '#6b7280');
+        return;
+    }
+    if (roll.result === 'instakill') {
+        enemy.hp = 0;
+        addFloat(enemy.x, enemy.y - SPRITE, 'INSTANT KILL', '#dc2626');
+    } else {
+        enemy.hp -= roll.damage;
+        addFloat(
+            enemy.x,
+            enemy.y - SPRITE,
+            (isSpell ? '✦' : '') + roll.damage + (roll.crit ? '!' : ''),
+            isSpell ? '#c026d3' : roll.crit ? '#ea580c' : '#b91c1c'
+        );
+    }
+    checkEnemyDeath(enemy);
+}
+
+// An enemy clone reaching 0 hp is a REAL kill: exp/gold/drop/killCount/quest,
+// followed by the classic end-of-battle cleanup (full heal, buff timer tick,
+// monster panel rerender) — the same per-kill cadence as the old 1v1 combat,
+// which is what keeps multi-enemy waves survivable at the old balance.
+function checkEnemyDeath(enemy) {
     if (enemy.hp <= 0 && enemy.state !== 'die') {
         enemy.state = 'die';
+        wave.kills++;
+        grantKillRewards(wave.monster);
+        displayLogInfo();
+        addFloat(enemy.x, enemy.y - SPRITE - 16, '+' + player.properties.goldDrop + 'g', '#a16207');
     }
 }
 
@@ -149,7 +167,9 @@ function targetable() {
 function update(dt) {
     const w = wave;
 
-    // enemies: run in, then bounce-attack
+    // enemies: run in, then bounce (visual); the wave attacks ROUND-ROBIN at
+    // the old one-attack-per-turn rate, so a 5-enemy wave is a longer fight,
+    // not 5x the incoming damage of the classic 1v1 turn exchange.
     for (const e of w.enemies) {
         if (e.state === 'die') {
             e.fade = Math.max(0, e.fade - dt * 2.5);
@@ -164,24 +184,32 @@ function update(dt) {
                 e.state = 'fight';
             }
         } else if (e.state === 'fight') {
-            // bounce back and forth; deal damage at each forward contact
             e.bouncePhase += dt * 6;
-            e.attackTimer -= dt;
-            if (e.attackTimer <= 0) {
-                const dmg = Math.floor(Math.random() * (e.maxDmg - e.minDmg + 1)) + e.minDmg;
-                w.heroHp = Math.max(0, w.heroHp - dmg);
+        }
+    }
+    if (!w.outcome) {
+        const fighters = w.enemies.filter((e) => e.state === 'fight');
+        w.enemyAttackTimer -= dt;
+        if (w.enemyAttackTimer <= 0 && fighters.length) {
+            const attacker = fighters[Math.floor(Math.random() * fighters.length)];
+            attacker.bouncePhase = 0; // sync the lunge with the hit
+            const healthBefore = player.properties.health;
+            monsterAttack(w.monster, attacker); // evasion/parry/thorn/counter/block
+            const dealt = healthBefore - player.properties.health;
+            if (dealt > 0) {
                 w.heroHitFlash = 0.25;
-                addFloat(HERO_X, GROUND - SPRITE, dmg, '#7f1d1d');
-                e.attackTimer = 0.8 + Math.random() * 0.5;
-                if (w.heroHp <= 0) {
-                    w.outcome = 'defeat';
-                    w.outcomeTimer = 1.6;
-                }
+                addFloat(HERO_X, GROUND - SPRITE, dealt, '#7f1d1d');
+            }
+            checkEnemyDeath(attacker); // thorn/counter can kill the attacker
+            w.enemyAttackTimer = 0.9 + Math.random() * 0.4;
+            if (player.properties.isDead === true) {
+                w.outcome = 'defeat';
+                w.outcomeTimer = 1.6;
             }
         }
     }
 
-    // hero auto-attack
+    // hero auto-attack + auto-spell (real rolls via battle.js)
     if (!w.outcome) {
         w.heroAttackTimer -= dt;
         w.heroLunge = Math.max(0, w.heroLunge - dt * 4);
@@ -200,35 +228,39 @@ function update(dt) {
                     });
                 } else {
                     w.heroLunge = 1;
-                    hitEnemy(target, rollPlayerDamage(), false);
+                    applyRoll(target, heroStrikeRoll(w.monster), false);
                 }
                 w.heroAttackTimer = w.weapon.cooldown;
             }
         }
 
-        // auto-spell every few seconds
         w.spellTimer -= dt;
         if (w.spellTimer <= 0 && targets.length) {
             const target = targets[0];
-            hitEnemy(target, Math.floor(rollPlayerDamage() * 2.5) + 1, true);
-            w.effects.push({
-                x: target.x,
-                y: GROUND - SPRITE / 2,
-                age: 0,
-                label: w.weapon.subType === 'staff' ? 'Fire Bolt!' : 'Savage Strike!',
-            });
-            w.spellTimer = 3.5;
+            const roll = heroSpellRoll(w.monster);
+            if (roll === null) {
+                w.spellTimer = 0.75; // nothing castable yet (mana/skills) — retry soon
+            } else {
+                applyRoll(target, roll, true);
+                w.effects.push({
+                    x: target.x,
+                    y: GROUND - SPRITE / 2,
+                    age: 0,
+                    label: roll.name + '!',
+                });
+                w.spellTimer = 3.5;
+            }
         }
     }
 
-    // projectiles
+    // projectiles roll on impact
     for (const p of w.projectiles) {
         p.x += p.speed * dt;
         if (p.target.state !== 'die' && p.x >= p.target.x - 14) {
-            hitEnemy(p.target, rollPlayerDamage(), false);
+            if (!wave.outcome) applyRoll(p.target, heroStrikeRoll(w.monster), false);
             p.done = true;
         }
-        if (p.x > canvas.width) p.done = true;
+        if (p.x > canvas.width || p.target.state === 'die') p.done = p.done || p.x >= p.target.x;
     }
     w.projectiles = w.projectiles.filter((p) => !p.done);
 
@@ -240,16 +272,15 @@ function update(dt) {
 
     w.heroHitFlash = Math.max(0, w.heroHitFlash - dt);
 
-    // outcome
+    // victory: wave cleared (the last kill's displayLogInfo already ran the
+    // end-of-battle cleanup and re-rendered/unlocked the monster panel)
     if (!w.outcome && targetable().length === 0) {
         w.outcome = 'victory';
         w.outcomeTimer = 1.6;
     }
     if (w.outcome) {
         w.outcomeTimer -= dt;
-        if (w.outcomeTimer <= 0) {
-            endWave();
-        }
+        if (w.outcomeTimer <= 0) endWave();
     }
 }
 
@@ -257,7 +288,7 @@ function drawBar(x, y, width, ratio, color) {
     ctx.fillStyle = '#00000033';
     ctx.fillRect(x, y, width, 6);
     ctx.fillStyle = color;
-    ctx.fillRect(x, y, Math.max(0, width * ratio), 6);
+    ctx.fillRect(x, y, Math.max(0, width * Math.min(1, ratio)), 6);
     ctx.strokeStyle = '#00000066';
     ctx.strokeRect(x, y, width, 6);
 }
@@ -265,7 +296,6 @@ function drawBar(x, y, width, ratio, color) {
 function drawSprite(img, x, y, flash) {
     const drawX = x - SPRITE / 2;
     const drawY = y - SPRITE;
-    // shadow
     ctx.fillStyle = '#00000022';
     ctx.beginPath();
     ctx.ellipse(x, y + 3, SPRITE / 2.4, 7, 0, 0, Math.PI * 2);
@@ -282,11 +312,17 @@ function drawSprite(img, x, y, flash) {
     }
 }
 
+function drawCenterText(text) {
+    ctx.fillStyle = '#6b5310';
+    ctx.font = '16px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(text, canvas.width / 2, 140);
+}
+
 function draw() {
     const w = wave;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // ground
     ctx.strokeStyle = '#8a6d1a';
     ctx.beginPath();
     ctx.moveTo(0, GROUND + 8);
@@ -294,10 +330,7 @@ function draw() {
     ctx.stroke();
 
     if (!w) {
-        ctx.fillStyle = '#6b5310';
-        ctx.font = '16px sans-serif';
-        ctx.textAlign = 'center';
-        ctx.fillText('Select a monster and press Fight', canvas.width / 2, 140);
+        drawCenterText('Select a monster and press Fight');
         return;
     }
 
@@ -311,10 +344,31 @@ function draw() {
         20
     );
 
-    // hero
+    // hero (real health/mana pools)
     const lungeOffset = Math.sin(w.heroLunge * Math.PI) * 18;
     drawSprite(w.heroImg, HERO_X + lungeOffset, GROUND, w.heroHitFlash);
-    drawBar(HERO_X - SPRITE / 2, GROUND - SPRITE - 12, SPRITE, w.heroHp / w.heroMaxHp, '#16a34a');
+    let maxHp = 1;
+    let maxMana = 1;
+    try {
+        maxHp = player.functions.maxhealth();
+        maxMana = player.functions.maxMana();
+    } catch {
+        /* keep drawing */
+    }
+    drawBar(
+        HERO_X - SPRITE / 2,
+        GROUND - SPRITE - 20,
+        SPRITE,
+        player.properties.health / maxHp,
+        '#16a34a'
+    );
+    drawBar(
+        HERO_X - SPRITE / 2,
+        GROUND - SPRITE - 12,
+        SPRITE,
+        player.properties.mana / maxMana,
+        '#2563eb'
+    );
 
     // enemies
     for (const e of w.enemies) {
@@ -369,7 +423,7 @@ function draw() {
         ctx.font = 'bold 28px sans-serif';
         ctx.textAlign = 'center';
         ctx.fillText(
-            w.outcome === 'victory' ? 'Victory!' : 'Defeated (visual only)',
+            w.outcome === 'victory' ? 'Victory! (' + w.kills + ' kills)' : 'You have died...',
             canvas.width / 2,
             120
         );
@@ -395,50 +449,38 @@ function step() {
     if (wave) stepTimer = setTimeout(step, 16);
 }
 
+// Wave end. The Fight buttons were re-created enabled by the monster-panel
+// rerender (displayLogInfo on victory, playerDead's own displayLogInfo on
+// defeat), so no disableButtons() re-toggle is needed here.
 function endWave() {
     wave = null;
     draw();
-    // the Fight button's inline onclick ran disableButtons() when the wave
-    // started; re-toggle it so the monster buttons unlock like a real fight end
-    if (typeof window.disableButtons === 'function') window.disableButtons();
-}
-
-function onToggle() {
-    if (wrap) wrap.style.display = toggle.checked ? 'block' : 'none';
-    if (toggle.checked) draw();
-    if (!toggle.checked && wave) {
-        // abandon a running wave and unlock the buttons
-        endWave();
-    }
 }
 
 function init() {
     canvas = document.getElementById('battleCanvas');
-    toggle = document.getElementById('canvasBattleToggle');
-    wrap = document.getElementById('canvasBattleWrap');
-    if (!canvas || !toggle || !wrap || !canvas.getContext) return;
+    if (!canvas || !canvas.getContext) return;
     ctx = canvas.getContext('2d');
 
-    // Route Fight through the prototype while the toggle is on; the real
-    // startBattle (battle.js) is untouched and used when it's off.
+    // The Fight button's generated onclick calls startBattle by name; route it
+    // here. The classic button combat stays available as realStartBattle.
     realStartBattle = window.startBattle;
     window.startBattle = function (monsterKey) {
-        if (toggle.checked) startWave(monsterKey);
-        else if (realStartBattle) realStartBattle(monsterKey);
+        startWave(monsterKey);
     };
 
-    toggle.addEventListener('change', onToggle);
-    onToggle();
+    draw();
 }
 
 init();
 
-// Dev-only debug hook for the prototype (inspect wave state from the console).
+// Dev-only debug hook (inspect wave state from the console / preview evals).
 if (import.meta.env.DEV) {
     window.__battleCanvasDebug = {
         getWave: () => wave,
         getCtx: () => ctx,
         monsterKeys: () => Object.keys(monsterList).length,
         startWave,
+        realStartBattle: () => realStartBattle,
     };
 }

@@ -328,7 +328,12 @@ function playerDamage(monster, damage, name, type) {
         );
     }
 }
-function monsterAttack(monsterStats) {
+// `target` carries the hp pool the retaliation effects (thorn/counter) hit and
+// whose death ends the fight. The classic button combat passes the shared
+// monsterList entry itself; the canvas combat passes a per-enemy clone (its
+// death/rewards are handled by the caller, so monsterKilled is skipped then).
+export function monsterAttack(monsterStats, target) {
+    if (target === undefined) target = monsterStats;
     if (player.properties.health < player.functions.maxhealth()) {
         var regen = player.functions.hpregen();
         player.properties.health += regen;
@@ -350,13 +355,13 @@ function monsterAttack(monsterStats) {
                     '</span>'
             );
         } else {
-            monsterDmg(monsterStats);
+            monsterDmg(monsterStats, target);
         }
     } else {
         Log('<span class ="bold" style="color:purple;">Enemy miss!' + '<br />' + '</span>');
     }
 }
-function monsterDmg(monsterStats) {
+function monsterDmg(monsterStats, target) {
     var monsterDamage =
         Math.floor(Math.random() * (monsterStats.maxDmg() - monsterStats.minDmg() + 1)) +
         monsterStats.minDmg();
@@ -370,7 +375,7 @@ function monsterDmg(monsterStats) {
                 '</span>'
         );
     }
-    monsterStats.hp -= thornDamage;
+    target.hp -= thornDamage;
     monsterDamage = Math.floor(
         monsterDamage *
             ((player.properties.prestigeMultiplier * 500) /
@@ -378,7 +383,7 @@ function monsterDmg(monsterStats) {
             player.functions.ignoreDamage()
     );
     if (monsterDamage >= 1) {
-        monsterDamageDeal(monsterDamage, monsterStats);
+        monsterDamageDeal(monsterDamage, monsterStats, target);
     } else {
         Log(
             '<span class ="bold" style="color:green;">Enemy deal 0 damage. A Legends power flows through you.' +
@@ -387,7 +392,7 @@ function monsterDmg(monsterStats) {
         );
     }
 }
-function monsterDamageDeal(monsterDamage, monsterStats) {
+function monsterDamageDeal(monsterDamage, monsterStats, target) {
     var randomCounterNumber = Math.floor(Math.random() * 100 + 1);
     var randomBlockNumber = Math.floor(Math.random() * 100 + 1);
     var randomReflectNumber = Math.floor(Math.random() * 100 + 1);
@@ -396,7 +401,7 @@ function monsterDamageDeal(monsterDamage, monsterStats) {
         var counterDamageDealt = Math.floor(
             monsterDamage * (player.functions.counterDamage() / 100)
         );
-        monsterStats.hp -= counterDamageDealt;
+        target.hp -= counterDamageDealt;
         Log(
             '<span class ="bold" style="color:purple;">You counter enemy for ' +
                 counterDamageDealt +
@@ -405,10 +410,8 @@ function monsterDamageDeal(monsterDamage, monsterStats) {
         );
     }
     if (randomReflectNumber <= player.functions.reflect()) {
-        console.log(monsterDamage);
         monsterDamage *= 0.5;
         text += '(reflected 50% damage)';
-        console.log(monsterDamage);
     }
     if (randomBlockNumber <= player.functions.blockChance()) {
         Log(
@@ -437,11 +440,11 @@ function monsterDamageDeal(monsterDamage, monsterStats) {
     );
     document.getElementById('health').innerHTML =
         player.properties.health + '/' + player.functions.maxhealth();
-    //document.getElementById(monsterStats.id).getElementsByClassName('hp')[0].innerHTML = monsterStats.hp;
     if (player.properties.health < 1) {
         playerDead(monsterStats);
     }
-    if (monsterStats.hp < 1) {
+    // Clone deaths (canvas combat) are detected and rewarded by the caller.
+    if (target === monsterStats && monsterStats.hp < 1) {
         monsterKilled(monsterStats);
     }
 }
@@ -495,10 +498,17 @@ export function playerDead(monsterStats) {
     }
 }
 function monsterKilled(monsterStats) {
+    grantKillRewards(monsterStats);
+    displayLogInfo();
+}
+// The per-kill rewards (exp/levelup, gold, item drop, kill count, quest check,
+// Warp unlock) without the end-of-battle cleanup, so the canvas combat can
+// grant them once per enemy in a multi-enemy wave and run the cleanup
+// (displayLogInfo) once when the wave ends.
+export function grantKillRewards(monsterStats) {
     monsterStats.hp = monsterStats.maxHp;
     monsterExperience(monsterStats);
     monsterStats.killCount++;
-    displayLogInfo();
     quest();
     if (monsterStats.lastEnemy === true) {
         var monsterNumber = monsterStats.id; //Used to determine div which contain a monster
@@ -622,7 +632,117 @@ function monsterGold(monsterStats) {
     updateHtml();
 }
 
-function displayLogInfo() {
+// ---- Canvas combat API -----------------------------------------------------
+// One hero basic attack against `monsterStats`, using the exact hit/instakill/
+// crit/defense/lifesteal/mastery pipeline of playerAttack+playerCritCheck+
+// playerDamage, but without the turn exchange or hp mutation: the caller owns
+// the target hp pool (a per-enemy clone) and applies the returned damage.
+export function heroStrikeRoll(monsterStats) {
+    var playerHitChance = (player.functions.accuracy() - monsterStats.eva) / 100;
+    if (playerHitChance <= Math.random()) {
+        Log('<span class ="bold" style="color:gray;">You missed!' + '<br />' + '</span>');
+        return { result: 'miss' };
+    }
+    var instantKillChance = Math.floor(Math.random() * 100 + 1);
+    if (player.functions.instantKillChance() >= instantKillChance) {
+        Log('<span class ="bold" style="color:red;">Instant Killed enemy!' + '<br />' + '</span>');
+        return { result: 'instakill' };
+    }
+    var playerCriticalChance = player.functions.criticalChance() / 100;
+    var criticalDamage = 1;
+    var damageType = ' physical damage';
+    if (playerCriticalChance > Math.random()) {
+        criticalDamage = player.functions.criticalDamage();
+        damageType = ' physical damage(Critical Hit)';
+    }
+    var damage =
+        Math.floor(
+            Math.random() * (player.functions.maxDamage() - player.functions.minDamage() + 1)
+        ) + player.functions.minDamage();
+    damage = Math.floor(
+        damage *
+            criticalDamage *
+            ((player.properties.prestigeMultiplier * 500) /
+                (player.properties.prestigeMultiplier * 500 +
+                    monsterStats.def() * player.functions.ignoreDefense()))
+    );
+    heroHitLanded(monsterStats, damage, 'basic attack.', damageType);
+    return { result: 'hit', damage: damage, crit: criticalDamage > 1 };
+}
+
+// One automatic spell cast: picks the strongest unlocked damage skill of the
+// equipped weapon the player can afford, spends the mana, and rolls hit +
+// damage exactly like playerSpellDamage. Returns null when no spell is
+// castable (nothing unlocked, no weapon, or not enough mana).
+export function heroSpellRoll(monsterStats) {
+    var weapon = equippedItems.weapon.subType;
+    if (weapon === undefined || weaponSkillList[weapon] === undefined) return null;
+    var best = null;
+    for (var skillKey in weaponSkillList[weapon]) {
+        var skill = weaponSkillList[weapon][skillKey];
+        if (
+            skill.type === 'damage' &&
+            skill.levelReq <= weaponMastery[weapon].level &&
+            player.properties.mana >= skill.manaCost &&
+            (best === null || skill.damageDisplay() > best.damageDisplay())
+        ) {
+            best = skill;
+        }
+    }
+    if (best === null) return null;
+    player.properties.mana -= best.manaCost;
+    var type = ' ' + best.type2 + ' damage';
+    var bonusDamage = 0;
+    for (var skillKey2 in weaponSkillList[weapon]) {
+        var skill2 = weaponSkillList[weapon][skillKey2];
+        if (skill2.type === 'magicDamageBuff' && skill2.type2 === 'magical' && weapon === 'staff') {
+            var randomNumber = Math.floor(Math.random() * 100 + 1);
+            if (randomNumber <= skill2.chance()) {
+                bonusDamage = skill2.damage();
+                type += ' (' + skill2.name + ') ';
+            }
+        }
+    }
+    updateHtml();
+    var playerHitChance = (player.functions.accuracy() - monsterStats.eva) / 100;
+    if (playerHitChance <= Math.random()) {
+        Log('<span class ="bold" style="color:gray;">You missed!' + '<br />' + '</span>');
+        return { result: 'miss', name: best.name };
+    }
+    var damage = best.damageDisplay() + bonusDamage;
+    heroHitLanded(monsterStats, damage, ' ' + best.name + '.', type);
+    return { result: 'hit', name: best.name, damage: damage };
+}
+
+// The on-hit side effects a landed hit has in playerDamage: log line,
+// life steal, weapon-mastery experience.
+function heroHitLanded(monsterStats, damage, name, type) {
+    Log(
+        '<span class ="bold" style="color:red;">You deal ' +
+            damage +
+            type +
+            ' with ' +
+            name +
+            '<br />' +
+            '</span>'
+    );
+    if (player.functions.lifeSteal() > 0) {
+        var lifeSteal = player.functions.lifeSteal();
+        player.properties.health += lifeSteal;
+        if (player.properties.health > player.functions.maxhealth()) {
+            player.properties.health = player.functions.maxhealth();
+        }
+        Log(
+            '<span class ="bold" style="color:green;">You life steal for ' +
+                lifeSteal +
+                ' health.<br />' +
+                '</span>'
+        );
+    }
+    weaponSkill(monsterStats);
+}
+
+export function displayLogInfo() {
     player.properties.health = player.functions.maxhealth();
     player.properties.mana = player.functions.maxMana();
     document.getElementById('health').innerHTML =
@@ -642,11 +762,11 @@ function displayLogInfo() {
     CreateMonsterHtml();
 }
 // Only the inline-onclick battle handlers stay on window: startBattle (generated
-// onclickevent), playerAttack/playerSpellDiv/playerSpellDamage (generated Attack/
-// Spell buttons). playerDead and updateBar are exported (imported by core/save);
-// everything else (playerCritCheck, playerDamage, monsterAttack, monsterDmg,
-// monsterDamageDeal, monsterKilled, weaponSkill, monsterExperience, monsterGold,
-// displayLogInfo) is called only internally here.
+// onclickevent — intercepted by ui/battleCanvas.js, which runs combat now),
+// playerAttack/playerSpellDiv/playerSpellDamage (the classic button combat,
+// kept intact as reference/fallback). Exported: playerDead + updateBar
+// (core/save) and the canvas combat API (monsterAttack, heroStrikeRoll,
+// heroSpellRoll, grantKillRewards, displayLogInfo). The rest is internal.
 window.startBattle = startBattle;
 window.playerSpellDiv = playerSpellDiv;
 window.playerAttack = playerAttack;
