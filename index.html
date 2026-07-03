@@ -60,6 +60,18 @@
     </script>
 </head>
 <body>
+    <!-- Boot loading overlay (ui/loadingOverlay.js drives the bar and removes it
+         once all sprites are preloaded). Static markup so it shows instantly. -->
+    <div id="loadingOverlay" style="position:fixed; inset:0; z-index:9999; background:#2b2113;
+            display:flex; flex-direction:column; align-items:center; justify-content:center;">
+        <div style="color:#edd26e; font-size:24px; margin-bottom:18px; font-weight:bold;">
+            Legend of the Fallen Warrior</div>
+        <div style="width:320px; height:18px; border:2px solid #edd26e; background:#00000055;">
+            <div id="loadingOverlayBar" style="width:0%; height:100%; background:#edd26e;
+                transition:width 120ms linear;"></div>
+        </div>
+        <div id="loadingOverlayPct" style="color:#edd26e; margin-top:8px; font-size:15px;">0%</div>
+    </div>
     <!-- Google Analytics + Ko-fi overlay widget removed for now (external scripts;
          they hung headless captures and stall page load when their CDNs are slow).
          Restore from git history (see this comment's commit) if wanted again. -->

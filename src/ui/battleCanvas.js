@@ -24,6 +24,7 @@ import {
     displayLogInfo,
 } from '../systems/battle.js';
 import { weaponCombatProfile } from '../systems/weaponBehavior.js';
+import { getImage, imageCache } from './uiCommon.js';
 
 const GROUND = 235;
 const HERO_X = 95;
@@ -78,16 +79,6 @@ function clampWave(areaType) {
 function currentWaveEntry() {
     const entries = clampWave(currentAreaType());
     return entries[player.properties.combatWave] || null;
-}
-
-const imageCache = {};
-function getImage(src) {
-    if (!imageCache[src]) {
-        const img = new Image();
-        img.src = src;
-        imageCache[src] = img;
-    }
-    return imageCache[src];
 }
 
 // Warm the cache for every monster + race sprite as soon as the game data

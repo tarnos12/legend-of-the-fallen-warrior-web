@@ -32,9 +32,12 @@ import './ui/monsterUI.js';
 import './ui/panelsUI.js';
 import './ui/inventoryUI.js';
 import './ui/shopUI.js';
-// Canvas combat prototype: wraps window.startBattle while its toggle is on, so
-// it must load AFTER battle.js (imported above) has registered the real one.
+// Canvas combat: wraps window.startBattle, so it must load AFTER battle.js
+// (imported above) has registered the real one.
 import './ui/battleCanvas.js';
+// Boot loading overlay: preloads all combat sprites behind #loadingOverlay
+// (needs monsterList/gameObjects, imported above).
+import './ui/loadingOverlay.js';
 import './data/gameObjects.js';
 import { copyPlayerProperties, createEquippedItemsObject } from './core/core.js';
 import './systems/stats.js';

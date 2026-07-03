@@ -17,3 +17,16 @@ export function testss() {
 String.prototype.capitalizeFirstLetter = function () {
     return this.charAt(0).toUpperCase() + this.slice(1);
 };
+
+// Shared image cache: the boot loading overlay (loadingOverlay.js) and the
+// combat canvas (battleCanvas.js) use the SAME Image objects, so anything the
+// overlay preloaded is instantly `complete` when combat draws it.
+export const imageCache = {};
+export function getImage(src) {
+    if (!imageCache[src]) {
+        const img = new Image();
+        img.src = src;
+        imageCache[src] = img;
+    }
+    return imageCache[src];
+}

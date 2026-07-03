@@ -50,7 +50,8 @@ self-registers its inline-onclick handlers via `Object.assign(window, {...})`.
 
 | File | Renders / owns | Key exports (imported elsewhere) | window handlers |
 |---|---|---|---|
-| `uiCommon.js` | Bootstrap tooltip re-init; installs `String.prototype.capitalizeFirstLetter` | `testss` | — |
+| `uiCommon.js` | Bootstrap tooltip re-init; installs `String.prototype.capitalizeFirstLetter`; the shared image cache | `testss`, `getImage`, `imageCache` | — |
+| `loadingOverlay.js` | Boot loading screen: preloads all combat sprites behind the static `#loadingOverlay` (index.html) with a progress bar + %, removes it at 100%. Failed downloads count as progress and a 15 s failsafe removes it regardless — loading can never brick startup. Shares the `uiCommon` image cache with the combat canvas. | — | — |
 | `monsterUI.js` | Monster tabs/panel (`#monsterTabs`); current-monster + tab state | `CreateMonsterHtml`, `changedTabmonster` | `changeMonsterPage`, `changedTabmonster` |
 | `panelsUI.js` | Stat/skill panels: `#weaponSkill`, `#checkBoxHtml`, `#playerSkills`, `#primaryStat`, `#secondaryStat`, `#activeBuffs` | `CreateWeaponSkillHtml`, `checkBoxHtml`, `CreatePlayerSkillsHtml`, `primaryStatUpdate`, `secondaryStatUpdate`, `activeBuffsHtml` | — |
 | `inventoryUI.js` | Inventory tabs (`#inventory`), equipped-item slots (`#equipHtml`), item tooltips; inventory tab state | `CreateInventoryWeaponHtml`, `unequipItemLoad`, `EquippedItemsEmpty`, `checkIfEquippedEmpty`, `itemTooltipTest` (reused by shopUI) | `CreateInventoryWeaponHtml` |
