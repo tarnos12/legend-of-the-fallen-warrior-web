@@ -103,91 +103,69 @@
             </div>
         </div>
 
-        <!--First Row-->
-        <div class="row paddingBothSides unselectable">
-            <div class="col-xs-12">
-                <div class="row c4" style="border:1px solid;">
-                    <div class="col-sm-4 c4">
-                        <div class="row marginTop topBar">
-                            <div class="col-xs-4">
-                                <button type="button" class="btn btn-default" onclick="muteAudio(); changeMusicImage();"><span id="musicimage2" class="glyphicon glyphicon-volume-up" aria-hidden="true"></span></button>
-                                <a href="updates.html" target="_blank">Changelog</a>
-                                <div class="c3">
-                                    <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_blank">
-                                        <input type="hidden" name="cmd" value="_s-xclick">
-                                        <input type="hidden" name="hosted_button_id" value="A9UAZH8H9XHFQ">
-                                        <input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
-                                        <img alt="" border="0" src="https://www.paypalobjects.com/pl_PL/i/scr/pixel.gif" width="1" height="1">
-                                    </form>
-                                </div>
-                            </div>
-                            <div class="col-xs-8">
-                                Level
-                                <span id="level">1</span>
-                                (<span id="experience">0</span>/<span id="maxexperience">100</span>)<br />
-                                Gold:
-                                <span id="gold">0</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-sm-4 c4">
-                        <div class="progress marginTop">
-                            <div id="progressBar" class="progress-bar" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 20%;">
-                                <span id="exppercent">60% Complete</span>
-                            </div>
-                        </div>
-                        <div class="progress">
-                            <div id="progressBar2" class="progress-bar progressColor" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 20%;">
-                                <span id="health"></span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-sm-4 c4">
-                        <div class="row topBar marginTop">
-                            <div class="col-xs-10 col-xs-offset-1">
-                                <!-- Simple audio playback -->
-                                <audio id="myAudio" controls="controls" loop preload="auto" hidden>
-                                    <source src="/sounds/sound.ogg" type="audio/ogg" />
-                                    <source src="/sounds/sound.mp3" type="audio/mpeg" />
-                                    Your browser does not support the audio element.
-                                </audio>
-                            </div>
-                            <div class="col-xs-12">
-                                <button class="sell" onclick="changeDifficulty('Mortal')" data-toggle="tooltip" data-placement="bottom" title="Enemy Stats x 0.2">Mortal</button>
-                                <button class="sell" onclick="changeDifficulty('Ageless')" data-toggle="tooltip" data-placement="bottom" title="Enemy Stats x 0.5">Ageless</button>
-                                <button class="sell" onclick="changeDifficulty('Hero')" data-toggle="tooltip" data-placement="bottom" title="Enemy Stats x 1">Hero</button>
-                                <button class="sell" onclick="changeDifficulty('Immortal')" data-toggle="tooltip" data-placement="bottom" title="Enemy Stats x 2">Immortal</button>
-                                <button class="sell" onclick="changeDifficulty('Lich')" data-toggle="tooltip" data-placement="bottom" title="Enemy Stats x 3">Lich</button>
-                                <button class="sell" onclick="changeDifficulty('Legend')" data-toggle="tooltip" data-placement="bottom" title="Enemy Stats x 5">Legend</button>
-                            </div>
-                            <div class="col-xs-12 c3">
-                                <span id="gameDifficulty">
-                                    Current Difficulty: Hero
-                                </span>
-                            </div>
-                        </div>
+        <!--Full-screen combat stage: ui/battleCanvas.js scales its fixed 700x280
+            combat world onto this canvas (sized by theme.css + resizeCanvas).
+            The panels below overlay it; #hudBar is fixed at the bottom.-->
+        <div id="stage" class="unselectable">
+            <div id="battleControls" class="c3"></div>
+            <div id="canvasBattleWrap">
+                <canvas id="battleCanvas" width="700" height="280"></canvas>
+            </div>
+            <div class="c4 c3" id="logConsole">
+                Console log
+            </div>
+            <div id="stageDock">
+                <div id="activeBuffs"></div>
+                <div id="hotBar"></div>
+            </div>
+        </div>
 
+        <!--Bottom HUD: vitals, level/gold and the main panel nav. The ids must
+            stay (stats.js/updateHtml write into level/experience/gold/exppercent/
+            health); the nav lis are ordinary Bootstrap tab toggles whose panes
+            are the overlay panels below (ui/stageUI.js adds close behavior).-->
+        <div id="hudBar" class="unselectable">
+            <button type="button" class="btn btn-default" id="hudMute" title="Mute music" onclick="muteAudio(); changeMusicImage();"><span id="musicimage2" class="glyphicon glyphicon-volume-up" aria-hidden="true"></span></button>
+            <audio id="myAudio" controls="controls" loop preload="auto" hidden>
+                <source src="/sounds/sound.ogg" type="audio/ogg" />
+                <source src="/sounds/sound.mp3" type="audio/mpeg" />
+                Your browser does not support the audio element.
+            </audio>
+            <div id="hudVitals">
+                <div class="progress">
+                    <div id="progressBar" class="progress-bar" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 20%;">
+                        <span id="exppercent">60% Complete</span>
+                    </div>
+                </div>
+                <div class="progress">
+                    <div id="progressBar2" class="progress-bar progressColor" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 20%;">
+                        <span id="health"></span>
                     </div>
                 </div>
             </div>
-        </div>
-        <!--Second Row-->
-        <div class="row paddingBothSides">
-
-            <div class="col-xs-12 c4 border unselectable secondaryStatMargin marginBottomNav">
-                <ul class="nav nav-tabs">
-                    <li onclick="CreateInventoryWeaponHtml();" class="active"><a href="#tab_mainBattle" data-toggle="tab"><span data-toggle="tooltip" data-placement="top" title="Battle">Battle</span></a></li>
-                    <li><a href="#tab_mainProfessions" data-toggle="tab"><span data-toggle="tooltip" data-placement="top" title="Professions"></span>Professions</a></li>
-                    <li><a href="#tab_mainSkills" data-toggle="tab"><span data-toggle="tooltip" data-placement="top" title="Skills"></span>Skills</a></li>
-                    <li><a href="#tab_mainShop" data-toggle="tab"><span data-toggle="tooltip" data-placement="top" title="Shop"></span>Shop</a></li>
-                    <li><a href="#tab_mainStory" data-toggle="tab"><span data-toggle="tooltip" data-placement="top" title="Options"></span>Story</a></li>
-                    <li><a href="#tab_mainOptions" data-toggle="tab"><span data-toggle="tooltip" data-placement="top" title="Options"></span>Options and Credits</a></li>
-                </ul>
+            <div id="hudInfo">
+                Level
+                <span id="level">1</span>
+                (<span id="experience">0</span>/<span id="maxexperience">100</span>)<br />
+                Gold:
+                <span id="gold">0</span>
             </div>
+            <ul class="nav nav-tabs" id="hudNav">
+                <li onclick="CreateInventoryWeaponHtml();"><a href="#tab_mainBattle" data-toggle="tab">Character</a></li>
+                <li><a href="#tab_mainProfessions" data-toggle="tab">Professions</a></li>
+                <li><a href="#tab_mainSkills" data-toggle="tab">Skills</a></li>
+                <li><a href="#tab_mainShop" data-toggle="tab">Shop</a></li>
+                <li><a href="#tab_mainStory" data-toggle="tab">Story</a></li>
+                <li><a href="#tab_mainOptions" data-toggle="tab">Options</a></li>
+            </ul>
+        </div>
+
+        <!--Panel row (the tab panes render as overlays above the stage)-->
+        <div class="row paddingBothSides">
             <div class="col-xs-12">
 
-                <div class="tab-content">
-                    <div class="tab-pane active unselectable" id="tab_mainBattle">
+                <div class="tab-content" id="mainPanels">
+                    <div class="tab-pane unselectable" id="tab_mainBattle">
                         <div class="row c4 marginBottom border">
                             <div class="col-xs-12">
                                 <div class="row margin">
@@ -226,36 +204,22 @@
                                         <!-- end of container -->
                                     </div>
 
-                                    <div id="secondDiv" class="col-md-5 col-lg-6">
+                                    <div id="secondDiv" class="col-md-7 col-lg-8">
 
                                         <div class="row c4 border">
                                             <div class="col-xs-12">
-                                                <!-- Idle canvas combat (ui/battleCanvas.js): waves run continuously;
-                                                     the control bar picks the area/wave and auto-progress. -->
-                                                <div id="battleControls" class="c3" style="margin-top:6px;"></div>
-                                                <div id="canvasBattleWrap" style="text-align:center; margin-top:4px;">
-                                                    <canvas id="battleCanvas" width="700" height="280"
-                                                        style="max-width:100%; border:1px solid #8a6d1a; background:#f3e2a0;"></canvas>
-                                                </div>
+                                                <!-- combat canvas/controls/log/buffs/hotbar live on the
+                                                     full-screen #stage now; this pane keeps the wave
+                                                     progression view and the sell filters -->
                                                 <div id="monsterTabs">
                                                 </div>
-                                                <div id="activeBuffs"></div>
-                                                <!-- tab content -->
                                                 <div>
-
-                                                    <div id="hotBar"></div> <!--Add margin top/bottom for better look ._.-->
                                                     <div id="checkBoxHtml"></div>
                                                 </div>
                                             </div>
 
                                         </div>
 
-                                    </div>
-                                    <div id="thirdDiv" class="col-md-2">
-
-                                            <div class="c4 c3" id="logConsole">
-                                                Console log
-                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -386,6 +350,19 @@
 
 
                             <div class="tab-pane active" id="tab_options">
+                                <div class="c3 marginBottom">
+                                    <h4>Difficulty</h4>
+                                    <button class="sell" onclick="changeDifficulty('Mortal')" data-toggle="tooltip" data-placement="bottom" title="Enemy Stats x 0.2">Mortal</button>
+                                    <button class="sell" onclick="changeDifficulty('Ageless')" data-toggle="tooltip" data-placement="bottom" title="Enemy Stats x 0.5">Ageless</button>
+                                    <button class="sell" onclick="changeDifficulty('Hero')" data-toggle="tooltip" data-placement="bottom" title="Enemy Stats x 1">Hero</button>
+                                    <button class="sell" onclick="changeDifficulty('Immortal')" data-toggle="tooltip" data-placement="bottom" title="Enemy Stats x 2">Immortal</button>
+                                    <button class="sell" onclick="changeDifficulty('Lich')" data-toggle="tooltip" data-placement="bottom" title="Enemy Stats x 3">Lich</button>
+                                    <button class="sell" onclick="changeDifficulty('Legend')" data-toggle="tooltip" data-placement="bottom" title="Enemy Stats x 5">Legend</button>
+                                    <br />
+                                    <span id="gameDifficulty">
+                                        Current Difficulty: Hero
+                                    </span>
+                                </div>
                                 <div class="c3">
                                     <h4>Save & Options</h4>
                                     <div id="saveGameSlot"></div>
@@ -421,6 +398,14 @@
                                     <b>Reddit users - Feedback</b><p><a href="http://www.reddit.com/r/incremental_games/" target="_blank">Incremental Reddit</a></p>
                                     <b>David E. Gervais - Monster images</b><p><a href="http://pousse.rapiere.free.fr/tome/" target="_blank">http://pousse.rapiere.free.fr/tome/</a><br />Published under the Creative Commons licence.</p>
                                     <b>Music by Eric Matyas</b><p><a href="www.soundimage.org" target="_blank">www.soundimage.org</a></p>
+                                    <div class="c3">
+                                        <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_blank">
+                                            <input type="hidden" name="cmd" value="_s-xclick">
+                                            <input type="hidden" name="hosted_button_id" value="A9UAZH8H9XHFQ">
+                                            <input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
+                                            <img alt="" border="0" src="https://www.paypalobjects.com/pl_PL/i/scr/pixel.gif" width="1" height="1">
+                                        </form>
+                                    </div>
                                 </div>
                             </div>
                         </div>

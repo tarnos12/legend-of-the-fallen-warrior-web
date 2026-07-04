@@ -27,6 +27,14 @@ import { weaponCombatProfile } from '../systems/weaponBehavior.js';
 import { waveUnlocks } from '../data/waveUnlocks.js';
 import { getImage, imageCache } from './uiCommon.js';
 
+// Combat runs in a FIXED logical world (the original canvas size) no matter
+// how big the on-screen canvas is: wave timing, approach distances and thus
+// balance are identical on a phone and a 4K monitor (and in the jsdom sims,
+// where the canvas keeps its 700x280 attributes). draw() scales this world
+// onto the real canvas; only cosmetic screen-space bits (ground band) span
+// the full canvas width.
+const WORLD_W = 700;
+const WORLD_H = 280;
 const GROUND = 235;
 const HERO_X = 95;
 const SPRITE = 64;
@@ -152,7 +160,7 @@ function startWave(monsterKey) {
     const enemies = [];
     for (let i = 0; i < count; i++) {
         enemies.push({
-            x: canvas.width + 30 + i * 55,
+            x: WORLD_W + 30 + i * 55,
             y: GROUND - ((i % 3) - 1) * 16,
             hp: monster.maxHp,
             maxHp: monster.maxHp,
@@ -437,7 +445,7 @@ function update(dt) {
                 if (p.hits >= prof.maxTargets) p.done = true;
             }
         }
-        if (p.x > canvas.width) p.done = true;
+        if (p.x > WORLD_W + 40) p.done = true;
     }
     w.projectiles = w.projectiles.filter((p) => !p.done);
 
@@ -493,18 +501,39 @@ function drawCenterText(text) {
     ctx.fillStyle = '#b0a184';
     ctx.font = '16px sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText(text, canvas.width / 2, 140);
+    ctx.fillText(text, WORLD_W / 2, 140);
+}
+
+// How the logical world maps onto the actual canvas: fit inside, clamp the
+// zoom, center horizontally, anchor to the bottom (the ground). At exactly
+// 700x280 (tests, legacy layout) this is the identity transform.
+function viewTransform() {
+    const scale = Math.max(0.85, Math.min(canvas.width / WORLD_W, canvas.height / WORLD_H, 2.6));
+    return {
+        scale,
+        offX: Math.max(0, (canvas.width - WORLD_W * scale) / 2),
+        offY: Math.max(0, canvas.height - WORLD_H * scale),
+    };
 }
 
 function draw() {
     const w = wave;
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+    // ground band in screen space so it spans the whole canvas, not the world
+    const view = viewTransform();
+    const groundY = view.offY + (GROUND + 8) * view.scale;
+    ctx.fillStyle = '#191410';
+    ctx.fillRect(0, groundY, canvas.width, canvas.height - groundY);
     ctx.strokeStyle = '#8a6d1a';
     ctx.beginPath();
-    ctx.moveTo(0, GROUND + 8);
-    ctx.lineTo(canvas.width, GROUND + 8);
+    ctx.moveTo(0, groundY);
+    ctx.lineTo(canvas.width, groundY);
     ctx.stroke();
+
+    // everything below draws in world coordinates
+    ctx.setTransform(view.scale, 0, 0, view.scale, view.offX, view.offY);
 
     if (!w) {
         if (player.properties.heroRace === '') {
@@ -628,7 +657,7 @@ function draw() {
         ctx.textAlign = 'center';
         ctx.fillText(
             w.outcome === 'victory' ? 'Victory! (' + w.kills + ' kills)' : 'You have died...',
-            canvas.width / 2,
+            WORLD_W / 2,
             120
         );
     }
@@ -642,7 +671,7 @@ function drawCelebration() {
     ctx.fillStyle = `rgba(251, 191, 36, ${alpha})`;
     ctx.font = 'bold 22px sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText(celebrate.text, canvas.width / 2, 48);
+    ctx.fillText(celebrate.text, WORLD_W / 2, 48);
 }
 
 // setTimeout-driven loop, NOT requestAnimationFrame: rAF is suspended in
@@ -694,7 +723,11 @@ function tick(dt) {
     else idleTick(dt);
 }
 
+let frameCount = 0;
 function step() {
+    // self-healing bitmap size (belt and braces around the resize listener:
+    // fullscreen toggles, devtools docking, HUD height changes...)
+    if ((frameCount++ & 31) === 0) resizeCanvas();
     const ts = performance.now();
     if (!lastTs) lastTs = ts;
     let elapsed = Math.min(1.5, (ts - lastTs) / 1000);
@@ -830,10 +863,33 @@ function renderControls() {
     }
 }
 
+// Size the canvas bitmap to its container (the full-screen stage). In jsdom
+// clientWidth/Height are 0, so tests keep the 700x280 attributes and the
+// identity view transform — sims are unaffected by stage mode.
+function resizeCanvas() {
+    const wrap = canvas.parentElement;
+    if (!wrap || !wrap.clientWidth || !wrap.clientHeight) return;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const width = Math.round(wrap.clientWidth * dpr);
+    const height = Math.round(wrap.clientHeight * dpr);
+    if (canvas.width !== width) canvas.width = width;
+    if (canvas.height !== height) canvas.height = height;
+}
+
 function init() {
     canvas = document.getElementById('battleCanvas');
     if (!canvas || !canvas.getContext) return;
     ctx = canvas.getContext('2d');
+    resizeCanvas();
+    window.addEventListener('resize', () => {
+        resizeCanvas();
+        draw();
+    });
+    // the stylesheet that sizes the stage can land after module evaluation
+    setTimeout(() => {
+        resizeCanvas();
+        draw();
+    }, 300);
 
     // The Fight button's generated onclick calls startBattle by name; route it
     // here (it selects that monster's area/wave). The classic button combat

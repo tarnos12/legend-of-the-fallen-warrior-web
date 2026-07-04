@@ -38,6 +38,8 @@ import './ui/battleCanvas.js';
 // Boot loading overlay: preloads all combat sprites behind #loadingOverlay
 // (needs monsterList/gameObjects, imported above).
 import './ui/loadingOverlay.js';
+// Stage mode: close buttons + toggle-close for the overlay panels (#hudBar nav).
+import './ui/stageUI.js';
 import './data/gameObjects.js';
 import { copyPlayerProperties, createEquippedItemsObject } from './core/core.js';
 import './systems/stats.js';

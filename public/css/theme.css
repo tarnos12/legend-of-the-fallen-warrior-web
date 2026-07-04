@@ -17,6 +17,7 @@
     --green: #4ade80;
     --red: #ef4444;
     --blue: #60a5fa;
+    --hud-h: 64px; /* bottom HUD height; #stage and the panels key off it */
 }
 
 /* ---- page ---- */
@@ -158,16 +159,140 @@ textarea {
     border-radius: 4px;
 }
 
-/* ---- combat control bar + arena ---- */
-#battleControls {
-    background: var(--bg-panel);
-    padding: 6px;
-    border-radius: 4px;
+/* ==========================================================================
+   Stage mode: the combat canvas fills the viewport, the HUD bar is fixed at
+   the bottom, and the main tab panes float above the stage as overlay panels.
+   battleCanvas.js sizes the canvas bitmap to #canvasBattleWrap and scales its
+   fixed 700x280 combat world onto it (the ground band is drawn in-canvas).
+   ========================================================================== */
+#stage {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: var(--hud-h);
+    z-index: 0;
+}
+#canvasBattleWrap {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
 }
 #battleCanvas {
-    border: 1px solid var(--border-gold) !important;
+    display: block;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(180deg, #171310 0%, #2a2015 100%);
+}
+#battleControls {
+    position: absolute;
+    top: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 5;
+    background: rgba(36, 29, 22, 0.88);
+    border: 1px solid var(--border-dim);
+    border-radius: 6px;
+    padding: 6px 12px;
+    white-space: nowrap;
+}
+#stage #logConsole {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    bottom: 8px;
+    width: 270px;
+    z-index: 4;
+    overflow-y: auto;
+    background: rgba(28, 23, 18, 0.72);
+    border: 1px solid var(--border-dim);
+    border-radius: 6px;
+    padding: 6px;
+    font-size: 12px;
+}
+#stageDock {
+    position: absolute;
+    left: 8px;
+    bottom: 8px;
+    z-index: 4;
+}
+
+/* ---- bottom HUD ---- */
+#hudBar {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: var(--hud-h);
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 0 12px;
+    background: var(--bg-panel-2);
+    border-top: 2px solid var(--border-gold);
+}
+#hudVitals {
+    width: 220px;
+    flex-shrink: 0;
+}
+#hudVitals .progress {
+    height: 15px;
+    margin: 4px 0;
+}
+#hudVitals .progress-bar {
+    font-size: 10px;
+    line-height: 15px;
+}
+#hudInfo {
+    flex-shrink: 0;
+    line-height: 1.4;
+}
+#hudBar .nav-tabs {
+    border-bottom: none;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 6px;
+    flex: 1;
+    margin: 0;
+}
+#hudBar .nav-tabs > li {
+    float: none;
+    margin: 0;
+}
+#hudBar .nav-tabs > li > a {
     border-radius: 4px;
-    background: linear-gradient(180deg, #221b12 0%, #2a2015 78%, #191410 78%) !important;
+    margin: 0;
+    padding: 8px 14px;
+}
+#hudBar .nav-tabs > li.active > a {
+    border-bottom-color: var(--border-gold);
+}
+
+/* ---- overlay panels (the top-level tab panes) ---- */
+#mainPanels > .tab-pane {
+    position: fixed;
+    z-index: 40;
+    top: 4vh;
+    bottom: calc(var(--hud-h) + 12px);
+    left: 50%;
+    transform: translateX(-50%);
+    width: 1100px;
+    max-width: 96vw;
+    overflow-y: auto;
+    background: var(--bg-panel);
+    border: 1px solid var(--border-gold);
+    border-radius: 8px;
+    box-shadow: 0 14px 48px rgba(0, 0, 0, 0.65);
+    padding: 10px 16px 20px;
+}
+.panelClose {
+    float: right;
+    margin: 2px 0 8px 10px;
+    min-width: 34px;
 }
 #offlineSummary {
     background: var(--bg-panel-2) !important;
@@ -191,7 +316,9 @@ textarea {
 }
 
 /* ---- pre-game: hide the in-game chrome until a character exists ---- */
-body.pre-game .container-fluid > .row {
+body.pre-game .container-fluid > .row,
+body.pre-game #stage,
+body.pre-game #hudBar {
     display: none !important;
 }
 
@@ -199,6 +326,47 @@ body.pre-game .container-fluid > .row {
    Mobile (the old layout overflowed and ignored small screens entirely)
    ========================================================================== */
 @media (max-width: 767px) {
+    :root {
+        --hud-h: 108px; /* HUD wraps to two rows: vitals+info, then the nav */
+    }
+    #hudBar {
+        flex-wrap: wrap;
+        gap: 6px;
+        padding: 4px 8px;
+    }
+    #hudVitals {
+        width: 140px;
+    }
+    #hudVitals .progress {
+        height: 12px;
+        margin: 2px 0;
+    }
+    #hudInfo {
+        font-size: 11px;
+    }
+    #hudBar .nav-tabs {
+        order: 3;
+        flex-basis: 100%;
+    }
+    #hudBar .nav-tabs > li > a {
+        padding: 6px 8px;
+        min-height: 36px;
+    }
+    #stage #logConsole {
+        display: none; /* no room next to the arena on phones */
+    }
+    #battleControls {
+        max-width: 96vw;
+        white-space: normal;
+        text-align: center;
+    }
+    #mainPanels > .tab-pane {
+        top: 0;
+        bottom: var(--hud-h);
+        width: 100vw;
+        max-width: 100vw;
+        border-radius: 0;
+    }
     /* comfortable touch targets */
     .buy,
     .attack,
