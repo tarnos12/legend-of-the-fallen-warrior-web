@@ -6,7 +6,11 @@ import { defineConfig } from 'vite';
 // relative URLs in index.html resolve exactly as before with no code changes.
 // As files are converted to ES modules they will move out of /public into /src
 // and join Vite's module pipeline.
-export default defineConfig({
+export default defineConfig(({ command }) => ({
+    // Relative base for builds so the bundle works from ANY path — the site is
+    // hosted at github.io/<repo>/, not the domain root. Dev keeps '/' (Vite
+    // doesn't support './' for the dev server).
+    base: command === 'build' ? './' : '/',
     server: {
         open: false,
         // Honour the PORT assigned by the preview harness (autoPort) so multiple
@@ -20,4 +24,4 @@ export default defineConfig({
         globals: true,
         include: ['test/**/*.test.js'],
     },
-});
+}));
