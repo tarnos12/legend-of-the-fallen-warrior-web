@@ -198,6 +198,28 @@ textarea {
     padding: 6px 12px;
     white-space: nowrap;
 }
+#stage #monsterTabs {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    z-index: 5;
+    max-width: 340px;
+    background: rgba(36, 29, 22, 0.88);
+    border: 1px solid var(--border-dim);
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-size: 12px;
+}
+#stage #monsterTabs:empty {
+    display: none;
+}
+#monsterTabs .questArea {
+    color: var(--gold);
+    font-weight: bold;
+}
+#monsterTabs .questGoal {
+    color: var(--text-dim);
+}
 #stage #logConsole {
     position: absolute;
     top: 8px;
@@ -355,9 +377,24 @@ body.pre-game #hudBar {
     #stage #logConsole {
         display: none; /* no room next to the arena on phones */
     }
+    /* controls + quest tracker flow as a top stack (the control bar wraps to
+       a variable height on phones, so absolute offsets can't avoid overlap) */
+    #stage {
+        display: flex;
+        flex-direction: column;
+    }
     #battleControls {
+        position: static;
+        transform: none;
+        margin: 8px auto 0;
         max-width: 96vw;
         white-space: normal;
+        text-align: center;
+    }
+    #stage #monsterTabs {
+        position: static;
+        margin: 6px 8px 0;
+        max-width: none;
         text-align: center;
     }
     #mainPanels > .tab-pane {
