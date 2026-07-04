@@ -80,12 +80,13 @@ font[color='#CC6633'] {
 .inventoryOther,
 .shopButton,
 .btn-default {
-    background: linear-gradient(180deg, var(--bg-panel-2), var(--bg-inset));
+    /* warm leather, not black — dark enough for the theme, clearly a button */
+    background: linear-gradient(180deg, #40331f, #2a2115);
     color: var(--text);
     border: 1px solid var(--border-gold);
     border-radius: 4px;
     text-shadow: none;
-    box-shadow: none;
+    box-shadow: inset 0 1px 0 rgba(237, 210, 110, 0.12);
     transition: border-color 120ms, color 120ms;
 }
 .buy:hover,
@@ -98,9 +99,46 @@ font[color='#CC6633'] {
 .shopButton:hover,
 .btn-default:hover,
 .btn-default:focus {
-    background: var(--bg-panel-2);
+    background: linear-gradient(180deg, #4d3e26, #332a1a);
     color: var(--gold-bright);
     border-color: var(--gold);
+}
+
+/* start screen: proper main-menu buttons (they float alone on the backdrop,
+   so the in-game button chrome read as flat black rectangles there) */
+#startingGameContainer .btn-default {
+    min-width: 230px;
+    padding: 12px 24px;
+    margin: 4px 0;
+    font-size: 17px;
+    color: var(--gold-bright);
+    background: linear-gradient(180deg, #4a3b22, #2b2214);
+    border: 1px solid var(--border-gold) !important;
+    border-radius: 6px;
+    box-shadow:
+        0 3px 12px rgba(0, 0, 0, 0.55),
+        inset 0 1px 0 rgba(237, 210, 110, 0.18);
+}
+#startingGameContainer .btn-default:hover,
+#startingGameContainer .btn-default:focus {
+    background: linear-gradient(180deg, #5a4929, #3a2f1c);
+    border-color: var(--gold) !important;
+    box-shadow:
+        0 3px 16px rgba(217, 178, 74, 0.25),
+        inset 0 1px 0 rgba(237, 210, 110, 0.25);
+}
+/* race-selection Choose / Go Back / slot buttons: same look, regular size */
+#raceDiv .btn-default,
+#startingGameContainer .btn-sm {
+    min-width: 110px;
+    padding: 6px 14px;
+    font-size: 14px;
+}
+/* the small round mute toggle shouldn't stretch to menu width */
+#startingGameContainer .shopButton.btn-default {
+    min-width: 0;
+    padding: 8px 12px;
+    font-size: 14px;
 }
 .backgroundRed {
     background-color: #7f1d1d !important;
