@@ -76,6 +76,17 @@ function CreateInventoryWeaponHtml() {
                 const item = playerInventory[i];
                 const hasType = itemStat.hasOwnProperty('itemType');
                 const imgClass = item.itemType === 'weapon' ? item.itemType : item.subType;
+                // key stats inline on the card (hover tooltip stays for detail,
+                // but is useless on touch and tedious for comparing drops)
+                const cardInfo =
+                    `<div style="font-size:11px; line-height:1.3;">` +
+                    `<font color="${item.color}">${item.itemRarity}</font> · ` +
+                    (item.itemType === 'weapon'
+                        ? `⚔ ${item.MinDamage}-${item.MaxDamage}`
+                        : item.itemType === 'armor'
+                          ? `🛡 ${Math.floor(item.defense)}`
+                          : `✦ lvl ${item.iLvl}`) +
+                    `</div>`;
                 cards +=
                     `<div class="col-xs-6 col-sm-4 col-md-4 col-lg-2 c8" style="margin-top:5px;" id="testingItem${item.id}">` +
                     `<a class="tooltips2" style="cursor:pointer;">` +
@@ -102,6 +113,7 @@ function CreateInventoryWeaponHtml() {
                     (hasType ? `</div>` : '') +
                     `</span>` +
                     `</a>` +
+                    cardInfo +
                     `<button type="button" style="margin-top:5px;" class="inventorySell" onclick="itemSell(${item.id})">Sell</button>` +
                     `</div>`;
             }

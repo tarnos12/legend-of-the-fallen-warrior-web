@@ -266,6 +266,9 @@ function removeStartingScreen() {
     divStyle.style.display = 'none';
     var divStyle2 = document.getElementById('startingGameContainer');
     divStyle2.style.display = 'none';
+    // reveal the in-game rows (hidden by body.pre-game in theme.css until a
+    // character exists — the old start screen leaked the game chrome behind it)
+    document.body.classList.remove('pre-game');
 }
 function characterCreationHtml() {
     characterCreationCreateBackground2();

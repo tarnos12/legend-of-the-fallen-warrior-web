@@ -95,6 +95,17 @@ function displayShopItems(type) {
     const items = type
         .map((item) => {
             const imgClass = item.itemType === 'weapon' ? item.itemType : item.subType;
+            // same inline stat line as the inventory cards — tooltips don't
+            // work on touch, and comparing wares needs the numbers up front
+            const cardInfo =
+                `<div style="font-size:11px; line-height:1.3;">` +
+                `<font color="${item.color}">${item.itemRarity}</font> · ` +
+                (item.itemType === 'weapon'
+                    ? `⚔ ${item.MinDamage}-${item.MaxDamage}`
+                    : item.itemType === 'armor'
+                      ? `🛡 ${Math.floor(item.defense)}`
+                      : `✦ lvl ${item.iLvl}`) +
+                `</div>`;
             return (
                 `<div class="col-xs-3">` +
                 `<a class="tooltips" style="cursor:pointer;">` +
@@ -106,7 +117,8 @@ function displayShopItems(type) {
                 itemTooltipTest(item) +
                 `<strong>Left-Click to equip</strong>` +
                 `</div></div></span></a>` +
-                `<br />${item.shopPrice} Gold` +
+                cardInfo +
+                `${item.shopPrice} Gold` +
                 `</div>`
             );
         })

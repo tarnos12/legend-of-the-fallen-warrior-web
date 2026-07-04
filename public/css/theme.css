@@ -1,0 +1,230 @@
+/* ==========================================================================
+   Dark-fantasy theme overlay (2026 visual overhaul).
+   Loaded LAST from index.html so it overrides bootstrap + the legacy css
+   without touching any render code. Everything keys off these variables.
+   ========================================================================== */
+:root {
+    --bg-page: #171310;
+    --bg-panel: #241d16;
+    --bg-panel-2: #2d251b;
+    --bg-inset: #1c1712;
+    --border-dim: #4a3b1d;
+    --border-gold: #8a6d1a;
+    --gold: #d9b24a;
+    --gold-bright: #edd26e;
+    --text: #e9ddc2;
+    --text-dim: #b0a184;
+    --green: #4ade80;
+    --red: #ef4444;
+    --blue: #60a5fa;
+}
+
+/* ---- page ---- */
+html,
+body {
+    /* the legacy fixed-width hover tooltips (300-400px absolute spans) hang
+       past the viewport and created horizontal scroll, worst on phones */
+    overflow-x: hidden;
+}
+body {
+    background-image: none;
+    background-color: var(--bg-page);
+    color: var(--text);
+}
+.container-fluid.darkBackground {
+    background-color: var(--bg-page);
+}
+
+/* ---- panels ---- */
+div.c3,
+div.c4,
+div.c8,
+div.darkBackground,
+div.background {
+    background-color: var(--bg-panel);
+    color: var(--text);
+}
+div.darkBackground {
+    background-color: var(--bg-panel-2);
+}
+.border {
+    border: 1px solid var(--border-dim) !important;
+    border-radius: 4px;
+}
+.row.c4.border,
+.row.c4 {
+    background-color: var(--bg-panel);
+}
+h1, h2, h3, h4, h5 {
+    color: var(--gold-bright);
+}
+a {
+    color: var(--gold);
+}
+a:hover,
+a:focus {
+    color: var(--gold-bright);
+}
+font[color='#CC6633'] {
+    color: #d9a06a; /* lore text, readable on dark */
+}
+
+/* ---- buttons ---- */
+.buy,
+.attack,
+.equip,
+.sell,
+.monster,
+.inventorySell,
+.inventoryOther,
+.shopButton,
+.btn-default {
+    background: linear-gradient(180deg, var(--bg-panel-2), var(--bg-inset));
+    color: var(--text);
+    border: 1px solid var(--border-gold);
+    border-radius: 4px;
+    text-shadow: none;
+    box-shadow: none;
+    transition: border-color 120ms, color 120ms;
+}
+.buy:hover,
+.attack:hover,
+.equip:hover,
+.sell:hover,
+.monster:hover,
+.inventorySell:hover,
+.inventoryOther:hover,
+.shopButton:hover,
+.btn-default:hover,
+.btn-default:focus {
+    background: var(--bg-panel-2);
+    color: var(--gold-bright);
+    border-color: var(--gold);
+}
+.backgroundRed {
+    background-color: #7f1d1d !important;
+    color: var(--text) !important;
+}
+
+/* ---- tabs ---- */
+.nav-tabs {
+    border-bottom: 1px solid var(--border-dim);
+}
+.nav-tabs > li > a {
+    background: var(--bg-inset);
+    color: var(--text-dim);
+    border: 1px solid var(--border-dim);
+    border-radius: 4px 4px 0 0;
+}
+.nav-tabs > li > a:hover {
+    background: var(--bg-panel-2);
+    color: var(--gold-bright);
+    border-color: var(--border-gold);
+}
+.nav-tabs > li.active > a,
+.nav-tabs > li.active > a:hover,
+.nav-tabs > li.active > a:focus {
+    background: var(--bg-panel-2);
+    color: var(--gold-bright);
+    border: 1px solid var(--border-gold);
+    border-bottom-color: transparent;
+}
+
+/* ---- progress bars ---- */
+.progress {
+    background-color: var(--bg-inset);
+    border: 1px solid var(--border-dim);
+    box-shadow: none;
+    border-radius: 4px;
+}
+.progress-bar {
+    background-color: #3f8f4f;
+    background-image: none;
+    color: var(--text);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+    box-shadow: none;
+}
+.progressColor {
+    background-color: #8f3f3f !important;
+}
+
+/* ---- forms ---- */
+select,
+input[type='text'],
+textarea {
+    background-color: var(--bg-inset);
+    color: var(--text);
+    border: 1px solid var(--border-gold);
+    border-radius: 4px;
+}
+
+/* ---- combat control bar + arena ---- */
+#battleControls {
+    background: var(--bg-panel);
+    padding: 6px;
+    border-radius: 4px;
+}
+#battleCanvas {
+    border: 1px solid var(--border-gold) !important;
+    border-radius: 4px;
+    background: linear-gradient(180deg, #221b12 0%, #2a2015 78%, #191410 78%) !important;
+}
+#offlineSummary {
+    background: var(--bg-panel-2) !important;
+    border: 1px solid var(--border-gold) !important;
+    border-radius: 4px;
+    color: var(--text);
+}
+
+/* ---- misc legacy fixes ---- */
+#logConsole {
+    background: var(--bg-inset);
+    border-radius: 4px;
+    padding: 4px;
+}
+.ui-dialog,
+.ui-dialog .ui-dialog-content,
+.ui-dialog .ui-dialog-buttonpane {
+    background: var(--bg-panel-2);
+    color: var(--text);
+    border-color: var(--border-gold);
+}
+
+/* ---- pre-game: hide the in-game chrome until a character exists ---- */
+body.pre-game .container-fluid > .row {
+    display: none !important;
+}
+
+/* ==========================================================================
+   Mobile (the old layout overflowed and ignored small screens entirely)
+   ========================================================================== */
+@media (max-width: 767px) {
+    /* comfortable touch targets */
+    .buy,
+    .attack,
+    .equip,
+    .sell,
+    .monster,
+    .inventorySell,
+    .inventoryOther,
+    .shopButton,
+    .btn-default {
+        min-height: 40px;
+        padding: 8px 12px;
+    }
+    #battleControls select,
+    #battleControls button {
+        min-height: 40px;
+    }
+    /* the start-screen hint row was shoved off-canvas with left:-30% */
+    #buttonDiv .row[style*='left:-30%'] {
+        position: static !important;
+        left: 0 !important;
+    }
+    /* fixed-width tooltips can't exceed the phone screen */
+    .tooltips span,
+    .tooltips2 span,
+    .tooltipA span {
+        max-width: 92vw !important;
+    }
+}

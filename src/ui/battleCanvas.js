@@ -190,19 +190,19 @@ function addFloat(x, y, txt, color) {
 // Apply a hero strike/spell result to an enemy clone and animate it.
 function applyRoll(enemy, roll, isSpell) {
     if (roll.result === 'miss') {
-        addFloat(enemy.x, enemy.y - SPRITE, 'miss', '#6b7280');
+        addFloat(enemy.x, enemy.y - SPRITE, 'miss', '#9ca3af');
         return;
     }
     if (roll.result === 'instakill') {
         enemy.hp = 0;
-        addFloat(enemy.x, enemy.y - SPRITE, 'INSTANT KILL', '#dc2626');
+        addFloat(enemy.x, enemy.y - SPRITE, 'INSTANT KILL', '#f87171');
     } else {
         enemy.hp -= roll.damage;
         addFloat(
             enemy.x,
             enemy.y - SPRITE,
             (isSpell ? '✦' : '') + roll.damage + (roll.crit ? '!' : ''),
-            isSpell ? '#c026d3' : roll.crit ? '#ea580c' : '#b91c1c'
+            isSpell ? '#e879f9' : roll.crit ? '#fb923c' : '#fca5a5'
         );
     }
     checkEnemyDeath(enemy);
@@ -218,7 +218,7 @@ function checkEnemyDeath(enemy) {
         wave.kills++;
         grantKillRewards(wave.monster);
         displayLogInfo();
-        addFloat(enemy.x, enemy.y - SPRITE - 16, '+' + player.properties.goldDrop + 'g', '#a16207');
+        addFloat(enemy.x, enemy.y - SPRITE - 16, '+' + player.properties.goldDrop + 'g', '#eab308');
     }
 }
 
@@ -238,7 +238,7 @@ function applySecondary(enemy, damage, color) {
 function maybeStun(enemy, profile) {
     if (enemy.state !== 'die' && profile.stunChance > 0 && Math.random() < profile.stunChance) {
         enemy.stunTimer = profile.stunSeconds;
-        addFloat(enemy.x, enemy.y - SPRITE - 16, 'STUN', '#ca8a04');
+        addFloat(enemy.x, enemy.y - SPRITE - 16, 'STUN', '#facc15');
     }
 }
 
@@ -283,7 +283,7 @@ function update(dt) {
             const dealt = healthBefore - player.properties.health;
             if (dealt > 0) {
                 w.heroHitFlash = 0.25;
-                addFloat(HERO_X, GROUND - SPRITE, dealt, '#7f1d1d');
+                addFloat(HERO_X, GROUND - SPRITE, dealt, '#ef4444');
             }
             checkEnemyDeath(attacker); // thorn/counter can kill the attacker
             w.enemyAttackTimer = 0.9 + Math.random() * 0.4;
@@ -337,7 +337,7 @@ function update(dt) {
                                             roll.damage * Math.pow(prof.cleaveFalloff, i + 1)
                                         )
                                     ),
-                                    '#b91c1c'
+                                    '#fca5a5'
                                 );
                             }
                         }
@@ -401,7 +401,7 @@ function update(dt) {
                         applySecondary(
                             near[i],
                             Math.max(1, Math.floor(p.primaryRoll.damage * prof.splashFalloff)),
-                            '#7c3aed'
+                            '#a78bfa'
                         );
                     }
                     w.effects.push({
@@ -421,7 +421,7 @@ function update(dt) {
                         1,
                         Math.floor(p.primaryRoll.damage * Math.pow(prof.pierceFalloff, p.hits))
                     ),
-                    '#78350f'
+                    '#d9b24a'
                 );
                 p.hits++;
                 if (p.hits >= prof.maxTargets) p.done = true;
@@ -452,7 +452,7 @@ function update(dt) {
 }
 
 function drawBar(x, y, width, ratio, color) {
-    ctx.fillStyle = '#00000033';
+    ctx.fillStyle = '#00000066';
     ctx.fillRect(x, y, width, 6);
     ctx.fillStyle = color;
     ctx.fillRect(x, y, Math.max(0, width * Math.min(1, ratio)), 6);
@@ -463,14 +463,14 @@ function drawBar(x, y, width, ratio, color) {
 function drawSprite(img, x, y, flash) {
     const drawX = x - SPRITE / 2;
     const drawY = y - SPRITE;
-    ctx.fillStyle = '#00000022';
+    ctx.fillStyle = '#00000055';
     ctx.beginPath();
     ctx.ellipse(x, y + 3, SPRITE / 2.4, 7, 0, 0, Math.PI * 2);
     ctx.fill();
     if (img && img.complete && img.naturalWidth > 0) {
         ctx.drawImage(img, drawX, drawY, SPRITE, SPRITE);
     } else {
-        ctx.fillStyle = '#6b7280';
+        ctx.fillStyle = '#9ca3af';
         ctx.fillRect(drawX, drawY, SPRITE, SPRITE);
     }
     if (flash > 0) {
@@ -480,7 +480,7 @@ function drawSprite(img, x, y, flash) {
 }
 
 function drawCenterText(text) {
-    ctx.fillStyle = '#6b5310';
+    ctx.fillStyle = '#b0a184';
     ctx.font = '16px sans-serif';
     ctx.textAlign = 'center';
     ctx.fillText(text, canvas.width / 2, 140);
@@ -511,7 +511,7 @@ function draw() {
     // header: area — wave x/y: monster xN — weapon
     const entries = areaEntries(currentAreaType());
     const areaName = (unlockedAreas().find((a) => a.type === currentAreaType()) || {}).displayName;
-    ctx.fillStyle = '#4a3a08';
+    ctx.fillStyle = '#d9b24a';
     ctx.font = 'bold 14px sans-serif';
     ctx.textAlign = 'left';
     ctx.fillText(
@@ -546,14 +546,14 @@ function draw() {
         GROUND - SPRITE - 20,
         SPRITE,
         player.properties.health / maxHp,
-        '#16a34a'
+        '#4ade80'
     );
     drawBar(
         HERO_X - SPRITE / 2,
         GROUND - SPRITE - 12,
         SPRITE,
         player.properties.mana / maxMana,
-        '#2563eb'
+        '#60a5fa'
     );
 
     // enemies
@@ -566,9 +566,9 @@ function draw() {
         const hop = e.state === 'run' ? Math.abs(Math.sin(e.bouncePhase)) * -5 : 0;
         drawSprite(w.img, e.x + bounce, e.y + hop, 0);
         if (e.state !== 'die') {
-            drawBar(e.x - SPRITE / 2, e.y - SPRITE - 12, SPRITE, e.hp / e.maxHp, '#dc2626');
+            drawBar(e.x - SPRITE / 2, e.y - SPRITE - 12, SPRITE, e.hp / e.maxHp, '#f87171');
             if (stunned) {
-                ctx.fillStyle = '#ca8a04';
+                ctx.fillStyle = '#facc15';
                 ctx.font = 'bold 16px sans-serif';
                 ctx.textAlign = 'center';
                 ctx.fillText('✶ ✶', e.x, e.y - SPRITE - 18);
@@ -579,7 +579,7 @@ function draw() {
 
     // projectiles
     for (const p of w.projectiles) {
-        ctx.fillStyle = p.magic ? '#7c3aed' : '#78350f';
+        ctx.fillStyle = p.magic ? '#a78bfa' : '#d9b24a';
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.magic ? 6 : 4, 0, Math.PI * 2);
         ctx.fill();
@@ -588,13 +588,13 @@ function draw() {
     // spell effects
     for (const fx of w.effects) {
         const t = fx.age / 0.7;
-        ctx.strokeStyle = `rgba(192,38,211,${1 - t})`;
+        ctx.strokeStyle = `rgba(232,121,249,${1 - t})`;
         ctx.lineWidth = 3;
         ctx.beginPath();
         ctx.arc(fx.x, fx.y, 20 + t * 30, 0, Math.PI * 2);
         ctx.stroke();
         ctx.lineWidth = 1;
-        ctx.fillStyle = `rgba(112,26,117,${1 - t})`;
+        ctx.fillStyle = `rgba(240,171,252,${1 - t})`;
         ctx.font = 'bold 13px sans-serif';
         ctx.textAlign = 'center';
         ctx.fillText(fx.label, fx.x, fx.y - 46 - t * 12);
@@ -613,7 +613,7 @@ function draw() {
 
     // outcome banner
     if (w.outcome) {
-        ctx.fillStyle = w.outcome === 'victory' ? '#166534' : '#7f1d1d';
+        ctx.fillStyle = w.outcome === 'victory' ? '#4ade80' : '#ef4444';
         ctx.font = 'bold 28px sans-serif';
         ctx.textAlign = 'center';
         ctx.fillText(
@@ -629,7 +629,7 @@ function draw() {
 function drawCelebration() {
     if (!celebrate) return;
     const alpha = Math.min(1, celebrate.t);
-    ctx.fillStyle = `rgba(133, 77, 14, ${alpha})`;
+    ctx.fillStyle = `rgba(251, 191, 36, ${alpha})`;
     ctx.font = 'bold 22px sans-serif';
     ctx.textAlign = 'center';
     ctx.fillText(celebrate.text, canvas.width / 2, 48);

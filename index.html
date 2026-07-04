@@ -17,6 +17,8 @@
     <script src="/vendor/jquery-ui/jquery-ui.min.js"></script>
     <script src="/js/bootstrap.min.js" type="text/javascript"></script>
     <link href="/css/main.css" rel="stylesheet" type="text/css">
+    <!-- Dark-fantasy theme overlay: loaded last so it overrides everything above. -->
+    <link href="/css/theme.css" rel="stylesheet" type="text/css">
     <script>
     $(function() {
         $( ".resizable" ).resizable();
@@ -59,7 +61,8 @@
         })
     </script>
 </head>
-<body>
+<!-- pre-game hides the in-game rows (theme.css) until removeStartingScreen() drops it -->
+<body class="pre-game">
     <!-- Boot loading overlay (ui/loadingOverlay.js drives the bar and removes it
          once all sprites are preloaded). Static markup so it shows instantly. -->
     <div id="loadingOverlay" style="position:fixed; inset:0; z-index:9999; background:#2b2113;
