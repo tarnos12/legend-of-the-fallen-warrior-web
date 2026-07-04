@@ -190,3 +190,4 @@ ModelManifest.xml
 images/skills/ButchersInsight.png
 # Vite build output
 dist/
+balance-report.txt

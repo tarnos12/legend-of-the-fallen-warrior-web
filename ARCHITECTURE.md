@@ -120,8 +120,11 @@ self-registers its inline-onclick handlers via `Object.assign(window, {...})`.
 
 ```
 npm run dev       # Vite dev server (port 5173, or PORT env)
-npm run build     # production build to dist/
-npm test          # vitest run (15 tests, jsdom)
+npm run build     # production build to dist/ (self-contained; verified via vite preview)
+npm test          # vitest run (jsdom)
 npm run lint      # eslint src test (no-undef + no-unused-vars = error; must be clean)
 npm run format    # prettier
+npm run balance   # scripts/balance-report.sim.js: simulates 30 min of idle play per
+                  # weapon class (stubbed canvas + pump) and writes balance-report.txt
+                  # (gitignored) — the tuning evidence table. ~2 min, on demand only.
 ```
