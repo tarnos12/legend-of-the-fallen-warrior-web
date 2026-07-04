@@ -127,4 +127,10 @@ npm run format    # prettier
 npm run balance   # scripts/balance-report.sim.js: simulates 30 min of idle play per
                   # weapon class (stubbed canvas + pump) and writes balance-report.txt
                   # (gitignored) — the tuning evidence table. ~2 min, on demand only.
+npm run deploy    # build + force-push dist/ as the gh-pages branch — publishes to
+                  # https://tarnos12.github.io/legend-of-the-fallen-warrior-web/
+                  # (source repo: github.com/tarnos12/legend-of-the-fallen-warrior-web)
 ```
+
+Builds use a relative base (`./`) so the bundle works from the Pages subpath; the
+dev server keeps `/`.
