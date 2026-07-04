@@ -451,18 +451,18 @@ function checkHeroRace() {
 }
 
 function changeMusicImage() {
+    // derive the icon from the actual audio state (volume-up = sound ON).
+    // The old blind class-flip desynced: this is also called on screen renders
+    // without muteAudio, so every extra call inverted the icon.
+    var audio = document.getElementById('myAudio');
+    var cls =
+        audio && audio.muted === true
+            ? 'glyphicon glyphicon-volume-off'
+            : 'glyphicon glyphicon-volume-up';
     var musicImage = document.getElementById('musicImage');
     var musicImage2 = document.getElementById('musicimage2');
-    if (musicImage.className === 'glyphicon glyphicon-volume-off') {
-        musicImage.className = 'glyphicon glyphicon-volume-up';
-    } else {
-        musicImage.className = 'glyphicon glyphicon-volume-off';
-    }
-    if (musicImage2.className === 'glyphicon glyphicon-volume-off') {
-        musicImage2.className = 'glyphicon glyphicon-volume-up';
-    } else {
-        musicImage2.className = 'glyphicon glyphicon-volume-off';
-    }
+    if (musicImage) musicImage.className = cls;
+    if (musicImage2) musicImage2.className = cls;
 }
 
 function saveGameSlot() {

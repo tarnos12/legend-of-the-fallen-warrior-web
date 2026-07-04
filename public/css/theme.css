@@ -354,6 +354,26 @@ textarea {
     margin: 2px 0 8px 10px;
     min-width: 34px;
 }
+/* Character panel: kill the double border/background of the legacy wrapper
+   (the overlay panel already provides the chrome) */
+#tab_mainBattle > .row.c4 {
+    border: none !important;
+    background: transparent;
+    margin-bottom: 0;
+}
+/* on desktop the two columns (equipment+stats | inventory) scroll on their
+   own, so a long stat list can never push the other column's content away */
+@media (min-width: 992px) {
+    #tab_mainBattle > .row.c4 > .col-xs-12 > .row.margin {
+        display: flex;
+    }
+    #firstDiv,
+    #secondDiv {
+        max-height: calc(96vh - var(--hud-h) - 90px);
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+}
 #offlineSummary {
     background: var(--bg-panel-2) !important;
     border: 1px solid var(--border-gold) !important;
