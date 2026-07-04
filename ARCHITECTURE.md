@@ -84,7 +84,7 @@ self-registers its inline-onclick handlers via `Object.assign(window, {...})`.
 
 | File | Owns |
 |---|---|
-| `battle.js` | Combat rules engine. Canvas-combat API (exported, used by `ui/battleCanvas.js`): `heroStrikeRoll`/`heroSpellRoll` (hit/instakill/crit/defense/lifesteal/mastery/mana), `monsterAttack(monster, target)` (evasion/parry/thorn/counter/block vs real player health, `playerDead`), `grantKillRewards` (exp/level-up, gold, drop, kill count, quest, Warp), `displayLogInfo` (end-of-battle heal + buff tick + panel rerender). The classic 1v1 button combat (`startBattle`/`playerAttack`/spells on window) is kept intact but no longer reachable — `battleCanvas.js` intercepts `startBattle`. |
+| `battle.js` | Combat rules engine (the classic 1v1 button combat was deleted; `battleCanvas.js` is the only consumer). Canvas-combat API: `heroStrikeRoll`/`heroSpellRoll` (hit/instakill/crit/defense/lifesteal/mastery/mana), `monsterAttack(monster, target)` (evasion/parry/thorn/counter/block vs real player health, `playerDead`), `grantKillRewards(monster, quiet)` (exp/level-up, gold, drop, kill count, quest, Warp), `displayLogInfo(quiet)` (per-kill heal + buff tick + panel rerender). `quiet=true` (offline progress, balance harness) always runs the game logic — including `quest(quiet)` unlocks and the heal/buff tick — and skips only the per-kill DOM rerenders. |
 | `equip.js` | Equip/unequip/sort logic + slot lookup tables; `getStartingItem` (used by changeRace). `equipItem`/`unequipItem`/`sortInventory` on window. |
 | `weaponBehavior.js` | `weaponCombatProfile(weapon?)`: how each weapon class behaves in canvas combat — sword fast+crit+parry, axe cleave, mace heavy+stun, staff splash, bow pierce — plus the item special-stat modifiers (`Attack speed`, `Extra targets`, `Stun chance`) so future item affixes change battle behavior with no combat-code changes. Unit-tested in `test/weapon-behavior.test.js`. |
 | `gameControls.js` | Player-facing controls: `disableButtons` (monster-button lockout), sell-filter checkboxes (`handleClick`), hardcore toggle, `changeRace`, audio (`myAudio`/`muteAudio`), `selectText`, `resetPassiveSkills`, shop-radio listener + `sortShop`, `changeDifficulty`, `rebirth` — all on window. |
@@ -125,7 +125,8 @@ npm test          # vitest run (jsdom)
 npm run lint      # eslint src test (no-undef + no-unused-vars = error; must be clean)
 npm run format    # prettier
 npm run balance   # scripts/balance-report.sim.js: simulates 30 min of idle play per
-                  # weapon class (stubbed canvas + pump) and writes balance-report.txt
+                  # weapon class, 5 runs each (stubbed canvas + pump, setQuiet(true)),
+                  # and writes the averaged table to balance-report.txt (~6 min)
                   # (gitignored) — the tuning evidence table. ~2 min, on demand only.
 npm run deploy    # build + force-push dist/ as the gh-pages branch — publishes to
                   # https://tarnos12.github.io/legend-of-the-fallen-warrior-web/

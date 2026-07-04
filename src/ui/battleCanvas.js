@@ -41,6 +41,9 @@ let stepTimer = 0;
 let lastTs = 0;
 let idleTimer = 0; // counts up between waves; wave auto-starts at NEXT_WAVE_DELAY
 let celebrate = null; // { text, t } banner when a new wave/area unlocks
+// headless-sim switch (balance harness): kills grant the same rewards but skip
+// the per-kill DOM (log rerender, inventory rerender) that dominates sim time
+let quietSim = false;
 let unlockWatch = { area: '', shown: -1, areas: -1 }; // change detection for the banner
 
 // ---- Idle progression state (persisted on player.properties) ---------------
@@ -216,9 +219,16 @@ function checkEnemyDeath(enemy) {
     if (enemy.hp <= 0 && enemy.state !== 'die') {
         enemy.state = 'die';
         wave.kills++;
-        grantKillRewards(wave.monster);
-        displayLogInfo();
-        addFloat(enemy.x, enemy.y - SPRITE - 16, '+' + player.properties.goldDrop + 'g', '#eab308');
+        grantKillRewards(wave.monster, quietSim);
+        displayLogInfo(quietSim); // heal/buff tick always; DOM skipped when quiet
+        if (!quietSim) {
+            addFloat(
+                enemy.x,
+                enemy.y - SPRITE - 16,
+                '+' + player.properties.goldDrop + 'g',
+                '#eab308'
+            );
+        }
     }
 }
 
@@ -867,6 +877,9 @@ if (import.meta.env.DEV) {
             const n = Math.max(1, Math.round(seconds / SIM_STEP));
             for (let i = 0; i < n; i++) tick(SIM_STEP);
             draw();
+        },
+        setQuiet: (v) => {
+            quietSim = v === true;
         },
         renderControls,
         // drop + equip a weapon of the given subType (and optional special

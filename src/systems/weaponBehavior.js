@@ -39,10 +39,13 @@ const BASE_PROFILES = {
     },
     mace: {
         range: 52,
-        cooldown: 1.6, // slowest swing...
+        cooldown: 1.4, // slowest swing...
         projectile: false,
         maxTargets: 1,
-        damageMult: 1.8, // ...but the biggest hits (Overbearing Wallop)
+        damageMult: 2.2, // ...but the biggest hits (Overbearing Wallop).
+        // sim-tuned from 1.6s/1.8x (~15% behind every other armed class over
+        // 30 min): early enemies are one-shot either way, so kill rate hangs
+        // on the swing rate — raising damage alone measurably did nothing.
         stunChance: 0.25, // Tremor identity: stunned enemies skip their
         stunSeconds: 1.2, // round-robin attack turn
     },

@@ -197,7 +197,7 @@ export function grantKillRewards(monsterStats, quiet) {
     monsterStats.hp = monsterStats.maxHp;
     monsterExperience(monsterStats, quiet);
     monsterStats.killCount++;
-    if (!quiet) quest();
+    quest(quiet); // unlocks always run; quiet only skips the panel rerender
     // (The prestige Warp button lives in the combat control bar now, shown
     // whenever an area boss — lastEnemy — has been killed.)
     player.properties.lastEnemyLevel = monsterStats.level;
@@ -428,11 +428,9 @@ function heroHitLanded(monsterStats, damage, name, type) {
     weaponSkill(monsterStats);
 }
 
-export function displayLogInfo() {
+export function displayLogInfo(quiet) {
     player.properties.health = player.functions.maxhealth();
     player.properties.mana = player.functions.maxMana();
-    document.getElementById('health').innerHTML =
-        player.properties.health + '/' + player.functions.maxhealth();
     for (var key in player.buffs) {
         if (player.buffs.hasOwnProperty(key)) {
             var buff = player.buffs[key];
@@ -444,6 +442,11 @@ export function displayLogInfo() {
             }
         }
     }
+    // quiet (headless sims): the heal/mana/buff logic above is balance-critical
+    // and must run per kill; only the rerenders below are skippable
+    if (quiet === true) return;
+    document.getElementById('health').innerHTML =
+        player.properties.health + '/' + player.functions.maxhealth();
     activeBuffsHtml();
     CreateMonsterHtml();
 }

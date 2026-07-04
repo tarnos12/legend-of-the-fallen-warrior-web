@@ -66,7 +66,10 @@ var monsterUnlock = {
     KingoftheLegionGrantBannecs: false,
 };
 
-export function quest() {
+// quiet=true (offline progress / headless sims) still runs every unlock —
+// isShown / area isUnlocked / story appends are all real progression — and
+// skips only the per-call progression-panel rerender at the end.
+export function quest(quiet) {
     var varikElement = '';
     var forestElement = '';
     var ozJotnarElement = '';
@@ -776,7 +779,7 @@ export function quest() {
     if (monsterList.monster055.killCount >= 1) {
         monsterList.monster056.isShown = true;
     }
-    CreateMonsterHtml();
+    if (quiet !== true) CreateMonsterHtml();
 }
 
 //test
