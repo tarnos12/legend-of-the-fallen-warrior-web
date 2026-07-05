@@ -122,16 +122,16 @@ function newGameSlot() {
         `<div class="btn-group-vertical" role="group" aria-label="New game, load game">` +
         `<div class="row">` +
         `<div class ="col-xs-12">` +
-        `<button type="button" style="margin-bottom:5px;" class="btn btn-default border" onclick="newGame(1);">New game 1</button> ${displayInfo}` +
+        `<button type="button" style="margin-bottom:5px;" class="btn btn-default border" onclick="newGame(1);">New game 1</button> <span class="slotInfo">${displayInfo}</span>` +
         `</div>` +
         `<div class ="col-xs-12">` +
-        `<button type="button" style="margin-bottom:5px;" class="btn btn-default border" onclick="newGame(2);">New Game 2</button> ${displayInfo2}` +
+        `<button type="button" style="margin-bottom:5px;" class="btn btn-default border" onclick="newGame(2);">New Game 2</button> <span class="slotInfo">${displayInfo2}</span>` +
         `</div>` +
         `<div class ="col-xs-12">` +
-        `<button type="button" style="margin-bottom:5px;" class="btn btn-default border" onclick="newGame(3);">New Game 3</button> ${displayInfo3}` +
+        `<button type="button" style="margin-bottom:5px;" class="btn btn-default border" onclick="newGame(3);">New Game 3</button> <span class="slotInfo">${displayInfo3}</span>` +
         `</div>` +
         `<div class ="col-xs-12">` +
-        `<button type="button" style="margin-bottom:5px;" class="btn btn-default border" onclick="newGame(0);">New game 0</button> ${displayInfo0}` +
+        `<button type="button" style="margin-bottom:5px;" class="btn btn-default border" onclick="newGame(0);">New game 0</button> <span class="slotInfo">${displayInfo0}</span>` +
         `</div>` +
         `</div></div>` +
         `<button type="button" class="btn btn-default border startBackButtonMargin" onclick="backToStartingScreen()">Go Back</button>` +
@@ -215,16 +215,16 @@ function loadGameSlot() {
         `<div class="btn-group-vertical" role="group" aria-label="New game, load game">` +
         `<div class="row">` +
         `<div class ="col-xs-12">` +
-        `<button type="button" style="margin-bottom:5px;" class="btn btn-default border" onclick="loadGame(1);">Load game 1</button> ${displayInfo}` +
+        `<button type="button" style="margin-bottom:5px;" class="btn btn-default border" onclick="loadGame(1);">Load game 1</button> <span class="slotInfo">${displayInfo}</span>` +
         `</div>` +
         `<div class ="col-xs-12">` +
-        `<button type="button" style="margin-bottom:5px;" class="btn btn-default border" onclick="loadGame(2);">Load Game 2</button> ${displayInfo2}` +
+        `<button type="button" style="margin-bottom:5px;" class="btn btn-default border" onclick="loadGame(2);">Load Game 2</button> <span class="slotInfo">${displayInfo2}</span>` +
         `</div>` +
         `<div class ="col-xs-12">` +
-        `<button type="button" style="margin-bottom:5px;" class="btn btn-default border" onclick="loadGame(3);">Load Game 3</button> ${displayInfo3}` +
+        `<button type="button" style="margin-bottom:5px;" class="btn btn-default border" onclick="loadGame(3);">Load Game 3</button> <span class="slotInfo">${displayInfo3}</span>` +
         `</div>` +
         `<div class ="col-xs-12">` +
-        `<button type="button" style="margin-bottom:5px;" class="btn btn-default border" onclick="loadGame(0);">Load Game 0</button> ${displayInfo0}` +
+        `<button type="button" style="margin-bottom:5px;" class="btn btn-default border" onclick="loadGame(0);">Load Game 0</button> <span class="slotInfo">${displayInfo0}</span>` +
         `</div>` +
         `</div></div>` +
         `<button type="button" class="btn btn-default border startBackButtonMargin" onclick="backToStartingScreen()">Go Back</button>` +

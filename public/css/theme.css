@@ -104,6 +104,26 @@ font[color='#CC6633'] {
     border-color: var(--gold);
 }
 
+/* the start/slot/race screens sit on .loadingContainer, which was still the
+   legacy bright-gold backdrop (#EDD26E): light theme text was unreadable on
+   it. The logo is bronze-on-transparent and reads fine on dark. */
+.loadingContainer {
+    background-color: var(--bg-page);
+}
+/* race-picker info icons carry inline color:black from the renderer */
+.tooltips .glyphicon-info-sign {
+    color: var(--gold) !important;
+}
+/* save-slot line next to the New Game / Load buttons */
+.slotInfo {
+    color: var(--text-dim);
+    margin-left: 10px;
+    font-size: 14px;
+}
+.slotInfo strong {
+    color: var(--red); /* the Hardcore marker */
+}
+
 /* start screen: proper main-menu buttons (they float alone on the backdrop,
    so the in-game button chrome read as flat black rectangles there) */
 #startingGameContainer .btn-default {
