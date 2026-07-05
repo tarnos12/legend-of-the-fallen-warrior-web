@@ -49,6 +49,7 @@ import {
     unequipItemLoad,
 } from '../ui/inventoryUI.js';
 import { refillShopInterval, shopOther } from '../ui/shopUI.js';
+import { recomputeCardBonuses } from '../systems/cards.js';
 import { characterCreationHtml, removeStartingScreen, saveGameSlot } from '../ui/characterUI.js';
 // Map a save slot (0-3) to its localStorage key. Slot 0 historically uses the
 // bare key "EncodedSave"; slots 1-3 append the number.
@@ -267,6 +268,7 @@ function load(slot) {
         removeStartingScreen();
         unequipItemLoad();
         CreateInventoryWeaponHtml();
+        recomputeCardBonuses(); // rebuild card set bonuses from cardsOwned
         primaryStatUpdate();
         secondaryStatUpdate();
         EquippedItemsEmpty();

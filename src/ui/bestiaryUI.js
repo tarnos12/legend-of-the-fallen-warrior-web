@@ -11,6 +11,8 @@
 import { monsterAreas } from '../data/gameObjects.js';
 import { monsterList } from '../data/monsterList.js';
 import { areaMonsterKeys } from '../data/waves.js';
+import { ownsCard, areaCardProgress, isAreaSetComplete } from '../systems/cards.js';
+import { CARD_SET_BONUS } from '../data/cards.js';
 
 export const BESTIARY_MASTERY_KILLS = 100;
 
@@ -47,14 +49,18 @@ function monsterCard(key) {
         tier >= 4
             ? `<div class="beastStats beastMastered">★ Mastered — drops item level ${m.level} gear (any slot, up to Legendary${m.lastEnemy === true ? ', boss' : ''})</div>`
             : `<div class="beastStats beastLocked">Drops at ${BESTIARY_MASTERY_KILLS} kills</div>`;
+    const cardBlock = ownsCard(key)
+        ? `<div class="beastStats beastCardOwned">🃏 Card collected</div>`
+        : `<div class="beastStats beastLocked">🃏 Card not found</div>`;
     return (
-        `<div class="beastCard">` +
+        `<div class="beastCard${ownsCard(key) ? ' hasCard' : ''}">` +
         `<div class="beastPortrait"><img src="images/monsters/${m.name}.png" alt=""></div>` +
         `<div class="beastName">${m.displayName}${m.lastEnemy === true ? ' ⚑' : ''}</div>` +
         `<div class="beastStats">Level ${m.level} · ${kills} kills</div>` +
         statsBlock +
         rewardBlock +
         masteryBlock +
+        cardBlock +
         `<div class="beastProgress"><div class="beastProgressFill" style="width:${Math.floor((progress / BESTIARY_MASTERY_KILLS) * 100)}%;"></div></div>` +
         `</div>`
     );
@@ -72,16 +78,29 @@ function renderBestiary() {
     const sections = monsterAreas
         .map((area) => {
             const cards = areaMonsterKeys(area.type).map(monsterCard).join('');
+            const prog = areaCardProgress(area.type);
+            const setBonus = CARD_SET_BONUS[area.type];
+            const complete = isAreaSetComplete(area.type);
+            const setLabel = setBonus
+                ? ` — <span class="cardSet${complete ? ' cardSetDone' : ''}">🃏 ${prog.owned}/${prog.total} cards` +
+                  (setBonus ? ` · set bonus ${setBonus.label}${complete ? ' ✓ ACTIVE' : ''}` : '') +
+                  `</span>`
+                : '';
             return (
-                `<div class="c3 beastAreaTitle"><h4>${area.displayName}</h4></div>` +
+                `<div class="c3 beastAreaTitle"><h4>${area.displayName}${setLabel}</h4></div>` +
                 `<div class="beastGrid">${cards}</div>`
             );
         })
         .join('');
+    const cardTotal = Object.keys(monsterList).length;
+    let cardsOwnedCount = 0;
+    for (const key in monsterList) if (ownsCard(key)) cardsOwnedCount++;
     container.innerHTML =
         `<div class="c3">Encountered: ${known}/${total} — fight a monster to reveal its entry; ` +
         `keep hunting it to learn more (complete at ${BESTIARY_MASTERY_KILLS} kills). ` +
-        `<span style="color:#facc15;">✨ Shiny</span> variants grant triple exp/gold and better drops.</div>` +
+        `<span style="color:#facc15;">✨ Shiny</span> variants grant triple exp/gold and better drops. ` +
+        `<span style="color:#60a5fa;">🃏 Cards ${cardsOwnedCount}/${cardTotal}</span> — enemies rarely drop their card; ` +
+        `complete an area's set for a permanent bonus.</div>` +
         sections;
 }
 

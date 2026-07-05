@@ -9,6 +9,20 @@ _Last updated: 2026-07-05_
 
 ## Current status
 
+**Collectible enemy cards: DONE.** (User chose: keep boss uniques as-is for now, add cards
+for every enemy.)
+- `data/cards.js` (`CARD_DROP_CHANCE` 0.03/kill, 2× shiny; `CARD_SET_BONUS` per area =
+  +5-10% gold/drop/exp) + `systems/cards.js` (`rollCard`, `recomputeCardBonuses`,
+  `ownsCard`/`areaCardProgress`/`isAreaSetComplete`).
+- Every kill can drop that monster's card (persisted in `player.properties.cardsOwned`,
+  backfilled for old saves). Completing an AREA's full card set adds its bonus to
+  `player.properties.cardGold/Drop/ExpBonus`, read by `core.js` drop/exp/goldRate.
+- Bestiary shows per-monster card status + per-area set progress/bonus.
+- Tests: `test/cards.test.js` (drop/dedupe, set completion, bonus applies, progress).
+  **77/77 pass, build + lint clean.** No version bump (self-contained backfill).
+- NOTE: acquisition of boss uniques is deliberately still the Phase-2 RNG drop — user
+  wants to playtest before deciding on Souls/Soul-Shop/sets (see "later ideas" below).
+
 **Item redesign — Phase 2 (named boss uniques): DONE.**
 - `src/data/bossUniques.js` — one signature named item per area boss (7 bosses; keyed
   by boss monster `name`): fixed slot + guaranteed signature affix + lore. e.g. Lord
@@ -51,6 +65,10 @@ _Last updated: 2026-07-05_
   info panel: show the boss's unique name (from `data/bossUniques.js`) so players know
   what to hunt. The placeholder "drops item level N gear" lines are already there in
   `bestiaryUI.js` / `mapUI.js` — swap in the unique name for boss monsters/areas.
+- **Boss-unique acquisition rework (after playtesting).** Current = 20% RNG drop, and a
+  slot is gated behind reaching its boss's area. User is weighing: Boss Souls (guaranteed
+  currency) + a Soul Shop (buy any unique, scaled to your level) to fix both the RNG and
+  the slot-gating; and/or themed multi-piece sets. Revisit with fresh ideas post-playtest.
 - Later polish: real map art (placeholder biome grid today), organic skill-tree node
   layouts, big-number formatting (`1.2M`), accessory offensive-affix wiring (crit/bonus
   damage read off accessories — needs new `core.js` readers).

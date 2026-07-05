@@ -585,6 +585,20 @@ textarea {
     height: 100%;
     background: var(--gold);
 }
+.beastCard.hasCard {
+    border-color: var(--blue);
+}
+.beastStats.beastCardOwned {
+    color: var(--blue);
+}
+.cardSet {
+    font-size: 12px;
+    font-weight: normal;
+    color: var(--text-dim);
+}
+.cardSet.cardSetDone {
+    color: var(--blue);
+}
 
 /* equipment paper-doll: cap slot art so the column fits unscrolled */
 #equipHtml img {

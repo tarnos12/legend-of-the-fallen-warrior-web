@@ -69,6 +69,14 @@ var player = {
         combatArea: '', // '' = first unlocked area
         combatWave: 0, // index into the area's monsters (wave 1 = index 0)
         combatAutoProgress: true,
+        // Collectible enemy cards (systems/cards.js). cardsOwned maps monster
+        // key -> true; the three bonuses are the aggregate % from COMPLETED
+        // per-area card sets, recomputed on card gain + on load, read by the
+        // rate functions below. Old saves backfill to {}/0 (no cards, no bonus).
+        cardsOwned: {},
+        cardGoldBonus: 0,
+        cardDropBonus: 0,
+        cardExpBonus: 0,
         potionInventory: [],
         //Minerals
         Thaumerite: 0,
@@ -378,6 +386,7 @@ var player = {
                 (player.functions.totalLuck() / 5 +
                     player.functions.totalMagicFind() +
                     player.properties.raceDropRate +
+                    player.properties.cardDropBonus +
                     player.buffs.ItemDrop.amount) /
                     100
             );
@@ -387,6 +396,7 @@ var player = {
                 1 +
                 (player.functions.totalExperienceRate() +
                     player.properties.raceExpRate +
+                    player.properties.cardExpBonus +
                     player.buffs.ExpGain.amount) /
                     100
             );
@@ -396,6 +406,7 @@ var player = {
                 1 +
                 (player.functions.totalGoldDrop() +
                     player.properties.raceGoldDrop +
+                    player.properties.cardGoldBonus +
                     player.buffs.GoldDrop.amount) /
                     100
             );
