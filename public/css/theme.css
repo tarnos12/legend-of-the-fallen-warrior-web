@@ -531,17 +531,32 @@ textarea {
 .statList {
     margin: 4px 0;
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    /* minmax(0,1fr): plain 1fr tracks grow to the widest row's min-content
+       and overflow the narrow stats column, clipping the right column.
+       width:100%: without it the legacy stylesheets collapse the grid to
+       zero width inside the stats tab (observed live). */
+    width: 100%;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     column-gap: 10px;
 }
 .statRow {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
     height: 26px; /* the legacy value markup drags odd line-box slack along;
                      fix the row height and let flex center the content */
-    padding: 0 8px;
+    padding: 0 6px;
     border-bottom: 1px solid rgba(74, 59, 29, 0.45);
+    min-width: 0;
+    white-space: nowrap;
+}
+.statName {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.statValue,
+.statPlus {
+    flex-shrink: 0;
 }
 .statValue * {
     vertical-align: middle;

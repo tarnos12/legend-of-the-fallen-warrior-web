@@ -195,7 +195,10 @@ function primaryStatUpdate() {
             currentBonus.type === 'Stats' ||
             currentBonus.type === 'mana' ||
             currentBonus.type == 'spellPower';
-        const label = currentBonus.type === 'spellPower' ? 'Spell Power' : typeCap;
+        // short names (Str/End/...) — two rows share a narrow column; the
+        // full name + description live in the icon tooltip
+        const label = currentBonus.shortNameDisplay;
+        const fullName = currentBonus.type === 'spellPower' ? 'Spell Power' : typeCap;
         const plusSpan = isSimpleSpan
             ? ''
             : `<span id="${typeCap}" class="statPlus" style="cursor:pointer" onclick="upgrade${typeCap}(event);" data-toggle="tooltip" data-placement="top" title="Increase ${currentBonus.type} (Ctrl/Alt+Click: +10, Shift+Click: +100)">` +
@@ -203,7 +206,7 @@ function primaryStatUpdate() {
 
         rows +=
             `<div class="statRow darkBackground">` +
-            `<span data-toggle="tooltip" data-placement="top" title="${currentBonus.tooltip}"><img class="statIcon" src="images/stat/${statDisplay2}.png"></span>` +
+            `<span data-toggle="tooltip" data-placement="top" title="${fullName} — ${currentBonus.tooltip}"><img class="statIcon" src="images/stat/${statDisplay2}.png"></span>` +
             `<span class="statName">${label}</span>` +
             `<span class="statValue"><span id="${statInfo}"></span></span>` +
             plusSpan +
