@@ -9,6 +9,14 @@ _Last updated: 2026-07-05_
 
 ## Current status
 
+**Bugfix — weapon/shield icons broke after loading a save: FIXED.** The on-load self-heal
+(`save.js` `repairItemImage`, from commit 766e922) re-derived art as `subType+rarity`,
+dropping the level-number suffix that weapons/shields need (`swordLegendary.png` has no
+file; only `swordLegendary5..100`). Now uses a single shared `itemImageName(item)` helper
+(`core/format.js`) used by BOTH generation and repair, so they can't drift again.
+Locked by `test/item-images.test.js` (every slot/level filename exists + matches generation).
+Verified live: load a save, all 27 icons resolve. 79/79 tests.
+
 **Collectible enemy cards: DONE.** (User chose: keep boss uniques as-is for now, add cards
 for every enemy.)
 - `data/cards.js` (`CARD_DROP_CHANCE` 0.03/kill, 2× shiny; `CARD_SET_BONUS` per area =

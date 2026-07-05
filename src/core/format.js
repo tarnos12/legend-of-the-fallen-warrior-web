@@ -36,4 +36,17 @@ function compare(z, x, other) {
     }
 }
 
-export { getNumberMultiplierofFive, getTen, getThousands, compare };
+// Single source of truth for an item's art filename (relative to
+// images/items/<subType>/). Weapons and shields append a level-bucket number
+// (swordLegendary25.png); armor and accessories don't (helmetLegendary.png).
+// Used by itemDrop generation and by save.js's on-load repair — keeping them in
+// sync (they drifted once, which broke every weapon/shield icon after a load).
+function itemImageName(item) {
+    var name = item.subType + item.itemRarity;
+    if (item.itemType === 'weapon' || item.subType === 'shield') {
+        name += getNumberMultiplierofFive(item.iLvl);
+    }
+    return name;
+}
+
+export { getNumberMultiplierofFive, getTen, getThousands, compare, itemImageName };

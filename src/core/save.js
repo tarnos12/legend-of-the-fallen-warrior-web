@@ -18,6 +18,7 @@ import {
     playerInventory,
 } from './core.js';
 import { Log } from './log.js';
+import { itemImageName } from './format.js';
 import { monsterList, MakeMonsterList } from '../data/monsterList.js';
 import { state } from './state.js';
 import {
@@ -224,8 +225,11 @@ function load(slot) {
         // carry stale names (e.g. numbered variants) whose files are gone —
         // they rendered as broken images (reported: the helmet slot).
         var repairItemImage = function (item) {
+            // re-derive art via the shared helper so it always matches what
+            // itemDrop generated (the old inline version dropped the weapon/
+            // shield number suffix, breaking those icons on every load)
             if (item && item.subType && item.itemRarity) {
-                item.image = item.subType + item.itemRarity;
+                item.image = itemImageName(item);
             }
         };
         for (var key in equippedItems) repairItemImage(equippedItems[key]);
