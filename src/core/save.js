@@ -218,6 +218,17 @@ function load(slot) {
             if (typeof savegame['player' + key] !== 'undefined')
                 equippedItems[key] = savegame['player' + key];
         }
+        // Self-heal item art references: `image` is always subType+rarity in
+        // the current generator, but items equipped/stored under older builds
+        // carry stale names (e.g. numbered variants) whose files are gone —
+        // they rendered as broken images (reported: the helmet slot).
+        var repairItemImage = function (item) {
+            if (item && item.subType && item.itemRarity) {
+                item.image = item.subType + item.itemRarity;
+            }
+        };
+        for (var key in equippedItems) repairItemImage(equippedItems[key]);
+        for (var i = 0; i < playerInventory.length; i++) repairItemImage(playerInventory[i]);
         for (var key in monsterList) {
             if (typeof savegame[key] !== 'undefined') monsterList[key].killCount = savegame[key];
         }
