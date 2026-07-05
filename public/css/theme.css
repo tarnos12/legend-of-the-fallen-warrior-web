@@ -374,30 +374,31 @@ textarea {
     margin: 2px 0 8px 10px;
     min-width: 34px;
 }
-/* ---- inventory: fixed 5-wide slot grid ---- */
+/* ---- inventory: fixed 5-wide slot grid (cells sized to the 50px icons) ---- */
 .invGrid {
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 8px;
+    grid-template-columns: repeat(5, 64px);
+    gap: 6px;
     padding: 8px 0;
+    justify-content: start;
 }
 .invCell {
     position: relative;
-    aspect-ratio: 1;
+    width: 64px;
+    height: 64px;
     display: flex;
     align-items: center;
     justify-content: center;
     background: var(--bg-inset);
     border: 1px solid var(--border-dim);
     border-radius: 6px;
-    min-width: 0;
 }
 .invCell.empty {
     opacity: 0.45;
 }
 .invCell img {
-    max-width: 70%;
-    max-height: 70%;
+    max-width: 48px;
+    max-height: 48px;
     cursor: pointer;
 }
 .invCell .invPower {
@@ -517,9 +518,21 @@ textarea {
     background: var(--gold);
 }
 
-/* ---- stat panel: compact flat rows ---- */
+/* equipment paper-doll: cap slot art so the column fits unscrolled */
+#equipHtml img {
+    max-width: 52px;
+    max-height: 52px;
+}
+#equipHtml h4 {
+    margin: 4px 0;
+}
+
+/* ---- stat panel: compact flat rows, two per line ---- */
 .statList {
     margin: 4px 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 10px;
 }
 .statRow {
     display: flex;

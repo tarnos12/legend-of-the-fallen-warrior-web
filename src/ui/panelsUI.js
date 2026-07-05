@@ -218,7 +218,6 @@ function secondaryStatUpdate() {
     for (var key in secondaryStatInfo) {
         var currentBonus = secondaryStatInfo[key];
         var statInfo = currentBonus.info;
-        var number = currentBonus.number;
         var statDisplay;
         if (currentBonus.type === 'Stats' || currentBonus.type === 'Skill points') {
             statDisplay = player.properties[statInfo];
@@ -226,12 +225,6 @@ function secondaryStatUpdate() {
             statDisplay = player.functions[statInfo]();
         }
         var statDisplay2 = currentBonus.displayName;
-        var background = '';
-        if (number === 1) {
-            background = 'darkBackground';
-        } else if (number === 2) {
-            background = 'background';
-        }
 
         let value;
         if (
@@ -264,27 +257,14 @@ function secondaryStatUpdate() {
             suffix += '%';
         }
 
+        // same compact flat rows as the primary panel (.statList/.statRow)
         rows +=
-            `<div class="col-xs-6 primaryStatsMargin border ${background}" style="height:40px;">` +
-            `<div class="row">` +
-            `<div class="col-xs-8 secondaryStatMargin">` +
-            `<span data-toggle="tooltip" data-placement="right" title="${currentBonus.tooltip()}">` +
-            `${statDisplay2}:` +
-            `</span>` +
-            `</div>` +
-            `<div class="col-xs-4 rightAlign secondaryStatMargin">` +
-            `<span data-toggle="tooltip" data-placement="right" title="${currentBonus.tooltip()}">` +
-            `${value}${suffix}` +
-            `</span>` +
-            `</div>` +
-            `</div>` +
+            `<div class="statRow darkBackground">` +
+            `<span class="statName" data-toggle="tooltip" data-placement="right" title="${currentBonus.tooltip()}">${statDisplay2}</span>` +
+            `<span class="statValue">${value}${suffix}</span>` +
             `</div>`;
     }
-    document.getElementById('secondaryStat').innerHTML =
-        `<div class="row">` +
-        `<div class="centerText"><h4>Secondary Stats</h4></div>` +
-        rows +
-        `</div>`;
+    document.getElementById('secondaryStat').innerHTML = `<div class="statList">${rows}</div>`;
     testss();
 }
 
