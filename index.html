@@ -160,7 +160,7 @@
                 <li onclick="renderWorldMap();"><a href="#tab_mainMap" data-toggle="tab">Map</a></li>
                 <li onclick="renderBestiary();"><a href="#tab_mainBestiary" data-toggle="tab">Bestiary</a></li>
                 <li><a href="#tab_mainProfessions" data-toggle="tab">Professions</a></li>
-                <li><a href="#tab_mainSkills" data-toggle="tab">Skills</a></li>
+                <li onclick="renderSkillTrees();"><a href="#tab_mainSkills" data-toggle="tab">Skills</a></li>
                 <li><a href="#tab_mainShop" data-toggle="tab">Shop</a></li>
                 <li><a href="#tab_mainStory" data-toggle="tab">Story</a></li>
                 <li><a href="#tab_mainOptions" data-toggle="tab">Options</a></li>
@@ -261,16 +261,21 @@
                             </ul>
                             <div class="tab-content">
                                 <div class="tab-pane active" id="tab_weaponSkillsShow">
-                                    <div class="c3">
-                                        <h4>Weapon Skills</h4>
+                                    <!-- canvas node tree (ui/skillTreeUI.js); the legacy
+                                         render below stays hidden: updateBar() and other
+                                         systems write into its spans -->
+                                    <div class="treeLayout">
+                                        <canvas id="weaponTreeCanvas" width="640" height="560"></canvas>
+                                        <div id="weaponTreeInfo" class="treeInfo c4"></div>
                                     </div>
-                                    <div id="weaponSkill"></div>
+                                    <div id="weaponSkill" class="legacyHidden"></div>
                                 </div>
                                 <div class="tab-pane" id="tab_passiveSkillsShow">
-                                    <div class="c3">
-                                        <h4>Passive skills</h4>
+                                    <div class="treeLayout">
+                                        <canvas id="passiveTreeCanvas" width="740" height="560"></canvas>
+                                        <div id="passiveTreeInfo" class="treeInfo c4"></div>
                                     </div>
-                                    <div id="playerSkills"></div>
+                                    <div id="playerSkills" class="legacyHidden"></div>
                                 </div>
                             </div>
                         </div>

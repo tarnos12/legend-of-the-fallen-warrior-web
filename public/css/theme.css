@@ -493,6 +493,43 @@ textarea {
     opacity: 0.55;
 }
 
+/* ---- skill trees (canvas, Skills panel) ---- */
+.treeLayout {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+}
+.treeLayout canvas {
+    flex: 1;
+    min-width: 0;
+    max-width: 760px;
+    width: 100%;
+    height: auto;
+    background: linear-gradient(180deg, #1c1712, #241d16);
+    border: 1px solid var(--border-dim);
+    border-radius: 6px;
+}
+.treeInfo {
+    width: 260px;
+    flex-shrink: 0;
+    background: var(--bg-inset);
+    border: 1px solid var(--border-dim);
+    border-radius: 6px;
+    padding: 10px 12px;
+    min-height: 160px;
+}
+.treeInfo h4 {
+    margin-top: 4px;
+}
+.treeInfoHeader {
+    border-bottom: 1px solid var(--border-dim);
+    padding-bottom: 6px;
+    margin-bottom: 6px;
+}
+.legacyHidden {
+    display: none;
+}
+
 /* ---- bestiary panel ---- */
 .beastGrid {
     display: grid;
@@ -745,6 +782,12 @@ body.pre-game #hudBar {
         flex-direction: column;
     }
     #mapInfo {
+        width: 100%;
+    }
+    .treeLayout {
+        flex-direction: column;
+    }
+    .treeInfo {
         width: 100%;
     }
     /* comfortable touch targets */
