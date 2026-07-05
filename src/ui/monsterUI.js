@@ -40,7 +40,7 @@ function CreateMonsterHtml() {
         if (unlock && monsterList[unlock.requires]) {
             const need = monsterList[unlock.requires];
             goal =
-                `🎯 Unlock wave ${lockedIndex + 1}: kill ${unlock.kills} ${need.displayName} ` +
+                `🎯 Next unlock: kill ${unlock.kills} ${need.displayName} ` +
                 `(${Math.min(need.killCount, unlock.kills)}/${unlock.kills})`;
         }
     } else {

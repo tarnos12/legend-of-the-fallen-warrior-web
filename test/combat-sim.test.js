@@ -100,9 +100,13 @@ describe('idle combat simulation', () => {
         reviveNow();
         dbg.startWave('monster005'); // level-5 pack vs a low-level hero
         // (combatWave gets clamped to the unlocked prefix for the UI, so read
-        // the effective value back rather than assuming index 4)
+        // the effective value back rather than assuming an index)
         const waveBefore = player.properties.combatWave;
-        expect(dbg.getWave().monster).toBe(monsterList.monster005);
+        // an explicit startWave key pins the spawn pool to that monster
+        expect(dbg.getWave().pool).toEqual(['monster005']);
+        expect(dbg.getWave().enemies.every((e) => e.monster === monsterList.monster005)).toBe(
+            true
+        );
         dbg.pump(120); // they will kill us
         expect(player.properties.isDead).toBe(true);
         expect(player.properties.combatWave).toBe(Math.max(0, waveBefore - 1));

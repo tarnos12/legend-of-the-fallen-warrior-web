@@ -193,9 +193,12 @@ function monsterKilled(monsterStats) {
 // (displayLogInfo) once when the wave ends.
 // quiet=true (offline progress) skips the per-kill DOM work (log lines, gold
 // counter, updateHtml, quest re-render); the caller renders once afterwards.
-export function grantKillRewards(monsterStats, quiet) {
+// shiny=true (rare sparkling spawns, ui/battleCanvas.js) triples exp + gold
+// and doubles the item-drop roll.
+export const SHINY_REWARD_MULT = 3;
+export function grantKillRewards(monsterStats, quiet, shiny) {
     monsterStats.hp = monsterStats.maxHp;
-    monsterExperience(monsterStats, quiet);
+    monsterExperience(monsterStats, quiet, shiny);
     monsterStats.killCount++;
     quest(quiet); // unlocks always run; quiet only skips the panel rerender
     // (The prestige Warp button lives in the combat control bar now, shown
@@ -264,8 +267,9 @@ export function updateBar() {
     }
 }
 //experience gained from killing a monster
-function monsterExperience(monsterStats, quiet) {
-    var expGain = monsterStats.baseExp() * player.functions.expRate();
+function monsterExperience(monsterStats, quiet, shiny) {
+    var expGain =
+        monsterStats.baseExp() * player.functions.expRate() * (shiny ? SHINY_REWARD_MULT : 1);
     var level = player.properties.level;
     if (player.properties.experience < player.properties.maxExperience) {
         player.properties.experience = Math.floor(player.properties.experience + expGain);
@@ -293,22 +297,22 @@ function monsterExperience(monsterStats, quiet) {
                 '</span>'
         );
     }
-    monsterGold(monsterStats, quiet);
+    monsterGold(monsterStats, quiet, shiny);
 }
 
 //gold gained from killing a monster
-function monsterGold(monsterStats, quiet) {
+function monsterGold(monsterStats, quiet, shiny) {
     var goldDrop = player.properties.goldDrop;
     var monsterLvl = monsterStats.level;
     goldDrop = 0;
     var randomGold = Math.floor(
         Math.random() * (monsterStats.level + 5 - monsterStats.level + 1) + monsterStats.level
     );
-    goldDrop = Math.floor(randomGold * player.functions.goldRate());
+    goldDrop = Math.floor(randomGold * player.functions.goldRate() * (shiny ? SHINY_REWARD_MULT : 1));
     player.properties.gold += goldDrop;
     if (!quiet) document.getElementById('gold').innerHTML = player.properties.gold;
     player.properties.goldDrop = goldDrop;
-    monsterItemDrop(monsterLvl, quiet); // Call item drop function with monster level.
+    monsterItemDrop(monsterLvl, quiet, shiny); // Call item drop function with monster level.
     if (!quiet) updateHtml();
 }
 

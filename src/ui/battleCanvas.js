@@ -25,7 +25,17 @@ import {
 } from '../systems/battle.js';
 import { weaponCombatProfile } from '../systems/weaponBehavior.js';
 import { waveUnlocks } from '../data/waveUnlocks.js';
+import {
+    waveGroups,
+    unlockedWaveMembers,
+    unlockedWaveCount,
+    isBossWave,
+} from '../data/waves.js';
 import { getImage, imageCache } from './uiCommon.js';
+
+// Rare sparkling spawns: extra exp/gold (x3) and doubled drop roll — see
+// systems/battle.js SHINY_REWARD_MULT and itemDrop.js.
+const SHINY_CHANCE = 0.05;
 
 // Combat runs in a FIXED logical world (the original canvas size) no matter
 // how big the on-screen canvas is: wave timing, approach distances and thus
@@ -79,20 +89,22 @@ function currentAreaType() {
     return areaType;
 }
 
-// Waves unlock in order (quest() flips isShown by kill count), so the shown
-// monsters are a prefix of the area list; the wave index is clamped to it.
+// Waves unlock in order (quest() flips monster isShown by kill count; a wave
+// group is available once its first member is shown), so the available waves
+// are a prefix and the wave index is clamped to it. Old saves stored the
+// monster index (0..9) — the same clamp folds them into the 5-wave range.
 function clampWave(areaType) {
-    const entries = areaEntries(areaType);
-    const shownCount = entries.filter((e) => e.monster.isShown === true).length;
-    const max = Math.max(0, shownCount - 1);
+    const max = Math.max(0, unlockedWaveCount(areaType) - 1);
     if (player.properties.combatWave > max) player.properties.combatWave = max;
     if (player.properties.combatWave < 0) player.properties.combatWave = 0;
-    return entries;
+    return waveGroups(areaType);
 }
 
-function currentWaveEntry() {
-    const entries = clampWave(currentAreaType());
-    return entries[player.properties.combatWave] || null;
+// The current wave's spawn pool: its unlocked members.
+function currentWavePool() {
+    const areaType = currentAreaType();
+    clampWave(areaType);
+    return unlockedWaveMembers(areaType, player.properties.combatWave);
 }
 
 // Warm the cache for every monster + race sprite as soon as the game data
@@ -130,36 +142,45 @@ function heroImage() {
     return null;
 }
 
-// Start a wave of the given monster. When invoked with an explicit key (the
-// old Fight button / debug), the idle state follows: that monster's area and
-// wave become the selection.
+// Start the selected wave. With an explicit monsterKey (debug / tests / the
+// intercepted startBattle), the selection follows that monster's area + wave
+// group and the wave spawns ONLY that monster — deterministic farming. With
+// no key, spawns pick semi-randomly among the wave group's unlocked members.
 function startWave(monsterKey) {
-    const monster = monsterList[monsterKey];
-    if (!monster || !ctx) return;
+    if (!ctx) return;
     if (player.properties.isDead === true) {
-        // Fight pressed while waiting for revive; the inline onclick already ran
-        // disableButtons(), so re-toggle it and stay idle (the loop restarts
-        // combat after the revive).
         draw();
         drawCenterText('You are dead — reviving...');
         if (typeof window.disableButtons === 'function') window.disableButtons();
         return;
     }
-    if (monster.area !== player.properties.combatArea || currentWaveEntry()?.key !== monsterKey) {
+    let pool;
+    if (monsterKey !== undefined && monsterList[monsterKey]) {
+        const monster = monsterList[monsterKey];
         player.properties.combatArea = monster.area;
-        const idx = areaEntries(monster.area).findIndex((e) => e.key === monsterKey);
-        player.properties.combatWave = Math.max(0, idx);
+        const waveIdx = waveGroups(monster.area).findIndex((g) => g.includes(monsterKey));
+        player.properties.combatWave = Math.max(0, waveIdx);
+        pool = [monsterKey];
         renderControls();
+    } else {
+        pool = currentWavePool();
     }
-    preloadCombatImages(); // covers manual Fight-button starts too
+    if (pool.length === 0) return;
+    preloadCombatImages(); // covers manual/debug starts too
     logData.length = 0;
     const logConsole = document.getElementById('logConsole');
     if (logConsole) logConsole.innerHTML = '';
 
-    const count = 1 + Math.floor(Math.random() * 5);
+    // the boss wave is a duel; regular waves bring 1-5 mixed enemies
+    const bossWave = isBossWave(currentAreaType(), player.properties.combatWave);
+    const count = bossWave ? 1 : 1 + Math.floor(Math.random() * 5);
     const enemies = [];
     for (let i = 0; i < count; i++) {
+        const monster = monsterList[pool[Math.floor(Math.random() * pool.length)]];
         enemies.push({
+            monster,
+            img: getImage('images/monsters/' + monster.name + '.png'),
+            shiny: Math.random() < SHINY_CHANCE,
             x: WORLD_W + 30 + i * 55,
             y: GROUND - ((i % 3) - 1) * 16,
             hp: monster.maxHp,
@@ -172,9 +193,7 @@ function startWave(monsterKey) {
         });
     }
     wave = {
-        monster,
-        monsterKey,
-        img: getImage('images/monsters/' + monster.name + '.png'),
+        pool,
         heroImg: heroImage(),
         // Recomputed every update so equipping a different weapon mid-wave
         // (the inventory stays usable) takes effect immediately.
@@ -227,13 +246,13 @@ function checkEnemyDeath(enemy) {
     if (enemy.hp <= 0 && enemy.state !== 'die') {
         enemy.state = 'die';
         wave.kills++;
-        grantKillRewards(wave.monster, quietSim);
+        grantKillRewards(enemy.monster, quietSim, enemy.shiny);
         displayLogInfo(quietSim); // heal/buff tick always; DOM skipped when quiet
         if (!quietSim) {
             addFloat(
                 enemy.x,
                 enemy.y - SPRITE - 16,
-                '+' + player.properties.goldDrop + 'g',
+                (enemy.shiny ? '✨ ' : '') + '+' + player.properties.goldDrop + 'g',
                 '#eab308'
             );
         }
@@ -297,7 +316,7 @@ function update(dt) {
             attacker.bouncePhase = 0; // sync the lunge with the hit
             const healthBefore = player.properties.health;
             // evasion/parry/thorn/counter/block; sword raises parry
-            monsterAttack(w.monster, attacker, { parryBonus: prof.parryBonus });
+            monsterAttack(attacker.monster, attacker, { parryBonus: prof.parryBonus });
             const dealt = healthBefore - player.properties.health;
             if (dealt > 0) {
                 w.heroHitFlash = 0.25;
@@ -333,7 +352,7 @@ function update(dt) {
                     });
                 } else {
                     w.heroLunge = 1;
-                    const roll = heroStrikeRoll(w.monster, {
+                    const roll = heroStrikeRoll(target.monster, {
                         damageMult: prof.damageMult,
                         critBonus: prof.critBonus,
                     });
@@ -368,7 +387,7 @@ function update(dt) {
         w.spellTimer -= dt;
         if (w.spellTimer <= 0 && targets.length) {
             const target = targets[0];
-            const roll = heroSpellRoll(w.monster);
+            const roll = heroSpellRoll(target.monster);
             if (roll === null) {
                 w.spellTimer = 0.75; // nothing castable yet (mana/skills) — retry soon
             } else {
@@ -399,7 +418,7 @@ function update(dt) {
             if (p.done) break;
             p.struck.add(enemy);
             if (p.hits === 0) {
-                p.primaryRoll = heroStrikeRoll(w.monster, {
+                p.primaryRoll = heroStrikeRoll(enemy.monster, {
                     damageMult: prof.damageMult,
                     critBonus: prof.critBonus,
                 });
@@ -547,9 +566,16 @@ function draw() {
         return;
     }
 
-    // header: area — wave x/y: monster xN — weapon
-    const entries = areaEntries(currentAreaType());
+    // header: area — wave x/y: living enemies — weapon
+    const groups = waveGroups(currentAreaType());
     const areaName = (unlockedAreas().find((a) => a.type === currentAreaType()) || {}).displayName;
+    const living = {};
+    for (const e of targetable()) {
+        living[e.monster.displayName] = (living[e.monster.displayName] || 0) + 1;
+    }
+    const composition = Object.keys(living)
+        .map((name) => name + (living[name] > 1 ? ' x' + living[name] : ''))
+        .join(', ');
     ctx.fillStyle = '#d9b24a';
     ctx.font = 'bold 14px sans-serif';
     ctx.textAlign = 'left';
@@ -558,11 +584,9 @@ function draw() {
             'Wave ' +
             (player.properties.combatWave + 1) +
             '/' +
-            entries.length +
+            groups.length +
             ': ' +
-            w.monster.displayName +
-            ' x' +
-            targetable().length +
+            composition +
             '  —  ' +
             w.weapon.subType,
         10,
@@ -603,9 +627,22 @@ function draw() {
         const bounce =
             e.state === 'fight' && !stunned ? Math.max(0, Math.sin(e.bouncePhase)) * -14 : 0;
         const hop = e.state === 'run' ? Math.abs(Math.sin(e.bouncePhase)) * -5 : 0;
-        drawSprite(w.img, e.x + bounce, e.y + hop, 0);
+        if (e.shiny) {
+            // golden aura behind the sprite
+            ctx.fillStyle = 'rgba(250, 204, 21, 0.25)';
+            ctx.beginPath();
+            ctx.ellipse(e.x + bounce, e.y + hop - SPRITE / 2, SPRITE * 0.7, SPRITE * 0.75, 0, 0, Math.PI * 2);
+            ctx.fill();
+        }
+        drawSprite(e.img, e.x + bounce, e.y + hop, 0);
         if (e.state !== 'die') {
             drawBar(e.x - SPRITE / 2, e.y - SPRITE - 12, SPRITE, e.hp / e.maxHp, '#f87171');
+            if (e.shiny) {
+                ctx.fillStyle = '#facc15';
+                ctx.font = 'bold 13px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText('✨', e.x + SPRITE / 2, e.y - SPRITE - 16);
+            }
             if (stunned) {
                 ctx.fillStyle = '#facc15';
                 ctx.font = 'bold 16px sans-serif';
@@ -698,20 +735,22 @@ function idleTick(dt) {
     idleTimer += dt;
     if (idleTimer < NEXT_WAVE_DELAY) return;
     preloadCombatImages();
-    const entry = currentWaveEntry();
-    if (!entry) return;
+    const pool = currentWavePool();
+    if (pool.length === 0) return;
     // Loading a save starts combat moments after the 64-sprite preload kicks
     // off, so hold this wave until ITS sprites are in (img.complete is also
     // true for a failed load — the placeholder shows, nothing stalls; the 8s
     // cap is a belt-and-braces guard against a hung request).
-    const monsterImg = getImage('images/monsters/' + entry.monster.name + '.png');
+    const poolReady = pool.every(
+        (key) => getImage('images/monsters/' + monsterList[key].name + '.png').complete
+    );
     const heroImg = heroImage();
-    if (idleTimer < 8 && (!monsterImg.complete || (heroImg && !heroImg.complete))) return;
+    if (idleTimer < 8 && (!poolReady || (heroImg && !heroImg.complete))) return;
     // covers the first wave after character creation/load, when the bar
     // hasn't been rendered with game data yet
     const bar = document.getElementById('battleControls');
     if (bar && bar.innerHTML === '') renderControls();
-    startWave(entry.key);
+    startWave();
 }
 
 function tick(dt) {
@@ -754,9 +793,9 @@ function endWave() {
     wave = null;
     idleTimer = 0;
     if (outcome === 'victory' && player.properties.combatAutoProgress === true) {
-        const entries = areaEntries(currentAreaType());
-        const next = entries[player.properties.combatWave + 1];
-        if (next && next.monster.isShown === true) player.properties.combatWave++;
+        if (player.properties.combatWave + 1 < unlockedWaveCount(currentAreaType())) {
+            player.properties.combatWave++;
+        }
     } else if (outcome === 'defeat') {
         player.properties.combatWave = Math.max(0, player.properties.combatWave - 1);
     }
@@ -775,6 +814,17 @@ function endWave() {
     draw();
 }
 
+// Travel to an area (world map): select it, restart from wave 1, abandon any
+// running wave. Exported for ui/mapUI.js.
+export function travelTo(areaType) {
+    if (!monsterAreas.some((a) => a.type === areaType && a.isUnlocked === true)) return false;
+    player.properties.combatArea = areaType;
+    player.properties.combatWave = 0;
+    abortWave();
+    renderControls();
+    return true;
+}
+
 // ---- Control bar: area select, wave nav, auto-progress ---------------------
 function abortWave() {
     // switching area/wave mid-fight abandons the current wave (no rewards)
@@ -790,21 +840,29 @@ function renderControls() {
         return;
     }
     const areaType = currentAreaType();
-    const entries = clampWave(areaType);
+    const groups = clampWave(areaType);
     const waveIndex = player.properties.combatWave;
-    const current = entries[waveIndex];
     const areaOptions = unlockedAreas()
         .map(
             (a) =>
                 `<option value="${a.type}"${a.type === areaType ? ' selected' : ''}>${a.displayName}</option>`
         )
         .join('');
-    // next wave locked? show the exact kill requirement (quest.js thresholds,
-    // mirrored in data/waveUnlocks.js)
+    // current wave label: its unlocked members (the spawn pool)
+    const poolNames = unlockedWaveMembers(areaType, waveIndex).map(
+        (key) => monsterList[key].displayName
+    );
+    const waveLabel =
+        isBossWave(areaType, waveIndex) && poolNames.length
+            ? `Boss: ${poolNames[0]}`
+            : poolNames.slice(0, 2).join(', ') + (poolNames.length > 2 ? '…' : '');
+    // next unlock: the first locked monster in this area (could join the
+    // CURRENT wave's pool or open the next wave) — quest.js thresholds,
+    // mirrored in data/waveUnlocks.js
     let lockedInfo = '';
-    const next = entries[waveIndex + 1];
-    if (next && next.monster.isShown !== true) {
-        const unlock = waveUnlocks[next.key];
+    const lockedKey = groups.flat().find((key) => monsterList[key].isShown !== true);
+    if (lockedKey) {
+        const unlock = waveUnlocks[lockedKey];
         if (unlock && monsterList[unlock.requires]) {
             const need = monsterList[unlock.requires];
             lockedInfo =
@@ -814,15 +872,18 @@ function renderControls() {
     }
     // the area boss was killed: the prestige Warp lives here now (formerly a
     // button injected into the old monster panel)
-    const warpable = entries.find((e) => e.monster.lastEnemy === true && e.monster.killCount > 0);
+    const warpable = groups
+        .flat()
+        .map((key) => monsterList[key])
+        .find((m) => m.lastEnemy === true && m.killCount > 0);
     const warpButton = warpable
         ? ` <button type="button" id="combatWarp" class="sell" title="Prestige: restart at higher monster levels">Warp</button>`
         : '';
     bar.innerHTML =
         `<label>Area: <select id="combatAreaSelect">${areaOptions}</select></label> ` +
         `<button type="button" id="combatWavePrev" class="sell">◀</button>` +
-        `<span style="margin:0 6px;">Wave ${waveIndex + 1}/${entries.length}` +
-        (current ? ` — ${current.monster.displayName}` : '') +
+        `<span style="margin:0 6px;">Wave ${waveIndex + 1}/${groups.length}` +
+        (waveLabel ? ` — ${waveLabel}` : '') +
         `</span>` +
         `<button type="button" id="combatWaveNext" class="sell">▶</button>` +
         lockedInfo +
@@ -844,9 +905,7 @@ function renderControls() {
         }
     });
     bar.querySelector('#combatWaveNext').addEventListener('click', () => {
-        const list = clampWave(currentAreaType());
-        const shownCount = list.filter((e) => e.monster.isShown === true).length;
-        if (player.properties.combatWave < shownCount - 1) {
+        if (player.properties.combatWave < unlockedWaveCount(currentAreaType()) - 1) {
             player.properties.combatWave++;
             abortWave();
             renderControls();

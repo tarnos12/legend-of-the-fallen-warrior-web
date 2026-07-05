@@ -11,6 +11,7 @@ import { player, playerInventory } from '../core/core.js';
 import { Log } from '../core/log.js';
 import { monsterList } from '../data/monsterList.js';
 import { monsterAreas } from '../data/gameObjects.js';
+import { unlockedWaveCount, unlockedWaveMembers } from '../data/waves.js';
 import { grantKillRewards, displayLogInfo } from './battle.js';
 import { weaponCombatProfile } from './weaponBehavior.js';
 import { quest } from './quest.js';
@@ -22,21 +23,20 @@ const MAX_AWAY_SECONDS = 8 * 3600; // idle-game classic: 8h offline cap
 const MAX_KILLS = 300; // hard cap (each kill runs the real reward pipeline)
 const EFFICIENCY = 0.7; // walk-in time, wave gaps, deaths...
 
-// The save's current wave monster (same selection rules as the combat canvas,
-// kept import-cycle-free here).
+// The save's current wave monster (same selection rules as the combat canvas:
+// the wave group's first unlocked member stands in for the mixed pool).
 function savedWaveMonster() {
     let areaType = player.properties.combatArea;
     const unlocked = monsterAreas.filter((a) => a.isUnlocked === true);
     if (!unlocked.some((a) => a.type === areaType)) {
         areaType = (unlocked[0] || monsterAreas[0]).type;
     }
-    const entries = Object.keys(monsterList)
-        .filter((key) => monsterList[key].area === areaType)
-        .sort((a, b) => monsterList[a].id - monsterList[b].id)
-        .map((key) => monsterList[key]);
-    const shownCount = entries.filter((m) => m.isShown === true).length;
-    const index = Math.max(0, Math.min(player.properties.combatWave, shownCount - 1));
-    return entries[index] || null;
+    const index = Math.max(
+        0,
+        Math.min(player.properties.combatWave, unlockedWaveCount(areaType) - 1)
+    );
+    const pool = unlockedWaveMembers(areaType, index);
+    return pool.length ? monsterList[pool[0]] : null;
 }
 
 // Kills per second from the live-combat numbers: average weapon damage at the

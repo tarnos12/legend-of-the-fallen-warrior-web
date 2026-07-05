@@ -18,10 +18,11 @@ import { state } from '../core/state.js';
 import { updateHtml } from './stats.js';
 // quiet=true (offline progress) skips the notification and the full inventory
 // re-render per kill; the offline loop renders the inventory once at the end.
-export function monsterItemDrop(monster, quiet) {
+// shiny=true (sparkling spawns) doubles the drop roll.
+export function monsterItemDrop(monster, quiet, shiny) {
     var itemDropNumber = 0;
     var randomItemChance = Math.floor(Math.random() * (1000 - 1) + 1);
-    if (randomItemChance * player.functions.dropRate() >= 500) {
+    if (randomItemChance * player.functions.dropRate() * (shiny ? 2 : 1) >= 500) {
         // < not <= : pushing at length===cap overfilled the inventory by one
         if (playerInventory.length < player.functions.inventory()) {
             getItemType(monster, true); // Call getItemType(monster); several times, for multiple item drop per monster kill/ random amount of items per kill...

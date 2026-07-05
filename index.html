@@ -154,6 +154,8 @@
             </div>
             <ul class="nav nav-tabs" id="hudNav">
                 <li onclick="CreateInventoryWeaponHtml();"><a href="#tab_mainBattle" data-toggle="tab">Character</a></li>
+                <li onclick="renderWorldMap();"><a href="#tab_mainMap" data-toggle="tab">Map</a></li>
+                <li onclick="renderBestiary();"><a href="#tab_mainBestiary" data-toggle="tab">Bestiary</a></li>
                 <li><a href="#tab_mainProfessions" data-toggle="tab">Professions</a></li>
                 <li><a href="#tab_mainSkills" data-toggle="tab">Skills</a></li>
                 <li><a href="#tab_mainShop" data-toggle="tab">Shop</a></li>
@@ -227,6 +229,19 @@
                                 </div>
                             </div>
                         </div>
+                    </div>
+                    <div id="tab_mainMap" class="tab-pane unselectable c4">
+                        <div class="c3"><h4>World Map</h4></div>
+                        <div id="mapLayout">
+                            <div id="mapCanvasWrap">
+                                <canvas id="mapCanvas" width="700" height="380"></canvas>
+                            </div>
+                            <div id="mapInfo" class="c4"></div>
+                        </div>
+                    </div>
+                    <div id="tab_mainBestiary" class="tab-pane unselectable c4">
+                        <div class="c3"><h4>Bestiary</h4></div>
+                        <div id="bestiaryContent"></div>
                     </div>
                     <div id="tab_mainProfessions" class="tab-pane unselectable c4">
 
