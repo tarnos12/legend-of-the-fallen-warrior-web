@@ -92,22 +92,14 @@ function displayShopItems(type) {
     else if (type === itemShopArmor) [category, containerId] = ['Armor', 'shopArmor'];
     else if (type === itemShopAccessory) [category, containerId] = ['Accessory', 'shopAccessory'];
 
+    // same slot-grid cells as the inventory: rarity = outline color, price as
+    // the corner badge, detail in the hover tooltip; the radio (hidden by CSS)
+    // still drives Buy via state.checkedShopItem
     const items = type
         .map((item) => {
             const imgClass = item.itemType === 'weapon' ? item.itemType : item.subType;
-            // same inline stat line as the inventory cards — tooltips don't
-            // work on touch, and comparing wares needs the numbers up front
-            const cardInfo =
-                `<div style="font-size:11px; line-height:1.3;">` +
-                `<font color="${item.color}">${item.itemRarity}</font> · ` +
-                (item.itemType === 'weapon'
-                    ? `⚔ ${item.MinDamage}-${item.MaxDamage}`
-                    : item.itemType === 'armor'
-                      ? `🛡 ${Math.floor(item.defense)}`
-                      : `✦ lvl ${item.iLvl}`) +
-                `</div>`;
             return (
-                `<div class="col-xs-3">` +
+                `<div class="invCell shopCell">` +
                 `<a class="tooltips" style="cursor:pointer;">` +
                 `<label> <input type="radio" name="shopItem" value=${item.id}>` +
                 `<img class="${imgClass}, ${item.itemRarity}" src="images/items/${item.subType}/${item.image}.png"/>` +
@@ -115,10 +107,9 @@ function displayShopItems(type) {
                 `<span style="width:300px;left:10px; bottom:40px;">` +
                 `<div class="row"><div class="col-xs-10 col-xs-offset-1">` +
                 itemTooltipTest(item) +
-                `<strong>Left-Click to equip</strong>` +
+                `<strong>Select, then Buy below</strong>` +
                 `</div></div></span></a>` +
-                cardInfo +
-                `${item.shopPrice} Gold` +
+                `<span class="invPower">${item.shopPrice}g</span>` +
                 `</div>`
             );
         })
@@ -133,7 +124,7 @@ function displayShopItems(type) {
         `</div>` +
         `<div class="row"><div class="col-xs-12">` +
         `<div class="c3"><h3>Item Shop</h3></div></div>` +
-        items +
+        `<div class="invGrid">${items}</div>` +
         `</div></div></div>`;
 
     if (containerId) document.getElementById(containerId).innerHTML = html;

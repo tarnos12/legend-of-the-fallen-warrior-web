@@ -411,6 +411,28 @@ textarea {
     text-shadow: 0 1px 2px #000;
     pointer-events: none;
 }
+/* sell mode: armed cells warn on hover */
+.invCell.sellArmed:hover {
+    border-color: var(--red);
+    box-shadow: 0 0 6px rgba(239, 68, 68, 0.45);
+}
+/* shop cells: the selection radio is invisible, the cell itself shows it */
+.shopCell label {
+    margin: 0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.shopCell input[type='radio'] {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+.shopCell:has(input:checked) {
+    border-color: var(--gold);
+    box-shadow: 0 0 8px rgba(217, 178, 74, 0.55);
+}
 
 /* ---- world map panel ---- */
 #mapLayout {

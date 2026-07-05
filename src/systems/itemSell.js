@@ -47,11 +47,20 @@ function sellAllItems() {
     inventoryId = [];
 }
 
-//Single item sell
+//Single item sell (right-click / sell mode in the inventory grid)
 function itemSell(id) {
     var item = playerInventory.filter(function (obj) {
         return obj.id === id;
     })[0];
+    // high-rarity items are painful to lose to a stray click
+    if (
+        item !== undefined &&
+        (item.itemRarity === 'Epic' || item.itemRarity === 'Legendary') &&
+        confirm('Sell ' + item.itemRarity + ' ' + item.name + ' for ' + item.Value + ' gold?') !==
+            true
+    ) {
+        return;
+    }
     var index = playerInventory.indexOf(item);
     if (index > -1) {
         playerInventory.splice(index, 1);

@@ -19,6 +19,19 @@ function changedTabInventory(index) {
     inventoryTabActiveNum = index;
 }
 
+// Sell mode: while ON, clicking an inventory item sells it instead of
+// equipping (right-click sells regardless — desktop shortcut; the toggle is
+// the touch path). Module-local like the tab index; resets on reload.
+var inventorySellMode = false;
+function toggleSellMode() {
+    inventorySellMode = !inventorySellMode;
+    CreateInventoryWeaponHtml();
+}
+function invCellClick(id) {
+    if (inventorySellMode) window.itemSell(id);
+    else window.equipItem(id);
+}
+
 function CreateInventoryWeaponHtml() {
     const navTabs = InventoryItemTypes.map((t, k) => {
         const li =
@@ -47,7 +60,10 @@ function CreateInventoryWeaponHtml() {
                 `<button type="button" onclick="sortInventory('iLvl')">Level</button>` +
                 (t.type === 'weapon'
                     ? `<button type="button" onclick="sortInventory('Damage')">Damage</button>`
-                    : '');
+                    : '') +
+                `<button type="button" class="sellModeToggle${inventorySellMode ? ' backgroundRed' : ''}" onclick="toggleSellMode()" ` +
+                `title="While ON, clicking an item sells it (right-click always sells)">` +
+                `💰 Sell mode${inventorySellMode ? ' ON' : ''}</button>`;
         }
 
         let cards = '';
@@ -88,9 +104,9 @@ function CreateInventoryWeaponHtml() {
                           ? Math.floor(item.defense)
                           : item.iLvl;
                 cards +=
-                    `<div class="invCell" id="testingItem${item.id}">` +
+                    `<div class="invCell${inventorySellMode ? ' sellArmed' : ''}" id="testingItem${item.id}">` +
                     `<a class="tooltips2" style="cursor:pointer;">` +
-                    `<img class="${imgClass}, ${item.itemRarity}"src="images/items/${item.subType}/${item.image}.png"onclick="equipItem(${item.id})"/>` +
+                    `<img class="${imgClass}, ${item.itemRarity}"src="images/items/${item.subType}/${item.image}.png"onclick="invCellClick(${item.id})" oncontextmenu="itemSell(${item.id});return false;"/>` +
                     (hasType
                         ? `<span style="pointer-events:none; left:-100px;right:0; bottom:100px; width:400px;">`
                         : `<span style="width:300px; left:80px;right:0; bottom:100px;">`) +
@@ -107,7 +123,7 @@ function CreateInventoryWeaponHtml() {
                         ? `<div class="col-xs-6">`
                         : `<div class="col-xs-10 col-xs-offset-1">`) +
                     itemTooltipTest(item) +
-                    `<strong>Left-Click to equip</strong>` +
+                    `<strong>${inventorySellMode ? 'Left-Click to SELL' : 'Left-Click to equip'} · Right-Click to sell</strong>` +
                     `</div></div>` +
                     `</div>` +
                     (hasType ? `</div>` : '') +
@@ -364,4 +380,9 @@ export {
 // on the inventory nav tabs, so it must be on window (it silently dropped off during
 // the ESM conversion, leaving tab clicks throwing a ReferenceError and the active-tab
 // state stuck at 0 across re-renders).
-Object.assign(window, { CreateInventoryWeaponHtml, changedTabInventory });
+Object.assign(window, {
+    CreateInventoryWeaponHtml,
+    changedTabInventory,
+    toggleSellMode,
+    invCellClick,
+});
