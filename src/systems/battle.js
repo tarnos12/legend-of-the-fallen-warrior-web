@@ -8,7 +8,7 @@ import { state } from '../core/state.js';
 import { updateHtml, manaRegen, levelUp } from './stats.js';
 import { playerRevive } from './intervalFunctions.js';
 import { quest } from './quest.js';
-import { monsterItemDrop } from './itemDrop.js';
+import { monsterItemDrop, rollBossUnique } from './itemDrop.js';
 import { pageReload, reset } from '../core/save.js';
 import { CreateMonsterHtml } from '../ui/monsterUI.js';
 import { CreateWeaponSkillHtml, activeBuffsHtml } from '../ui/panelsUI.js';
@@ -201,6 +201,8 @@ export function grantKillRewards(monsterStats, quiet, shiny) {
     monsterExperience(monsterStats, quiet, shiny);
     monsterStats.killCount++;
     quest(quiet); // unlocks always run; quiet only skips the panel rerender
+    // area bosses can drop their signature named unique (no-op for non-bosses)
+    rollBossUnique(monsterStats, quiet, shiny);
     // (The prestige Warp button lives in the combat control bar now, shown
     // whenever an area boss — lastEnemy — has been killed.)
     player.properties.lastEnemyLevel = monsterStats.level;

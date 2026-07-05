@@ -8,6 +8,7 @@ import {
     itemRarity,
 } from '../data/gameObjects.js';
 import { AFFIX_POOLS, RARITY_AFFIX_BUDGET, rollAffixValue } from '../data/affixes.js';
+import { BOSS_UNIQUES, BOSS_UNIQUE_CHANCE, signatureValue } from '../data/bossUniques.js';
 import { player, playerInventory } from '../core/core.js';
 import { Log, itemDropLog } from '../core/log.js';
 import { getNumberMultiplierofFive } from '../core/format.js';
@@ -44,6 +45,43 @@ export function monsterItemDrop(monster, quiet, shiny) {
         }
     }
     if (!quiet) CreateInventoryWeaponHtml();
+}
+
+// Boss unique roll: only area bosses (keyed by name in data/bossUniques.js)
+// can drop their signature named item, at BOSS_UNIQUE_CHANCE (doubled for
+// shiny bosses). The unique is a forced-Legendary base of the item's slot with
+// its normal random affixes PLUS a guaranteed signature affix, a fixed name and
+// gold color. Called from battle.js grantKillRewards with the full monster.
+export function rollBossUnique(monster, quiet, shiny) {
+    var defs = BOSS_UNIQUES[monster.name];
+    if (!defs || defs.length === 0) return null;
+    if (Math.random() >= BOSS_UNIQUE_CHANCE * (shiny ? 2 : 1)) return null;
+    var def = defs[Math.floor(Math.random() * defs.length)];
+    var before = playerInventory.length;
+    // crafted 'Legendary' base: pushed unconditionally (uniques bypass the sell
+    // filters and are always kept) and rolls its own random affixes first
+    getItemType(monster.level, false, def.itemType, def.subType, 'Legendary');
+    if (playerInventory.length === before) return null;
+    var item = playerInventory[playerInventory.length - 1];
+    item.name = def.name;
+    item.color = '#ff9d1a';
+    item.isUnique = true;
+    item.lore = def.lore;
+    // guarantee the signature affix at (at least) its fixed magnitude
+    var sig = signatureValue(def.signature, monster.level);
+    item[def.signature.key] = Math.max(item[def.signature.key] || 0, sig);
+    item.Value = Math.floor(item.Value * 1.5) + 500;
+    if (!quiet) {
+        Log(
+            '<span class="bold" style="color:#ff9d1a;">✦ ' +
+                monster.displayName +
+                ' dropped a unique: ' +
+                def.name +
+                '!<br /></span>'
+        );
+        CreateInventoryWeaponHtml();
+    }
+    return item;
 }
 
 export function getItemType(monster, isDrop, craftItemType, craftitemSubType, craftItemQuality) {
@@ -194,6 +232,10 @@ function getItemRarity(monster, dropItem, isDrop, craftItemQuality) {
         itemRarityArray = 2;
     } else if (craftItemQuality === 'Master') {
         itemRarityArray = 3;
+    } else if (craftItemQuality === 'Legendary') {
+        // force the top tier (boss uniques). itemRarity[0] = Legendary, so the
+        // roll window collapses to just its chance and always picks Legendary.
+        itemRarityArray = itemRarity.length;
     }
     var itemChanceTotal = itemRarity[itemRarity.length - itemRarityArray]; // last array element
     totalChance = itemChanceTotal.chance;

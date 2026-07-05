@@ -9,6 +9,18 @@ _Last updated: 2026-07-05_
 
 ## Current status
 
+**Item redesign — Phase 2 (named boss uniques): DONE.**
+- `src/data/bossUniques.js` — one signature named item per area boss (7 bosses; keyed
+  by boss monster `name`): fixed slot + guaranteed signature affix + lore. e.g. Lord
+  Varik's Cleaver (axe, +2 Extra targets), Tar Nuk's Reckoning (mace, 30% Stun),
+  The Keeper's Aegis (shield, +Bonus life), The Beholder's Eye (amulet, +Magic find).
+- `itemDrop.rollBossUnique(monster, quiet, shiny)` — 20% per boss kill (2× shiny);
+  forced-Legendary base of the slot (new `'Legendary'` craft quality forces top tier)
+  + normal random affixes + the stamped name/gold color/`isUnique`/signature. Called
+  from `battle.grantKillRewards` (no-op for non-bosses).
+- Tests: `test/boss-uniques.test.js` (drop shape, signature magnitude, non-bosses never
+  drop, level scaling). **72/72 pass, build + lint clean.** Live-verified all bosses.
+
 **Item redesign — Phase 1 (affix pools + compressed power curve + budget model): DONE.**
 - New `src/data/affixes.js` — curated per-slot prefix/suffix pools. Every affix key
   is a stat the player actually reads for that slot, so a shield can't roll crit and
@@ -35,11 +47,10 @@ _Last updated: 2026-07-05_
 
 ## In flight / next steps
 
-- **Item redesign Phase 2 — named boss uniques.** Each area boss drops 1–2 named items
-  with a *fixed* signature affix (e.g. Lord Varik's Cleaver = axe, always +1 Extra
-  target), boss-only, low odds. This is the payoff for the empty "drops" display slots.
 - **Item redesign Phase 3 — surface drops** in the bestiary "mastered" tier and the map
-  info panel (the placeholder lines are already there in `bestiaryUI.js` / `mapUI.js`).
+  info panel: show the boss's unique name (from `data/bossUniques.js`) so players know
+  what to hunt. The placeholder "drops item level N gear" lines are already there in
+  `bestiaryUI.js` / `mapUI.js` — swap in the unique name for boss monsters/areas.
 - Later polish: real map art (placeholder biome grid today), organic skill-tree node
   layouts, big-number formatting (`1.2M`), accessory offensive-affix wiring (crit/bonus
   damage read off accessories — needs new `core.js` readers).
