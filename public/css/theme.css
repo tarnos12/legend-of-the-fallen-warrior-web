@@ -492,6 +492,10 @@ textarea {
 .mapUnknown {
     opacity: 0.55;
 }
+.mapUnique {
+    color: var(--gold-bright);
+    font-style: italic;
+}
 
 /* ---- skill trees (canvas, Skills panel) ---- */
 .treeLayout {
@@ -573,6 +577,10 @@ textarea {
 }
 .beastStats.beastMastered {
     color: var(--gold-bright);
+}
+.beastStats.beastUnique {
+    color: var(--gold-bright);
+    font-style: italic;
 }
 .beastProgress {
     height: 5px;

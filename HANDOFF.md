@@ -9,6 +9,15 @@ _Last updated: 2026-07-05_
 
 ## Current status
 
+**Item redesign — Phase 3 (surface boss uniques): DONE.** The bestiary "mastered" tier
+(`bestiaryUI.js`) and the map info panel (`mapUI.js`) now name each area boss's signature
+unique (from `data/bossUniques.js`) instead of the generic "drops ... gear" placeholder, so
+players can see what to hunt. Bestiary: a `☠ Signature drop: <name>` line under the mastered
+block for boss monsters (keyed by monster `name` ∈ `BOSS_UNIQUES`; non-bosses unchanged). Map:
+a `Boss drop: ☠ <name>` line under the area's drops line (not kill-gated — advertises the hunt).
+Gold-italic styling via new `.beastUnique`/`.mapUnique` in `theme.css`. Display-only, no new
+save data, no gameplay change. 79/79 tests, build + lint clean.
+
 **Bugfix — weapon/shield icons broke after loading a save: FIXED.** The on-load self-heal
 (`save.js` `repairItemImage`, from commit 766e922) re-derived art as `subType+rarity`,
 dropping the level-number suffix that weapons/shields need (`swordLegendary.png` has no
@@ -69,10 +78,6 @@ for every enemy.)
 
 ## In flight / next steps
 
-- **Item redesign Phase 3 — surface drops** in the bestiary "mastered" tier and the map
-  info panel: show the boss's unique name (from `data/bossUniques.js`) so players know
-  what to hunt. The placeholder "drops item level N gear" lines are already there in
-  `bestiaryUI.js` / `mapUI.js` — swap in the unique name for boss monsters/areas.
 - **Boss-unique acquisition rework (after playtesting).** Current = 20% RNG drop, and a
   slot is gated behind reaching its boss's area. User is weighing: Boss Souls (guaranteed
   currency) + a Soul Shop (buy any unique, scaled to your level) to fix both the RNG and

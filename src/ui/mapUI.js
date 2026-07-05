@@ -9,6 +9,7 @@ import { player } from '../core/core.js';
 import { monsterAreas } from '../data/gameObjects.js';
 import { monsterList } from '../data/monsterList.js';
 import { areaMonsterKeys } from '../data/waves.js';
+import { BOSS_UNIQUES } from '../data/bossUniques.js';
 import { travelTo } from './battleCanvas.js';
 
 // node layout on a 700x380 map; placeholder biomes until a real image lands
@@ -120,6 +121,12 @@ function renderInfo() {
                 : `<li class="mapUnknown">??? <span class="mapEnemyLvl">lvl ${m.level}</span></li>`;
         })
         .join('');
+    const bossUniqueNames = areaMonsterKeys(area.type)
+        .flatMap((key) => BOSS_UNIQUES[monsterList[key].name] || [])
+        .map((u) => u.name);
+    const bossDropLine = bossUniqueNames.length
+        ? `<div class="mapMeta">Boss drop: <span class="mapUnique">☠ ${bossUniqueNames.join(', ')}</span></div>`
+        : '';
     info.innerHTML =
         `<h4>${node.icon || ''} ${area.displayName}</h4>` +
         `<div class="mapBiome">${node.biome || ''}${unlocked ? '' : ' — <span style="color:var(--red);">locked</span>'}</div>` +
@@ -127,6 +134,7 @@ function renderInfo() {
         `<div class="mapMeta">Enemies:</div>` +
         `<ul class="mapEnemyList">${enemies}</ul>` +
         `<div class="mapMeta">Drops: item level ${levelRange(area.type)} gear</div>` +
+        bossDropLine +
         (unlocked
             ? `<button type="button" id="mapTravel" class="sell" style="margin-top:8px;">Travel here</button>`
             : `<div class="mapMeta" style="opacity:0.8;">🔒 Unlocks through story progression.</div>`);

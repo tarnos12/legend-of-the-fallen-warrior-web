@@ -13,6 +13,7 @@ import { monsterList } from '../data/monsterList.js';
 import { areaMonsterKeys } from '../data/waves.js';
 import { ownsCard, areaCardProgress, isAreaSetComplete } from '../systems/cards.js';
 import { CARD_SET_BONUS } from '../data/cards.js';
+import { BOSS_UNIQUES } from '../data/bossUniques.js';
 
 export const BESTIARY_MASTERY_KILLS = 100;
 
@@ -45,9 +46,13 @@ function monsterCard(key) {
         tier >= 3
             ? `<div class="beastStats">✦ ${Math.floor(m.baseExp())} exp · 💰 ${m.level}-${m.level + 5} gold</div>`
             : `<div class="beastStats beastLocked">Rewards at 25 kills</div>`;
+    const uniqueLine = (BOSS_UNIQUES[m.name] || [])
+        .map((u) => `<div class="beastStats beastUnique">☠ Signature drop: ${u.name}</div>`)
+        .join('');
     const masteryBlock =
         tier >= 4
-            ? `<div class="beastStats beastMastered">★ Mastered — drops item level ${m.level} gear (any slot, up to Legendary${m.lastEnemy === true ? ', boss' : ''})</div>`
+            ? `<div class="beastStats beastMastered">★ Mastered — drops item level ${m.level} gear (any slot, up to Legendary${m.lastEnemy === true ? ', boss' : ''})</div>` +
+              uniqueLine
             : `<div class="beastStats beastLocked">Drops at ${BESTIARY_MASTERY_KILLS} kills</div>`;
     const cardBlock = ownsCard(key)
         ? `<div class="beastStats beastCardOwned">🃏 Card collected</div>`
