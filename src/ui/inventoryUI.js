@@ -51,8 +51,10 @@ function CreateInventoryWeaponHtml() {
         }
 
         let cards = '';
+        let cardCount = 0;
         for (var i = 0; i < playerInventory.length; i++) {
             if (playerInventory[i].itemType === t.type) {
+                cardCount++;
                 var itemStat;
                 if (playerInventory[i].itemType === 'weapon') {
                     itemStat = equippedItems.weapon;
@@ -76,19 +78,17 @@ function CreateInventoryWeaponHtml() {
                 const item = playerInventory[i];
                 const hasType = itemStat.hasOwnProperty('itemType');
                 const imgClass = item.itemType === 'weapon' ? item.itemType : item.subType;
-                // key stats inline on the card (hover tooltip stays for detail,
-                // but is useless on touch and tedious for comparing drops)
-                const cardInfo =
-                    `<div style="font-size:11px; line-height:1.3;">` +
-                    `<font color="${item.color}">${item.itemRarity}</font> · ` +
-                    (item.itemType === 'weapon'
-                        ? `⚔ ${item.MinDamage}-${item.MaxDamage}`
+                // corner badge: the item's headline number (avg damage /
+                // defense / item level) — rarity is the icon's outline color,
+                // full detail stays in the hover tooltip
+                const power =
+                    item.itemType === 'weapon'
+                        ? Math.round((item.MinDamage + item.MaxDamage) / 2)
                         : item.itemType === 'armor'
-                          ? `🛡 ${Math.floor(item.defense)}`
-                          : `✦ lvl ${item.iLvl}`) +
-                    `</div>`;
+                          ? Math.floor(item.defense)
+                          : item.iLvl;
                 cards +=
-                    `<div class="col-xs-6 col-sm-4 col-md-4 col-lg-2 c8" style="margin-top:5px;" id="testingItem${item.id}">` +
+                    `<div class="invCell" id="testingItem${item.id}">` +
                     `<a class="tooltips2" style="cursor:pointer;">` +
                     `<img class="${imgClass}, ${item.itemRarity}"src="images/items/${item.subType}/${item.image}.png"onclick="equipItem(${item.id})"/>` +
                     (hasType
@@ -113,10 +113,17 @@ function CreateInventoryWeaponHtml() {
                     (hasType ? `</div>` : '') +
                     `</span>` +
                     `</a>` +
-                    cardInfo +
-                    `<button type="button" style="margin-top:5px;" class="inventorySell" onclick="itemSell(${item.id})">Sell</button>` +
+                    `<span class="invPower">${power}</span>` +
                     `</div>`;
             }
+        }
+        // fixed 5-wide grid, at least 4 rows; leftover cells render empty
+        if (t.type !== 'other') {
+            const cellTotal = Math.max(20, Math.ceil(cardCount / 5) * 5);
+            for (let empty = cardCount; empty < cellTotal; empty++) {
+                cards += `<div class="invCell empty"></div>`;
+            }
+            cards = `<div class="invGrid">${cards}</div>`;
         }
 
         let otherBlock = '';
@@ -141,7 +148,7 @@ function CreateInventoryWeaponHtml() {
 
         return (
             paneOpen +
-            `id="tab_${t.type}" style="height:400px;">` +
+            `id="tab_${t.type}" style="min-height:400px;">` +
             `<div class="row" id="inventorySpace${t.type}">` +
             `<div class="c3" style="margin-bottom:10px;"><h4>Inventory</h4>` +
             sortSection +

@@ -374,6 +374,86 @@ textarea {
     margin: 2px 0 8px 10px;
     min-width: 34px;
 }
+/* ---- inventory: fixed 5-wide slot grid ---- */
+.invGrid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+    padding: 8px 0;
+}
+.invCell {
+    position: relative;
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-inset);
+    border: 1px solid var(--border-dim);
+    border-radius: 6px;
+    min-width: 0;
+}
+.invCell.empty {
+    opacity: 0.45;
+}
+.invCell img {
+    max-width: 70%;
+    max-height: 70%;
+    cursor: pointer;
+}
+.invCell .invPower {
+    position: absolute;
+    right: 4px;
+    bottom: 2px;
+    font-size: 11px;
+    font-weight: bold;
+    color: var(--gold-bright);
+    text-shadow: 0 1px 2px #000;
+    pointer-events: none;
+}
+
+/* ---- stat panel: compact flat rows ---- */
+.statList {
+    margin: 4px 0;
+}
+.statRow {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    height: 26px; /* the legacy value markup drags odd line-box slack along;
+                     fix the row height and let flex center the content */
+    padding: 0 8px;
+    border-bottom: 1px solid rgba(74, 59, 29, 0.45);
+}
+.statValue * {
+    vertical-align: middle;
+}
+.statRow:last-child {
+    border-bottom: none;
+}
+.statIcon {
+    width: 16px;
+    height: 16px;
+    display: block;
+}
+.statValue {
+    margin-left: auto;
+    font-weight: bold;
+    color: var(--gold-bright);
+}
+/* updateHtml wraps the breakdown info-icon in a <p>; bootstrap's paragraph
+   margin was doubling every row's height */
+.statValue p {
+    display: inline;
+    margin: 0;
+}
+.statPlus {
+    color: var(--green);
+    padding: 0 4px;
+}
+.statPlus:hover {
+    color: var(--gold-bright);
+}
+
 /* Character panel: kill the double border/background of the legacy wrapper
    (the overlay panel already provides the chrome) */
 #tab_mainBattle > .row.c4 {

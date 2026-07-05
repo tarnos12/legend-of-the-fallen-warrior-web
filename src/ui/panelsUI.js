@@ -179,12 +179,15 @@ function CreatePlayerSkillsHtml() {
 }
 
 function primaryStatUpdate() {
+    // compact flat rows: [icon] [name] ......... [value] [+]
+    // The span ids must stay (updateHtml writes the values into #statInfo and
+    // the upgrade handlers hang off #TypeCap); updateHtml also shows/hides
+    // .statPlus depending on unspent stat points.
     let rows = '';
     for (var key in primaryStatInfo) {
         var currentBonus = primaryStatInfo[key];
         var statInfo = currentBonus.info;
         var statDisplay2 = currentBonus.type;
-        var shortNameDisplay = currentBonus.shortNameDisplay;
         const typeCap = currentBonus.type.capitalizeFirstLetter();
 
         const isSimpleSpan =
@@ -192,45 +195,21 @@ function primaryStatUpdate() {
             currentBonus.type === 'Stats' ||
             currentBonus.type === 'mana' ||
             currentBonus.type == 'spellPower';
-        const statDisplay = isSimpleSpan
-            ? `<span id="${statInfo}"></span>`
-            : `<span id="${statInfo}"></span>` +
-              `<span id="${typeCap}" style="cursor:pointer" onclick="upgrade${typeCap}(event);" data-toggle="tooltip" data-placement="top" title="Increase ${currentBonus.type}">` +
+        const label = currentBonus.type === 'spellPower' ? 'Spell Power' : typeCap;
+        const plusSpan = isSimpleSpan
+            ? ''
+            : `<span id="${typeCap}" class="statPlus" style="cursor:pointer" onclick="upgrade${typeCap}(event);" data-toggle="tooltip" data-placement="top" title="Increase ${currentBonus.type} (Ctrl/Alt+Click: +10, Shift+Click: +100)">` +
               `<span class="glyphicon glyphicon-plus unselectable"></span></span>`;
 
-        const isWide =
-            currentBonus.type === 'damage' ||
-            currentBonus.type === 'mana' ||
-            currentBonus.type == 'spellPower';
-
-        const statDisplay3 = statDisplay2.capitalizeFirstLetter();
-        let iconBlock = '';
-        if (
-            'Strength, Endurance, Agility, Dexterity, Wisdom, Intelligence, Luck, Damage, Mana, Stats, SpellPower'.indexOf(
-                statDisplay3
-            ) != -1
-        ) {
-            iconBlock =
-                `<span data-toggle="tooltip" data-placement="top" title="${currentBonus.tooltip}"><img src="images/stat/${statDisplay2}.png"></span><br />` +
-                shortNameDisplay;
-        }
-
         rows +=
-            (isWide
-                ? `<div class="col-xs-12 primaryStatsMargin border darkBackground"><div class="row"><div class="col-xs-6">`
-                : `<div class="col-xs-6 primaryStatsMargin border darkBackground"><div class="row"><div class="col-xs-4">`) +
-            iconBlock +
-            `</div>` +
-            (isWide
-                ? `<div class="col-xs-6 rightAlign primaryNumberMargin">`
-                : `<div class="col-xs-8 rightAlign primaryNumberMargin darkBackground">`) +
-            statDisplay +
-            ` ` +
-            `</div>` +
-            `</div>` +
+            `<div class="statRow darkBackground">` +
+            `<span data-toggle="tooltip" data-placement="top" title="${currentBonus.tooltip}"><img class="statIcon" src="images/stat/${statDisplay2}.png"></span>` +
+            `<span class="statName">${label}</span>` +
+            `<span class="statValue"><span id="${statInfo}"></span></span>` +
+            plusSpan +
             `</div>`;
     }
-    document.getElementById('primaryStat').innerHTML = `<div class="row">${rows}</div>`;
+    document.getElementById('primaryStat').innerHTML = `<div class="statList">${rows}</div>`;
     updateHtml();
 }
 
