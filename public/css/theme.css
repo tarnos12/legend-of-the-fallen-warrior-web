@@ -298,6 +298,15 @@ textarea {
     bottom: 8px;
     z-index: 4;
 }
+#logToggle {
+    display: none; /* desktop always shows the side log */
+    position: absolute;
+    right: 8px;
+    bottom: 8px;
+    z-index: 6;
+    min-height: 40px;
+    min-width: 44px;
+}
 
 /* ---- bottom HUD ---- */
 #hudBar {
@@ -689,7 +698,21 @@ body.pre-game #hudBar {
         min-height: 36px;
     }
     #stage #logConsole {
-        display: none; /* no room next to the arena on phones */
+        display: none; /* no room next to the arena on phones... */
+    }
+    #logToggle {
+        display: block; /* ...so 📜 opens it as an overlay sheet instead */
+    }
+    body.logOpen #stage #logConsole {
+        display: block;
+        position: fixed;
+        top: 35vh;
+        left: 8px;
+        right: 8px;
+        bottom: calc(var(--hud-h) + 56px);
+        width: auto;
+        z-index: 45;
+        background: rgba(23, 19, 16, 0.94);
     }
     /* controls + quest tracker flow as a top stack (the control bar wraps to
        a variable height on phones, so absolute offsets can't avoid overlap) */

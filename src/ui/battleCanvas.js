@@ -566,9 +566,8 @@ function draw() {
         return;
     }
 
-    // header: area — wave x/y: living enemies — weapon
-    const groups = waveGroups(currentAreaType());
-    const areaName = (unlockedAreas().find((a) => a.type === currentAreaType()) || {}).displayName;
+    // header: living enemies — weapon (area + wave live in the floating
+    // control bar right above; repeating them here was just noise)
     const living = {};
     for (const e of targetable()) {
         living[e.monster.displayName] = (living[e.monster.displayName] || 0) + 1;
@@ -579,19 +578,7 @@ function draw() {
     ctx.fillStyle = '#d9b24a';
     ctx.font = 'bold 14px sans-serif';
     ctx.textAlign = 'left';
-    ctx.fillText(
-        (areaName ? areaName + ' — ' : '') +
-            'Wave ' +
-            (player.properties.combatWave + 1) +
-            '/' +
-            groups.length +
-            ': ' +
-            composition +
-            '  —  ' +
-            w.weapon.subType,
-        10,
-        20
-    );
+    ctx.fillText(composition + '  —  ' + w.weapon.subType, 10, 20);
 
     // hero (real health/mana pools)
     const lungeOffset = Math.sin(w.heroLunge * Math.PI) * 18;

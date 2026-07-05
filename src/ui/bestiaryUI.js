@@ -45,7 +45,7 @@ function monsterCard(key) {
             : `<div class="beastStats beastLocked">Rewards at 25 kills</div>`;
     const masteryBlock =
         tier >= 4
-            ? `<div class="beastStats beastMastered">★ Mastered — drop table coming soon</div>`
+            ? `<div class="beastStats beastMastered">★ Mastered — drops item level ${m.level} gear (any slot, up to Legendary${m.lastEnemy === true ? ', boss' : ''})</div>`
             : `<div class="beastStats beastLocked">Drops at ${BESTIARY_MASTERY_KILLS} kills</div>`;
     return (
         `<div class="beastCard">` +

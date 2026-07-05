@@ -35,6 +35,13 @@ function init() {
         btn.addEventListener('click', () => closePanel(pane));
         pane.insertBefore(btn, pane.firstChild);
     }
+    // mobile: the side log is hidden; 📜 toggles it as an overlay sheet
+    const logToggle = document.getElementById('logToggle');
+    if (logToggle) {
+        logToggle.addEventListener('click', () => {
+            document.body.classList.toggle('logOpen');
+        });
+    }
     if (nav) {
         nav.addEventListener('click', (e) => {
             const li = e.target.closest('li');

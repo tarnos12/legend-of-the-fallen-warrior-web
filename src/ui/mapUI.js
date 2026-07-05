@@ -126,7 +126,7 @@ function renderInfo() {
         `<div class="mapMeta">Enemy levels: ${levelRange(area.type)}</div>` +
         `<div class="mapMeta">Enemies:</div>` +
         `<ul class="mapEnemyList">${enemies}</ul>` +
-        `<div class="mapMeta" style="opacity:0.6;">Notable drops: coming soon</div>` +
+        `<div class="mapMeta">Drops: item level ${levelRange(area.type)} gear</div>` +
         (unlocked
             ? `<button type="button" id="mapTravel" class="sell" style="margin-top:8px;">Travel here</button>`
             : `<div class="mapMeta" style="opacity:0.8;">🔒 Unlocks through story progression.</div>`);
