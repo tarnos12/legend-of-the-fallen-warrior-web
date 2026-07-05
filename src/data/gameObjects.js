@@ -765,6 +765,11 @@ var itemPower = [
     },
 ];
 
+// power is the COMPRESSED base-stat multiplier (2026-07 redesign): a Legendary
+// is ~1.8x a Common at the same item level, not 5x, so lower rarities stay
+// relevant across a level range and rarity means "better + more affixes",
+// not "obsoletes everything below it". Affix slot counts live in
+// data/affixes.js RARITY_AFFIX_BUDGET; minMods/maxMods are legacy (unused).
 var itemRarity = [
     {
         type: 'Legendary',
@@ -772,7 +777,7 @@ var itemRarity = [
         maxMods: 7,
         chance: 10,
         color: 'red',
-        power: 5,
+        power: 4.3,
         rarityValue: 5,
     },
     {
@@ -781,7 +786,7 @@ var itemRarity = [
         maxMods: 6,
         chance: 50,
         color: 'orange',
-        power: 4,
+        power: 3.7,
         rarityValue: 4,
     },
     {
@@ -790,7 +795,7 @@ var itemRarity = [
         maxMods: 4,
         chance: 200,
         color: '#800080',
-        power: 3,
+        power: 3.1,
         rarityValue: 3,
     },
     {
@@ -799,7 +804,7 @@ var itemRarity = [
         maxMods: 3,
         chance: 1000,
         color: '#00CC33',
-        power: 2,
+        power: 2.75,
         rarityValue: 2,
     },
     {
@@ -808,7 +813,7 @@ var itemRarity = [
         maxMods: 2,
         chance: 5000,
         color: 'white',
-        power: 1,
+        power: 2.4,
         rarityValue: 1,
     },
 ];

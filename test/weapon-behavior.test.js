@@ -81,12 +81,13 @@ describe('weapon affix generation (itemDrop)', () => {
         // Commons never roll behavior affixes
         for (const item of commons) expect(specialOf(item)).toBe(0);
 
-        // Rare+ roll them regularly (expected ~25% of 200 -- zero is ~impossible)
+        // Rare+ roll them regularly (behavior affixes are 3 of the 5 weapon
+        // prefixes; Rare gets 1 prefix, Epic 1-2, Legendary 2-3)
         let affixed = 0;
         for (const item of rarePlus) {
             expect(['Rare', 'Epic', 'Legendary']).toContain(item.itemRarity);
             const count = specialOf(item);
-            expect(count).toBeLessThanOrEqual(1); // at most one affix
+            expect(count).toBeLessThanOrEqual(3); // capped by the prefix budget
             if (count === 1) {
                 affixed++;
                 if (item['Attack speed'] > 0) {

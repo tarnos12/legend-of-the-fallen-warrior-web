@@ -34,7 +34,10 @@ var armorSlots = ['shield', 'chest', 'helmet', 'legs', 'boots'];
 function sumEquippedStat(statKey, slots) {
     var total = 0;
     for (var i = 0; i < slots.length; i++) {
-        total += equippedItems[slots[i]][statKey];
+        // `|| 0`: items only carry the stat keys they actually rolled (the
+        // affix redesign no longer zero-fills every key), so a missing key
+        // must read as 0, not undefined — otherwise the sum becomes NaN.
+        total += equippedItems[slots[i]][statKey] || 0;
     }
     return total;
 }
@@ -216,16 +219,16 @@ var player = {
             );
         },
         totalBlockChance: function () {
-            return equippedItems.shield['Block chance'];
+            return equippedItems.shield['Block chance'] || 0;
         },
         totalBlockAmount: function () {
-            return equippedItems.shield['Block amount'];
+            return equippedItems.shield['Block amount'] || 0;
         },
         totalLifeGainOnHit: function () {
-            return equippedItems.weapon['Life gain on hit'];
+            return equippedItems.weapon['Life gain on hit'] || 0;
         },
         totalCriticalChance: function () {
-            return equippedItems.weapon['Critical chance'];
+            return equippedItems.weapon['Critical chance'] || 0;
         },
         totalArmorBonus: function () {
             return sumEquippedStat('defense', armorSlots);

@@ -6,9 +6,8 @@ import {
     itemAccessorySubType,
     itemPower,
     itemRarity,
-    itemBaseMod,
-    itemModifiers,
 } from '../data/gameObjects.js';
+import { AFFIX_POOLS, RARITY_AFFIX_BUDGET, rollAffixValue } from '../data/affixes.js';
 import { player, playerInventory } from '../core/core.js';
 import { Log, itemDropLog } from '../core/log.js';
 import { getNumberMultiplierofFive } from '../core/format.js';
@@ -222,27 +221,18 @@ function getItemRarity(monster, dropItem, isDrop, craftItemQuality) {
     getItemPower(monster, dropItem, isDrop, craftItemQuality);
 }
 function getItemPower(monster, dropItem, isDrop, craftItemQuality) {
-    var craftedBonus = 1;
+    // Item quality is now a small MULTIPLIER on the compressed rarity power
+    // (was a large additive that would dwarf the new 2.0-3.6 base). It gives
+    // two same-rarity items a ±10% spread and a name prefix.
     for (var key in itemPower) {
         if (itemPower.hasOwnProperty(key)) {
             var randomNumber = Math.floor(Math.random() * (100 - 1) + 1);
             var itemPowerChance = itemPower[key].chance;
             var itemPowerType = itemPower[key].type;
             if (randomNumber <= itemPowerChance) {
-                if (itemPowerType === 'Inferior') {
-                    dropItem['itemQuality'] = itemPowerType;
-                    craftedBonus = 0.8;
-                    dropItem.power += 0.3;
-                } else if (itemPowerType === 'Normal') {
-                    craftedBonus = 1;
-                    dropItem.power += 0.4;
-                    dropItem['itemQuality'] = itemPowerType;
-                } else if (itemPowerType === 'Superior') {
-                    dropItem['itemQuality'] = itemPowerType;
-                    craftedBonus = 1.2;
-                    dropItem.power += 0.5;
-                }
-                dropItem.power += craftedBonus;
+                dropItem['itemQuality'] = itemPowerType;
+                if (itemPowerType === 'Inferior') dropItem.power *= 0.95;
+                else if (itemPowerType === 'Superior') dropItem.power *= 1.1;
                 break; //Break here so it will stop once it rolls an item quality...
             }
         }
@@ -272,6 +262,10 @@ function getItemBaseStats(monster, dropItem, isDrop, craftItemQuality) {
         randomNumber = Math.floor(Math.random() * (maxDefense - minDefense + 1) + minDefense);
         dropItem['defense'] = randomNumber;
         dropItem.Value += Math.floor(dropItem.defense * 10);
+    } else if (dropItem.itemType === 'accessory') {
+        // accessories have no base damage/defense; give them a value floor so a
+        // 0-affix Common still passes the Value>0 push guard and prices sanely
+        dropItem.Value += Math.floor(10 + dropItem.iLvl * dropItem.rarityValue * 2);
     }
     if (dropItem.itemQuality !== 'Normal') {
         dropItem.name +=
@@ -287,106 +281,67 @@ function getItemBaseStats(monster, dropItem, isDrop, craftItemQuality) {
 }
 
 function getBaseItemMod(monster, dropItem, isDrop) {
-    var currentMods = 0;
-    var randomMod;
-    var newArray = [];
-    var arrayIndex = 0;
-    var randomModAmount = Math.round(Math.random()); // Picks a number between 0 and 1, since we want max 1 "base bonus" on an item
-    newArray = itemBaseMod.slice(); // Copy an array so we can remove array values so we dont get double of the same bonus on the item
-    if (currentMods < randomModAmount) {
-        randomMod = newArray[Math.floor(Math.random() * newArray.length)]; // picks a random bonus
-        var randomModValue =
-            Math.floor(Math.random() * (randomMod.maxValue - randomMod.minValue + 1)) +
-            randomMod.minValue;
-        dropItem[randomMod.type] = randomModValue;
-        arrayIndex = newArray.indexOf(randomMod); // Find out an index of our randomMod, so we can remove it( we dont want to get it multiple times...
-        newArray.splice(arrayIndex, 1); // Remove an itemMod from copied array...
-        currentMods += 1;
-    }
+    // The old physical/spell "base mod" (itemBaseMod) was never read by the
+    // player, so it's dropped; affix rolling happens in getBonusItemMod.
     getBonusItemMod(monster, dropItem, isDrop);
+}
+
+// ---- Affix rolling (curated per-slot prefix/suffix pools) -------------------
+function affixRandInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+// Apply one rolled affix onto the item, folding into the right base stat by
+// kind and accumulating the gold Value. Keys match what the player reads.
+function applyAffix(dropItem, affix, legendary) {
+    var v = rollAffixValue(affix, dropItem.iLvl, legendary);
+    if (v <= 0 && affix.kind !== 'targets') return;
+    if (affix.kind === 'foldDamage') {
+        v = Math.min(1000, v);
+        dropItem['Bonus damage'] = v;
+        dropItem.MinDamage = Math.floor(dropItem.MinDamage * (1 + v / 100));
+        dropItem.MaxDamage = Math.floor(dropItem.MaxDamage * (1 + v / 100));
+    } else if (affix.kind === 'foldArmor') {
+        dropItem['Bonus armor'] = v;
+        dropItem.defense = Math.floor(dropItem.defense * (1 + v / 100));
+    } else if (affix.kind === 'flatCrit') {
+        dropItem['Critical chance'] = (dropItem['Critical chance'] || 0) + v;
+    } else {
+        // attributes / utility / behavior / extra targets: additive on the key
+        dropItem[affix.key] = (dropItem[affix.key] || 0) + v;
+    }
+    dropItem.Value += Math.floor((affix.baseValue || 5) * v);
+}
+
+function rollAffixList(dropItem, list, range, legendary) {
+    var count = affixRandInt(range[0], range[1]);
+    var available = list.slice();
+    for (var i = 0; i < count && available.length > 0; i++) {
+        var pick = available.splice(Math.floor(Math.random() * available.length), 1)[0];
+        applyAffix(dropItem, pick, legendary);
+    }
+}
+
+// Roll the item's prefixes then suffixes from its slot pool, by the rarity's
+// affix-slot budget. Runs AFTER base stats (damage/defense/subtype crit/shield
+// block) are finalized, so folds land on the final numbers.
+function rollAffixes(dropItem) {
+    var pool =
+        dropItem.itemType === 'weapon' ? AFFIX_POOLS.weapon : AFFIX_POOLS[dropItem.subType];
+    if (!pool) return;
+    var budget = RARITY_AFFIX_BUDGET[dropItem.itemRarity] || RARITY_AFFIX_BUDGET.Common;
+    var legendary = dropItem.itemRarity === 'Legendary';
+    rollAffixList(dropItem, pool.prefixes, budget.prefix, legendary);
+    rollAffixList(dropItem, pool.suffixes, budget.suffix, legendary);
 }
 
 function getBonusItemMod(monster, dropItem, isDrop) {
     var itemLevel = dropItem.iLvl;
-    var currentMods = 0;
-    var minMods = dropItem.minMods;
-    var maxMods = dropItem.maxMods;
-    var randomMod = 0;
-    var newArray = [];
-    var itemModLevel = itemModifiers.modifier;
-    var randomModValue = 0;
-    var arrayIndex = 0;
     if (dropItem.subType === 'shield' || dropItem.itemType === 'weapon') {
         var number = getNumberMultiplierofFive(itemLevel);
         dropItem.image += number;
     }
-    var itemModLevelLength = itemModLevel.length;
-    var randomModAmount = Math.floor(Math.random() * (maxMods - minMods + 1)) + minMods; //Random value between min/max(both inclusive !important)
-    newArray = itemModLevel.slice(); // Copy an array so we can remove array values so we dont get double of the same bonus on the item
-    for (var i = 0; i < itemModLevelLength; i++) {
-        randomMod = newArray[Math.floor(Math.random() * newArray.length)]; // picks a random bonus
-        if (currentMods < randomModAmount) {
-            if (
-                (randomMod.type === 'Life gain on hit' && dropItem.itemType === 'weapon') ||
-                (randomMod.type !== 'Bonus damage' &&
-                    randomMod.type !== 'Bonus armor' &&
-                    randomMod.type !== 'Life gain on hit')
-            ) {
-                // !== bonus damage/armor etc. so it won't be rolled on accessories/armor/weapon
-                randomModValue =
-                    Math.floor(
-                        Math.random() *
-                            (randomMod.maxValue * dropItem.iLvl -
-                                randomMod.minValue * dropItem.iLvl * 0.5 +
-                                1)
-                    ) +
-                    randomMod.minValue * dropItem.iLvl * 0.5;
-                dropItem[randomMod.type] = randomModValue;
-                dropItem.Value += Math.floor(randomMod.baseValue * randomModValue);
-                arrayIndex = newArray.indexOf(randomMod); // Find out an index of our randomMod, so we can remove it( we dont want to get it multiple times...
-                newArray.splice(arrayIndex, 1); // Remove an itemMod from copied array...
-                currentMods += 1;
-            } else if (randomMod.type === 'Bonus damage' && dropItem.itemType === 'weapon') {
-                randomModValue =
-                    Math.floor(Math.random() * (randomMod.maxValue - randomMod.minValue + 1)) +
-                    randomMod.minValue;
-                dropItem[randomMod.type] = randomModValue + dropItem.iLvl;
-                if (dropItem[randomMod.type] >= 1000) {
-                    dropItem[randomMod.type] = 1000;
-                }
-                dropItem.Value += Math.floor(randomMod.baseValue * randomModValue);
-                dropItem.MinDamage = Math.floor(
-                    dropItem.MinDamage + (dropItem.MinDamage * randomModValue) / 100
-                );
-                dropItem.MaxDamage = Math.floor(
-                    dropItem.MaxDamage + (dropItem.MaxDamage * randomModValue) / 100
-                );
-                arrayIndex = newArray.indexOf(randomMod); // Find out an index of our randomMod, so we can remove it( we dont want to get it multiple times...
-                newArray.splice(arrayIndex, 1); // Remove an itemMod from copied array...
-                currentMods += 1;
-            } else if (randomMod.type === 'Bonus armor' && dropItem.itemType === 'armor') {
-                randomModValue =
-                    Math.floor(Math.random() * (randomMod.maxValue - randomMod.minValue + 1)) +
-                    randomMod.minValue;
-                dropItem[randomMod.type] = randomModValue + dropItem.iLvl;
-                dropItem.Value += Math.floor(randomMod.baseValue * randomModValue);
-                dropItem.defense *= 1 + randomModValue / 100;
-                arrayIndex = newArray.indexOf(randomMod); // Find out an index of our randomMod, so we can remove it( we dont want to get it multiple times...
-                newArray.splice(arrayIndex, 1); // Remove an itemMod from copied array...
-                currentMods += 1;
-            } else {
-                dropItem[randomMod.type] = 0;
-                arrayIndex = newArray.indexOf(randomMod); // Find out an index of our randomMod, so we can remove it( we dont want to get it multiple times...
-                newArray.splice(arrayIndex, 1); // Remove an itemMod from copied array...
-                currentMods += 1;
-            }
-        } else {
-            dropItem[randomMod.type] = 0;
-            arrayIndex = newArray.indexOf(randomMod); // Find out an index of our randomMod, so we can remove it( we dont want to get it multiple times...
-            newArray.splice(arrayIndex, 1); // Remove an itemMod from copied array...
-            currentMods += 1;
-        }
-    }
+    // shield block is innate (scales with power/rarity/level)
     if (dropItem.subType === 'shield') {
         dropItem['Block chance'] = Math.floor(
             10 + (dropItem.power + dropItem.rarityValue) / 2 + dropItem.iLvl / 20
@@ -398,6 +353,8 @@ function getBonusItemMod(monster, dropItem, isDrop) {
         }
         dropItem.Value += Math.floor(dropItem['Block chance'] * 5 + dropItem['Block amount'] * 5);
     }
+    // weapon subtype identity: innate crit + the class damage multiplier. Runs
+    // before affixes so a crit prefix stacks on top and Bonus damage folds last.
     if (dropItem.itemType === 'weapon') {
         var criticalValue = dropItem.power;
         var weaponBonusDamage = 1;
@@ -426,37 +383,12 @@ function getBonusItemMod(monster, dropItem, isDrop) {
         }
         dropItem.MinDamage = Math.floor(1 + dropItem.MinDamage * weaponBonusDamage);
         dropItem.MaxDamage = Math.floor(2 + dropItem.MaxDamage * weaponBonusDamage);
+    }
+    // curated prefix/suffix affixes from the slot pool (folds Bonus damage into
+    // MinDamage, Bonus armor into defense, adds crit, sets attributes/utility)
+    rollAffixes(dropItem);
+    if (dropItem.itemType === 'weapon') {
         dropItem['AverageDamage'] = (dropItem.MinDamage + dropItem.MaxDamage) / 2;
-
-        // Weapon behavior affix: Rare+ weapons can roll ONE special stat that
-        // changes how the weapon fights in canvas combat (read by
-        // systems/weaponBehavior.js, displayed by the inventory tooltip).
-        // Rare 20% / Epic 35% / Legendary 50% chance; Legendary rolls stronger.
-        var affixChance = 0;
-        if (dropItem.itemRarity === 'Rare') affixChance = 20;
-        else if (dropItem.itemRarity === 'Epic') affixChance = 35;
-        else if (dropItem.itemRarity === 'Legendary') affixChance = 50;
-        if (affixChance > 0 && Math.floor(Math.random() * 100 + 1) <= affixChance) {
-            var legendaryAffix = dropItem.itemRarity === 'Legendary';
-            var affixPick = Math.floor(Math.random() * 3);
-            if (affixPick === 0) {
-                // 5-10%, Legendary 10-20%
-                dropItem['Attack speed'] = legendaryAffix
-                    ? 10 + Math.floor(Math.random() * 11)
-                    : 5 + Math.floor(Math.random() * 6);
-                dropItem.Value += dropItem['Attack speed'] * 15;
-            } else if (affixPick === 1) {
-                // 5-10%, Legendary 10-20%
-                dropItem['Stun chance'] = legendaryAffix
-                    ? 10 + Math.floor(Math.random() * 11)
-                    : 5 + Math.floor(Math.random() * 6);
-                dropItem.Value += dropItem['Stun chance'] * 15;
-            } else {
-                // +1 cleave/pierce/splash target
-                dropItem['Extra targets'] = 1;
-                dropItem.Value += 200;
-            }
-        }
     }
     if (dropItem.Value > 0) {
         var itemHolder = [];
