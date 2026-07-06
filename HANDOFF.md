@@ -9,6 +9,13 @@ _Last updated: 2026-07-05_
 
 ## Current status
 
+**Big-number formatting: DONE.** New `formatBig` in `core/format.js` renders the HUD gold +
+experience counters compactly (`1.2M`, `3.4B`, `150M`): exact below 10000 (so a loaded
+1234-gold save still reads "1234"), else truncated (never rounded up) to one decimal + K/M/B/T/Qa.
+Applied in `systems/stats.js` (gold + experience + maxExperience). The legacy `getThousands`
+(integer K/M, its own test) is untouched. Covered by `test/logic.test.js`. Display-only, no
+gameplay change. 80/80 tests, build + lint clean.
+
 **Item redesign — Phase 3 (surface boss uniques): DONE.** The bestiary "mastered" tier
 (`bestiaryUI.js`) and the map info panel (`mapUI.js`) now name each area boss's signature
 unique (from `data/bossUniques.js`) instead of the generic "drops ... gear" placeholder, so
@@ -83,8 +90,9 @@ for every enemy.)
   currency) + a Soul Shop (buy any unique, scaled to your level) to fix both the RNG and
   the slot-gating; and/or themed multi-piece sets. Revisit with fresh ideas post-playtest.
 - Later polish: real map art (placeholder biome grid today), organic skill-tree node
-  layouts, big-number formatting (`1.2M`), accessory offensive-affix wiring (crit/bonus
-  damage read off accessories — needs new `core.js` readers).
+  layouts, accessory offensive-affix wiring (crit/bonus damage read off accessories —
+  needs new `core.js` readers). (Big-number formatting shipped — see Current status; could
+  extend `formatBig` to combat damage floaters / health-mana readouts if wanted.)
 
 ## Decisions waiting on the user (blockers for content work)
 

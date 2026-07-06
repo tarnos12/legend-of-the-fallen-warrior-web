@@ -69,7 +69,7 @@ self-registers its inline-onclick handlers via `Object.assign(window, {...})`.
 |---|---|---|
 | `core.js` | `player` (properties/functions/buffs), `equippedItems` + `createEquippedItemsObject`, `playerInventory`, `defaultValues` + `copyPlayerProperties`, `currentGameVersion` | Pure player state — no handlers, no rendering. Only imports its three data providers (weaponMastery, skills, gameObjects). |
 | `log.js` | `Log` + `logData` ring buffer (`#logConsole`), `fadeLog` fade animation, the named notification helpers (`potionBuyLog`, `deathLog`, `levelUpLog`, ...) | Self-contained (no game-state imports). |
-| `format.js` | Pure number/display formatters: `getThousands`, `getTen`, `getNumberMultiplierofFive`, `compare` (green/red delta markup) | No imports. |
+| `format.js` | Pure number/display formatters: `formatBig` (compact `1.2M`/`3.4B` HUD counters — exact below 10000, else truncated 1-decimal K/M/B/T/Qa; used for gold + exp), `getThousands` (legacy integer K/M), `getTen`, `getNumberMultiplierofFive`, `compare` (green/red delta markup) | No imports. |
 | `state.js` | `state` object holding shared **reassigned primitives** (battleTurn, damageTaken, hardcoreMode, checkedShopItem, checkBox\*, weapon/armor/accessoryAmount) | Primitives can't be live-rebound across modules, hence one shared object. Add new shared reassigned scalars here. |
 | `save.js` | Save/load/reset to `localStorage` (base64 `EncodedSave`, `EncodedSave1..3`), `pageReload`, version check | **Save-wipe guard:** `player.properties.gameVersion` must equal `currentGameVersion` or loads wipe. Covered by a test. |
 

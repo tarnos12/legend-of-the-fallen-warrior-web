@@ -3,7 +3,7 @@ import { playerPassive } from '../data/skills.js';
 import { characterRaces } from '../data/gameObjects.js';
 import { equippedItems, player } from '../core/core.js';
 import { Log, fadeLog } from '../core/log.js';
-import { getThousands } from '../core/format.js';
+import { formatBig } from '../core/format.js';
 import { CreatePlayerHotBar } from './potionsHotbar.js';
 import { CreateMonsterHtml } from '../ui/monsterUI.js';
 import {
@@ -235,9 +235,9 @@ function updateHtml() {
     gold = document.getElementById('gold');
 
     level.innerHTML = player.properties.level;
-    maxExperience.innerHTML = player.properties.maxExperience;
-    experience.innerHTML = player.properties.experience;
-    gold.innerHTML = getThousands(player.properties.gold.toFixed(0));
+    maxExperience.innerHTML = formatBig(player.properties.maxExperience);
+    experience.innerHTML = formatBig(player.properties.experience);
+    gold.innerHTML = formatBig(player.properties.gold);
 
     //primaryStatUpdate();
     secondaryStatUpdate();

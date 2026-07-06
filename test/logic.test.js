@@ -5,7 +5,7 @@ import {
     player,
     playerInventory,
 } from '../src/core/core.js';
-import { getNumberMultiplierofFive, getTen, getThousands } from '../src/core/format.js';
+import { getNumberMultiplierofFive, getTen, getThousands, formatBig } from '../src/core/format.js';
 import { getItemType } from '../src/systems/itemDrop.js';
 
 // Some game functions call Log(), which writes to #logConsole; provide it.
@@ -32,6 +32,19 @@ describe('number/display helpers (pure)', () => {
         expect(getThousands(12345)).toBe('12K');
         expect(getThousands(2500000)).toBe('2M');
         expect(getThousands(99.9)).toBe(99);
+    });
+
+    it('formatBig keeps small numbers exact and truncates big ones to 1 decimal + K/M/B/T', () => {
+        expect(formatBig(1234)).toBe(1234); // < 10000 stays exact
+        expect(formatBig(9999)).toBe(9999); // boundary: still exact
+        expect(formatBig('1234')).toBe(1234); // accepts toFixed'd strings
+        expect(formatBig(12345)).toBe('12.3K'); // truncates, does not round up
+        expect(formatBig(1200000)).toBe('1.2M');
+        expect(formatBig(15000000)).toBe('15M'); // trailing .0 dropped
+        expect(formatBig(150000000)).toBe('150M'); // >=100 of a unit: no decimal
+        expect(formatBig(3400000000)).toBe('3.4B');
+        expect(formatBig(1e12)).toBe('1T');
+        expect(formatBig(-2500000)).toBe('-2.5M'); // sign preserved
     });
 });
 
