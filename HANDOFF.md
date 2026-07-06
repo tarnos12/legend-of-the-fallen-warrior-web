@@ -9,6 +9,19 @@ _Last updated: 2026-07-05_
 
 ## Current status
 
+**Accessory offensive-affix wiring: DONE.** Rings/amulets now carry LIVE offensive
+affixes instead of only attributes. New `core.js` readers: `totalCriticalChance` sums
+weapon + accessory-slot crit, and `totalBonusDamage` sums accessory `Bonus damage` (weapon's
+stays folded into MinDamage at generation, excluded to avoid double-count) into the
+`bonusDamage()` damage multiplier. `data/affixes.js`: ring prefixes gained `Crit Chance %`
+(`flatCrit`) + `Bonus Damage %` (new `flatDamage` kind — modest live %, min3/max6 + iLvl/10);
+amulet gained crit; talisman stays defensive. `itemDrop.applyAffix` stores `flatDamage` as a
+live key (not folded). Tooltip shows accessory crit (`inventoryUI.js`; weapon/shield snapshots
+unchanged). Magnitudes at iLvl50: ~13-18% crit (capped 75% overall) / ~8-11% dmg per affix,
+one of each max per ring — a real upgrade path, not a balance breaker. Tests: `item-affixes`
+(pool membership + still-forbidden keys) + `equip-stats` (readers reflect an equipped offensive
+ring). 82/82 pass, build + lint clean. No save-wipe (item stats self-contained).
+
 **Big-number formatting: DONE.** New `formatBig` in `core/format.js` renders the HUD gold +
 experience counters compactly (`1.2M`, `3.4B`, `150M`): exact below 10000 (so a loaded
 1234-gold save still reads "1234"), else truncated (never rounded up) to one decimal + K/M/B/T/Qa.
@@ -90,9 +103,9 @@ for every enemy.)
   currency) + a Soul Shop (buy any unique, scaled to your level) to fix both the RNG and
   the slot-gating; and/or themed multi-piece sets. Revisit with fresh ideas post-playtest.
 - Later polish: real map art (placeholder biome grid today), organic skill-tree node
-  layouts, accessory offensive-affix wiring (crit/bonus damage read off accessories —
-  needs new `core.js` readers). (Big-number formatting shipped — see Current status; could
-  extend `formatBig` to combat damage floaters / health-mana readouts if wanted.)
+  layouts. (Big-number formatting + accessory offensive-affix wiring shipped — see Current
+  status. Possible follow-ups: extend `formatBig` to combat damage floaters / health-mana
+  readouts; give talismans a dedicated defensive-special affix once combat readers exist.)
 
 ## Decisions waiting on the user (blockers for content work)
 

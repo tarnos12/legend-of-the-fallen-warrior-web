@@ -29,6 +29,11 @@ var equipmentSlots = [
 ];
 // Slots that contribute to armor/defense (excludes weapon and accessories).
 var armorSlots = ['shield', 'chest', 'helmet', 'legs', 'boots'];
+// Accessory slots — the only non-weapon slots that carry OFFENSIVE affixes
+// (crit chance, % bonus damage). Their attributes/utility are summed via
+// equipmentSlots above; the two offensive keys are read separately below so a
+// ring/amulet can meaningfully roll crit and bonus damage.
+var accessorySlots = ['ring', 'amulet', 'talisman'];
 // Sum a single stat key across the given equipped slots. Order-independent for
 // integer stats, so the result is identical to the original unrolled sums.
 function sumEquippedStat(statKey, slots) {
@@ -236,7 +241,10 @@ var player = {
             return equippedItems.weapon['Life gain on hit'] || 0;
         },
         totalCriticalChance: function () {
-            return equippedItems.weapon['Critical chance'] || 0;
+            return (
+                (equippedItems.weapon['Critical chance'] || 0) +
+                sumEquippedStat('Critical chance', accessorySlots)
+            );
         },
         totalArmorBonus: function () {
             return sumEquippedStat('defense', armorSlots);
@@ -256,8 +264,16 @@ var player = {
         totalExperienceRate: function () {
             return sumEquippedStat('Experience rate', equipmentSlots);
         },
+        // % bonus physical damage rolled on ACCESSORIES. The weapon's own
+        // 'Bonus damage' affix is folded into its MinDamage/MaxDamage at
+        // generation (systems/itemDrop.js), so it is NOT summed here — that
+        // would double-count it. Accessories store it as a live key that feeds
+        // the bonusDamage() multiplier below.
+        totalBonusDamage: function () {
+            return sumEquippedStat('Bonus damage', accessorySlots);
+        },
         bonusDamage: function () {
-            var damage = 0;
+            var damage = player.functions.totalBonusDamage();
             if (playerPassive.brawler.level > 0) {
                 damage += playerPassive.brawler.bonusTotal();
             }

@@ -336,6 +336,12 @@ function itemTooltipTest(item) {
                     100)
         ).toFixed(2)}%<br />`;
     }
+    // accessories now carry live crit (core reads it off ring/amulet); bonus
+    // damage renders via the generic stat loop below. Weapon crit is shown in
+    // the weapon block above, so this branch is accessory-only.
+    if (item.itemType === 'accessory' && item['Critical chance'] > 0) {
+        html += `<div class="borderBottom borderTop">Critical Chance: ${compare(item['Critical chance'], equippedItemStat['Critical chance'], '%')}</div>`;
+    }
     for (var statName in item) {
         //Here stat will become the word Defense
         if (item.hasOwnProperty(statName)) {

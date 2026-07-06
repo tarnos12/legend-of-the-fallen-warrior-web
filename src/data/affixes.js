@@ -16,7 +16,9 @@
 //   util        summed utility (same scaling as attr; Value uses baseValue)
 //   foldDamage  % that folds into weapon MinDamage/MaxDamage at generation
 //   foldArmor   % that folds into armor defense at generation
-//   flatCrit    live-read weapon/ring crit %, value = rand(min..max)+iLvl/5
+//   flatCrit    live-read weapon/accessory crit %, value = rand(min..max)+iLvl/5
+//   flatDamage  live-read accessory % bonus damage (NOT folded — accessories
+//               have no weapon damage to fold into), value = rand(min..max)+iLvl/10
 //   behavior    weaponBehavior special (%): value 5–10, Legendary 10–20
 //   targets     +N cleave/pierce/splash targets (weaponBehavior)
 //   block       shield block chance/amount (kept innate; see itemDrop)
@@ -41,6 +43,9 @@ const A = {
     lifeOnHit: { key: 'Life gain on hit', label: 'Life on Hit', kind: 'util', min: 1, max: 2, baseValue: 15 },
     // weapon / ring power
     bonusDamage: { key: 'Bonus damage', label: 'Bonus Damage %', kind: 'foldDamage', min: 5, max: 10, baseValue: 20 },
+    // accessory version of bonus damage: a modest LIVE % (read by core, not
+    // folded into weapon damage), so rings can add offense without a weapon base
+    accDamage: { key: 'Bonus damage', label: 'Bonus Damage %', kind: 'flatDamage', min: 3, max: 6, baseValue: 20 },
     crit: { key: 'Critical chance', label: 'Crit Chance %', kind: 'flatCrit', min: 3, max: 8, baseValue: 25 },
     attackSpeed: { key: 'Attack speed', label: 'Attack Speed %', kind: 'behavior', baseValue: 15 },
     stun: { key: 'Stun chance', label: 'Stun Chance %', kind: 'behavior', baseValue: 15 },
@@ -52,10 +57,13 @@ const A = {
 // Per-slot pools. Every affix here is a key the slot's equip actually
 // contributes to the player: fold-damage/crit/speed/stun/targets/life-on-hit
 // apply on WEAPONS only, fold-armor on ARMOR only, and the rest are summed
-// attributes/utility that work in any slot. So accessories get their identity
-// through attributes (Str/Dex → damage+crit, End → survivability) rather than
-// dead crit/damage keys the engine never reads off a ring. Prefix = the slot's
-// power identity, suffix = flavor/utility; rarity buys how many of each.
+// attributes/utility that work in any slot. Accessories additionally carry LIVE
+// offensive affixes — direct crit (flatCrit) and % bonus damage (flatDamage) —
+// which core.js now reads off ring/amulet slots, so a ring is a real offense
+// piece rather than only an attribute stick. The weaponBehavior specials
+// (Attack speed/Stun/Extra targets) and Life-on-hit stay weapon-only (the engine
+// reads them off the equipped weapon). Prefix = the slot's power identity,
+// suffix = flavor/utility; rarity buys how many of each.
 export const AFFIX_POOLS = {
     // ---- weapons (all subtypes share this pool for v1) ----
     weapon: {
@@ -86,13 +94,14 @@ export const AFFIX_POOLS = {
     },
     // ---- accessories (summed stats only; identity via attribute bias) ----
     ring: {
-        // offense-leaning: Str/Dex raise damage + crit through the attr system
-        prefixes: [A.str, A.dex],
+        // offense accessory: direct crit + % bonus damage, plus Str/Dex which
+        // also raise damage/crit through the attribute system
+        prefixes: [A.str, A.dex, A.crit, A.accDamage],
         suffixes: [A.luck, A.gold, A.magicFind, A.life],
     },
     amulet: {
-        // utility/find + caster stats
-        prefixes: [A.magicFind, A.mana],
+        // utility/find + caster stats, with a crit option
+        prefixes: [A.magicFind, A.mana, A.crit],
         suffixes: [A.wis, A.int, A.gold, A.exp, A.allAttr],
     },
     talisman: {
@@ -133,6 +142,8 @@ export function rollAffixValue(affix, iLvl, legendary) {
             return randInt(affix.min, affix.max) + iLvl;
         case 'flatCrit':
             return randInt(affix.min, affix.max) + Math.floor(iLvl / 5);
+        case 'flatDamage':
+            return randInt(affix.min, affix.max) + Math.floor(iLvl / 10);
         case 'behavior':
             return legendary ? randInt(10, 20) : randInt(5, 10);
         case 'targets':

@@ -348,6 +348,10 @@ function applyAffix(dropItem, affix, legendary) {
         dropItem.defense = Math.floor(dropItem.defense * (1 + v / 100));
     } else if (affix.kind === 'flatCrit') {
         dropItem['Critical chance'] = (dropItem['Critical chance'] || 0) + v;
+    } else if (affix.kind === 'flatDamage') {
+        // accessory % bonus damage: a LIVE key summed by core.totalBonusDamage
+        // (not folded into MinDamage — accessories have no base weapon damage)
+        dropItem['Bonus damage'] = (dropItem['Bonus damage'] || 0) + v;
     } else {
         // attributes / utility / behavior / extra targets: additive on the key
         dropItem[affix.key] = (dropItem[affix.key] || 0) + v;

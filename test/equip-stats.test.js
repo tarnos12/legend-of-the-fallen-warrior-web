@@ -61,4 +61,18 @@ describe('equipped sparse items keep player stats finite', () => {
         expect(Number.isFinite(core.player.functions.totalMagicFind())).toBe(true);
         expect(Number.isFinite(core.player.functions.totalGoldDrop())).toBe(true);
     });
+
+    it('an accessory with crit + bonus damage feeds the offensive core readers', () => {
+        equipCrafted('accessory', 'ring');
+        // simulate a rolled offensive ring on the equipped slot
+        core.equippedItems.ring['Critical chance'] = 12;
+        core.equippedItems.ring['Bonus damage'] = 8;
+        // accessory-only reader excludes the weapon's folded bonus damage
+        expect(core.player.functions.totalBonusDamage()).toBe(8);
+        // crit reader sums weapon crit + accessory crit
+        expect(core.player.functions.totalCriticalChance()).toBeGreaterThanOrEqual(12);
+        // bonus damage feeds the damage multiplier (passives are 0 here)
+        expect(core.player.functions.bonusDamage()).toBeGreaterThanOrEqual(8);
+        expect(Number.isFinite(core.player.functions.minDamage())).toBe(true);
+    });
 });

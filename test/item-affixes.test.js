@@ -45,15 +45,34 @@ describe('affix pools are slot-restricted', () => {
         }
     });
 
-    it('accessories never roll weapon/armor-only keys (only summed stats apply)', () => {
+    // Accessories now carry LIVE offensive affixes (crit + Bonus damage — core
+    // reads them off ring/amulet), but the keys that still do nothing on an
+    // accessory stay off them: weaponBehavior specials + Life-on-hit read the
+    // equipped weapon, and armor/defense are armor-only.
+    const ACCESSORY_FORBIDDEN = [
+        'Attack speed',
+        'Stun chance',
+        'Extra targets',
+        'Life gain on hit',
+        'Bonus armor',
+    ];
+
+    it('accessories never roll weapon-behavior, life-on-hit or armor keys', () => {
         for (const sub of ['ring', 'amulet', 'talisman']) {
             const items = generate('accessory', sub, 120, 'Master');
             for (const it of items) {
-                for (const key of WEAPON_ONLY.concat(ARMOR_ONLY)) {
+                for (const key of ACCESSORY_FORBIDDEN) {
                     expect(it[key] === undefined || it[key] === 0).toBe(true);
                 }
+                expect(it.defense === undefined).toBe(true);
             }
         }
+    });
+
+    it('rings can roll live offensive crit and bonus damage (wired to core readers)', () => {
+        const rings = generate('accessory', 'ring', 250, 'Master');
+        expect(rings.some((r) => r['Critical chance'] > 0)).toBe(true);
+        expect(rings.some((r) => r['Bonus damage'] > 0)).toBe(true);
     });
 
     it('common accessories still drop despite having no base stats', () => {
