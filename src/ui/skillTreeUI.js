@@ -22,6 +22,16 @@ const GAP_X = 84;
 const GAP_Y = 76;
 const TOP = 64;
 const LEFT = 42;
+// Organic layout: each node drifts sideways by a deterministic amount so the
+// chains read as branching vines instead of ramrod columns, and consecutive
+// nodes are joined by a smooth bezier "vine" rather than a straight spine. The
+// drift is a pure function of (column,row) — stable across the frequent
+// hover/click redraws — and small enough (±SWAY) to keep every node and its
+// hit box inside the canvas bitmap (see index.html widths).
+const SWAY = 14;
+function swayX(col, row) {
+    return Math.sin(row * 0.85 + col * 1.6) * SWAY;
+}
 
 const TREE_LABELS = [
     { label: 'Offensive', from: 0, to: 2 },
@@ -106,6 +116,25 @@ function nodeFrame(ctx, x, y, state, hovered) {
     ctx.lineWidth = 1;
 }
 
+// Smooth connector through a chain of node-center points: each segment is a
+// vertical-tangent bezier, so a small horizontal offset between stacked nodes
+// curves organically instead of kinking.
+function drawVine(ctx, points) {
+    if (points.length < 2) return;
+    ctx.strokeStyle = '#4a3b1d';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(points[0].x, points[0].y);
+    for (let i = 1; i < points.length; i++) {
+        const a = points[i - 1];
+        const b = points[i];
+        const midY = (a.y + b.y) / 2;
+        ctx.bezierCurveTo(a.x, midY, b.x, midY, b.x, b.y);
+    }
+    ctx.stroke();
+    ctx.lineWidth = 1;
+}
+
 function drawPassiveTree() {
     const c = canvas2d('passiveTreeCanvas');
     if (!c) return;
@@ -131,19 +160,21 @@ function drawPassiveTree() {
     }
 
     columns.forEach((keys, col) => {
-        const x = LEFT + col * GAP_X;
-        // spine connecting the column's nodes
-        ctx.strokeStyle = '#4a3b1d';
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.moveTo(x + NODE / 2, TOP + NODE / 2);
-        ctx.lineTo(x + NODE / 2, TOP + (keys.length - 1) * GAP_Y + NODE / 2);
-        ctx.stroke();
-        ctx.lineWidth = 1;
+        const baseX = LEFT + col * GAP_X;
+        // organic node positions (deterministic sideways drift per row)
+        const nodes = keys.map((key, row) => ({
+            key,
+            x: baseX + swayX(col, row),
+            y: TOP + row * GAP_Y,
+        }));
+        // vine connector through the swayed node centers
+        drawVine(
+            ctx,
+            nodes.map((n) => ({ x: n.x + NODE / 2, y: n.y + NODE / 2 }))
+        );
 
-        keys.forEach((key, row) => {
+        nodes.forEach(({ key, x, y }) => {
             const passive = playerPassive[key];
-            const y = TOP + row * GAP_Y;
             const unlocked = player.properties.level >= passive.levelReq;
             let state;
             if (!unlocked) state = 'locked';
@@ -184,52 +215,59 @@ function drawWeaponTree() {
 
     weaponTypeObject.forEach((weapon, col) => {
         const type = weapon.type;
-        const x = LEFT + col * (GAP_X + 30);
+        const baseX = LEFT + col * (GAP_X + 30);
         const mastery = weaponMastery[type];
         const skills = Object.keys(weaponSkillList[type] || {});
 
-        // spine
-        ctx.strokeStyle = '#4a3b1d';
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.moveTo(x + NODE / 2, 20 + NODE / 2);
-        ctx.lineTo(x + NODE / 2, 20 + skills.length * GAP_Y + NODE / 2);
-        ctx.stroke();
-        ctx.lineWidth = 1;
+        // chain: mastery node (index 0) then its skills, each with organic drift
+        const chain = [{ y: 20 }].concat(
+            skills.map((_, row) => ({ y: 20 + (row + 1) * GAP_Y }))
+        );
+        chain.forEach((n, i) => {
+            n.x = baseX + swayX(col, i);
+        });
+        // vine connector through the swayed centers
+        drawVine(
+            ctx,
+            chain.map((n) => ({ x: n.x + NODE / 2, y: n.y + NODE / 2 }))
+        );
 
         // mastery node on top
+        const mx = chain[0].x;
+        const my = chain[0].y;
         nodeFrame(
             ctx,
-            x,
-            20,
+            mx,
+            my,
             mastery.level > 1 ? 'maxed' : 'leveled',
             hoveredWeapon === 'mastery:' + type
         );
-        drawIcon(ctx, 'images/skills/' + type + '.png', x + 6, 26, NODE - 12, 1);
+        drawIcon(ctx, 'images/skills/' + type + '.png', mx + 6, my + 6, NODE - 12, 1);
         ctx.font = 'bold 11px sans-serif';
         ctx.textAlign = 'center';
         ctx.fillStyle = '#edd26e';
-        ctx.fillText('Lv ' + mastery.level, x + NODE / 2, 20 + NODE + 13);
-        weaponHits.push({ x, y: 20, key: 'mastery:' + type });
+        ctx.fillText('Lv ' + mastery.level, mx + NODE / 2, my + NODE + 13);
+        weaponHits.push({ x: mx, y: my, key: 'mastery:' + type });
 
         skills.forEach((skillKey, row) => {
             const skill = weaponSkillList[type][skillKey];
-            const y = 20 + (row + 1) * GAP_Y;
+            const nx = chain[row + 1].x;
+            const ny = chain[row + 1].y;
             const unlocked = mastery.level >= skill.levelReq;
-            nodeFrame(ctx, x, y, unlocked ? 'maxed' : 'locked', hoveredWeapon === type + ':' + skillKey);
+            nodeFrame(ctx, nx, ny, unlocked ? 'maxed' : 'locked', hoveredWeapon === type + ':' + skillKey);
             drawIcon(
                 ctx,
                 'images/skills/' + skill.image + '.png',
-                x + 6,
-                y + 6,
+                nx + 6,
+                ny + 6,
                 NODE - 12,
                 unlocked ? 1 : 0.3
             );
             ctx.font = 'bold 11px sans-serif';
             ctx.textAlign = 'center';
             ctx.fillStyle = unlocked ? '#b0a184' : '#7a6f5c';
-            ctx.fillText(unlocked ? '✓' : 'Lv ' + skill.levelReq, x + NODE / 2, y + NODE + 13);
-            weaponHits.push({ x, y, key: type + ':' + skillKey });
+            ctx.fillText(unlocked ? '✓' : 'Lv ' + skill.levelReq, nx + NODE / 2, ny + NODE + 13);
+            weaponHits.push({ x: nx, y: ny, key: type + ':' + skillKey });
         });
     });
 }

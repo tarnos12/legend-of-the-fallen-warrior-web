@@ -9,6 +9,14 @@ _Last updated: 2026-07-05_
 
 ## Current status
 
+**Organic skill-tree layouts: DONE.** The passive + weapon canvas trees (`ui/skillTreeUI.js`)
+no longer render as ramrod columns: each node gets a deterministic sideways drift (`swayX`,
+±14px, a pure `sin` of column/row so it's stable across the frequent hover/click redraws) and
+consecutive nodes are joined by smooth bezier "vine" connectors (`drawVine`) instead of a
+straight spine. Purely visual — node grid order, hit-testing (hits use the drifted x), and the
+info panels are unchanged. Verified node x-extents stay in-bounds (passive 29–696 in 740, weapon
+29–564 in 640). Canvas draws aren't snapshot-tested; 82/82 tests, build + lint clean.
+
 **Accessory offensive-affix wiring: DONE.** Rings/amulets now carry LIVE offensive
 affixes instead of only attributes. New `core.js` readers: `totalCriticalChance` sums
 weapon + accessory-slot crit, and `totalBonusDamage` sums accessory `Bonus damage` (weapon's
@@ -102,10 +110,11 @@ for every enemy.)
   slot is gated behind reaching its boss's area. User is weighing: Boss Souls (guaranteed
   currency) + a Soul Shop (buy any unique, scaled to your level) to fix both the RNG and
   the slot-gating; and/or themed multi-piece sets. Revisit with fresh ideas post-playtest.
-- Later polish: real map art (placeholder biome grid today), organic skill-tree node
-  layouts. (Big-number formatting + accessory offensive-affix wiring shipped — see Current
-  status. Possible follow-ups: extend `formatBig` to combat damage floaters / health-mana
-  readouts; give talismans a dedicated defensive-special affix once combat readers exist.)
+- Later polish: real map art (the map still uses a placeholder biome grid — the one remaining
+  cosmetic item that needs actual art assets, not just code). (Big-number formatting, accessory
+  offensive-affix wiring, and organic skill-tree layouts all shipped — see Current status.
+  Possible follow-ups: extend `formatBig` to combat damage floaters / health-mana readouts;
+  give talismans a dedicated defensive-special affix once combat readers exist.)
 
 ## Decisions waiting on the user (blockers for content work)
 
