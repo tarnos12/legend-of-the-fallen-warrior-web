@@ -214,9 +214,9 @@ function updateHtml() {
         '%</span></a> ';
     mana.innerHTML =
         '<span data-toggle="tooltip" data-placement="top" title="Total Mana">' +
-        player.properties.mana.toFixed(0) +
+        formatBig(player.properties.mana) +
         '/' +
-        player.functions.maxMana().toFixed(0) +
+        formatBig(player.functions.maxMana()) +
         '</span>' +
         '<a class="tooltipA">' +
         '<p class="glyphicon glyphicon-info-sign"></p>' +
@@ -265,7 +265,7 @@ function healthPercent() {
 
 function playerHealthBar() {
     document.getElementById('health').innerHTML =
-        player.properties.health + '/' + player.functions.maxhealth();
+        formatBig(player.properties.health) + '/' + formatBig(player.functions.maxhealth());
 }
 
 function manaRegen() {

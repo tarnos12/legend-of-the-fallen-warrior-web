@@ -13,6 +13,7 @@
 // wave end (full heal, buff timers, monster panel rerender). Only the enemies'
 // hp pools are local clones — one wave enemy = one real kill.
 import { player } from '../core/core.js';
+import { formatBig } from '../core/format.js';
 import { logData } from '../core/log.js';
 import { monsterList } from '../data/monsterList.js';
 import { characterRaces, monsterAreas } from '../data/gameObjects.js';
@@ -231,7 +232,7 @@ function applyRoll(enemy, roll, isSpell) {
         addFloat(
             enemy.x,
             enemy.y - SPRITE,
-            (isSpell ? '✦' : '') + roll.damage + (roll.crit ? '!' : ''),
+            (isSpell ? '✦' : '') + formatBig(roll.damage) + (roll.crit ? '!' : ''),
             isSpell ? '#e879f9' : roll.crit ? '#fb923c' : '#fca5a5'
         );
     }
@@ -252,7 +253,7 @@ function checkEnemyDeath(enemy) {
             addFloat(
                 enemy.x,
                 enemy.y - SPRITE - 16,
-                (enemy.shiny ? '✨ ' : '') + '+' + player.properties.goldDrop + 'g',
+                (enemy.shiny ? '✨ ' : '') + '+' + formatBig(player.properties.goldDrop) + 'g',
                 '#eab308'
             );
         }
@@ -267,7 +268,7 @@ function targetable() {
 // (no re-roll, so lifesteal/mastery aren't multiplied by target count).
 function applySecondary(enemy, damage, color) {
     enemy.hp -= damage;
-    addFloat(enemy.x, enemy.y - SPRITE, damage, color);
+    addFloat(enemy.x, enemy.y - SPRITE, formatBig(damage), color);
     checkEnemyDeath(enemy);
 }
 
@@ -320,7 +321,7 @@ function update(dt) {
             const dealt = healthBefore - player.properties.health;
             if (dealt > 0) {
                 w.heroHitFlash = 0.25;
-                addFloat(HERO_X, GROUND - SPRITE, dealt, '#ef4444');
+                addFloat(HERO_X, GROUND - SPRITE, formatBig(dealt), '#ef4444');
             }
             checkEnemyDeath(attacker); // thorn/counter can kill the attacker
             w.enemyAttackTimer = 0.9 + Math.random() * 0.4;
