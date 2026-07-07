@@ -9,6 +9,16 @@ _Last updated: 2026-07-05_
 
 ## Current status
 
+**Real world-map art: DONE.** The map panel (`ui/mapUI.js`) no longer draws a placeholder
+grid — it paints a full procedural continent on `#mapCanvas`: a deterministic sine-perturbed
+coastline (`coastPath`/`coastM`, with `isOcean` as the shared land/water test), per-area biome
+tints, terrain glyphs (pines/peaks/snow-peaks/dunes/towers keyed off each node's biome), ocean
+waves, a compass rose, an inner frame, a dotted travel trail, and outlined node labels for
+legibility. Everything is a pure function of position (a small seeded PRNG scatters decor), so
+it's rock-steady across the frequent hover/click redraws — no external art assets (CSP-safe).
+Node positions/hit-testing unchanged. Verified live in headless Chromium (`canvas.toDataURL`).
+82/82 tests, build + lint clean; canvas draws aren't snapshot-tested.
+
 **Organic skill-tree layouts: DONE.** The passive + weapon canvas trees (`ui/skillTreeUI.js`)
 no longer render as ramrod columns: each node gets a deterministic sideways drift (`swayX`,
 ±14px, a pure `sin` of column/row so it's stable across the frequent hover/click redraws) and
@@ -110,11 +120,12 @@ for every enemy.)
   slot is gated behind reaching its boss's area. User is weighing: Boss Souls (guaranteed
   currency) + a Soul Shop (buy any unique, scaled to your level) to fix both the RNG and
   the slot-gating; and/or themed multi-piece sets. Revisit with fresh ideas post-playtest.
-- Later polish: real map art (the map still uses a placeholder biome grid — the one remaining
-  cosmetic item that needs actual art assets, not just code). (Big-number formatting, accessory
-  offensive-affix wiring, and organic skill-tree layouts all shipped — see Current status.
-  Possible follow-ups: extend `formatBig` to combat damage floaters / health-mana readouts;
-  give talismans a dedicated defensive-special affix once combat readers exist.)
+- Polish backlog is cleared (big-number formatting, accessory offensive-affix wiring, organic
+  skill-tree layouts, and the painted world map all shipped — see Current status). Optional
+  follow-ups if wanted: extend `formatBig` to combat damage floaters / health-mana readouts;
+  give talismans a dedicated defensive-special affix once combat readers exist; swap the
+  procedural map for bespoke raster art (would need actual image assets); per-area map
+  ambience (e.g. animated waves) if a render loop is ever added to the map panel.
 
 ## Decisions waiting on the user (blockers for content work)
 
