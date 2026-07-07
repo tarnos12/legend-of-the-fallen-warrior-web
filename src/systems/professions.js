@@ -954,11 +954,6 @@ function craftItemQuality() {
     document.getElementById('craftItemQualityHtml').innerHTML = html;
     displayCraftedItem();
 }
-//       LEGEND >_<
-//var currentItemToCraft = ""; //Weapon/Armor/Accessory
-//var currentItemQualityToCraft = ""; //Beginner/Intermediate/Master
-//var craftingLevelReq = "";
-//var totalCraftingLevelReq = "";
 var itemSubTypeArrayCss = [];
 function displayCraftedItem() {
     var html = '';
@@ -1141,8 +1136,7 @@ function craftItem(itemType, itemSubType, itemQuality) {
 // (save.js load/newGame). The inline-onclick handlers stay on window: gather
 // (generated onclickEvent), createPotion, changeItemType, changeItemBonus,
 // craftItemQuality, displayCraftedItem, craftItem (crafting/alchemy buttons).
-// professionGatherHtml/craftingHtmlButtons/craftingBackground/craftingHtml2 are
-// internal-only.
+// professionGatherHtml/craftingHtmlButtons/craftingBackground are internal-only.
 export {
     createHerbs,
     createMinerals,
