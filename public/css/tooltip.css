@@ -149,12 +149,6 @@ a.tooltips2:hover > span {
     bottom: -8px;
 }
 
-div.story {
-    height: 400px;
-    overflow-y: auto;
-    width: 100%;
-}
-
 div.inventory {
     height: 300px;
     width: 100%;
