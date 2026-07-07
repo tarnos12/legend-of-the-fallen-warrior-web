@@ -21,9 +21,10 @@ the player's level (`buyBossUnique` → `itemDrop.mintBossUnique`, prices 3→15
 lint clean.** Live-verified in Chromium: bought Lord Varik's Cleaver for 3 souls (Legendary, +2
 Extra targets), panel renders with locked/affordable states, no console errors.
 - **Design note:** this is Stage 0 (prove the loop) per the staged-roadmap rule — chose the
-  Souls+Shop direction over themed sets. Next polish if kept: show the soul balance in the HUD;
-  a "buy at a chosen level" or bulk option; maybe let souls reroll/upgrade an owned unique. If
-  you'd rather pivot to sets, the Souls currency + `mintBossUnique` foundation still applies.
+  Souls+Shop direction over themed sets. Since shipped, a live HUD soul counter was added
+  (`#soulCount`). Next polish if kept: a "buy at a chosen level" or bulk option; let souls
+  reroll/upgrade an owned unique. If you'd rather pivot to sets, the Souls currency +
+  `mintBossUnique` foundation still applies.
 
 **Dead-code + unpolished-feature removal pass: DONE.** Cut cruft and a half-finished tab
 (surveyed via two explore agents), bundle dropped ~35 KB (244→209 KB):
@@ -153,9 +154,11 @@ for every enemy.)
 ## In flight / next steps
 
 - **Boss-unique acquisition rework — Stage 0 shipped** (Boss Souls + Soul Shop; see Current
-  status). Open follow-ups: HUD soul-balance indicator; buy-at-chosen-level / bulk; souls to
-  reroll or upgrade an owned unique; or pivot/augment with themed multi-piece SETS (the Souls
-  currency + `mintBossUnique` foundation is reusable either way). Revisit after playtesting.
+  status), plus a live **HUD soul counter** (`#soulCount`, purple ☠ next to gold — updated by
+  `stats.updateHtml` + `refreshSoulUi` on gain/spend). Open follow-ups: buy-at-chosen-level /
+  bulk; souls to reroll or upgrade an owned unique (repeat-buy already gives a fresh roll but
+  clutters inventory); or pivot/augment with themed multi-piece SETS (the Souls currency +
+  `mintBossUnique` foundation is reusable either way). Revisit after playtesting.
 - Polish backlog is cleared (big-number formatting, accessory offensive-affix wiring, organic
   skill-tree layouts, and the painted world map all shipped — see Current status). Optional
   follow-ups if wanted: extend `formatBig` to combat damage floaters / health-mana readouts;

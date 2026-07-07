@@ -234,6 +234,8 @@ function updateHtml() {
     maxExperience.innerHTML = formatBig(player.properties.maxExperience);
     experience.innerHTML = formatBig(player.properties.experience);
     gold.innerHTML = formatBig(player.properties.gold);
+    const soulCount = document.getElementById('soulCount');
+    if (soulCount) soulCount.innerHTML = formatBig(player.properties.bossSouls || 0);
 
     //primaryStatUpdate();
     secondaryStatUpdate();

@@ -21,7 +21,13 @@
     --soul: #c08bff;
 }
 
-/* ---- soul shop (Shop panel) ---- */
+/* ---- boss souls: HUD counter + Soul Shop (Shop panel) ---- */
+#soulHud {
+    color: var(--soul);
+    margin-left: 10px;
+    white-space: nowrap;
+    font-weight: bold;
+}
 .soulHeader {
     color: var(--soul);
     margin: 4px 0 10px;

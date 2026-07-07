@@ -11,8 +11,17 @@ import { SOUL_DROP, soulShopEntry } from '../data/bossSouls.js';
 import { mintBossUnique } from './itemDrop.js';
 import { CreateInventoryWeaponHtml } from '../ui/inventoryUI.js';
 
+// Refresh the HUD soul counter + the Soul Shop (both no-op if their DOM is
+// absent, e.g. headless sims). Keeps souls visible without waiting for the next
+// full updateHtml pass.
+function refreshSoulUi() {
+    const el = document.getElementById('soulCount');
+    if (el) el.innerHTML = player.properties.bossSouls || 0;
+    if (typeof window.renderSoulShop === 'function') window.renderSoulShop();
+}
+
 // Grant souls on an area-boss kill (no-op for non-bosses). Called from
-// battle.grantKillRewards. quiet (offline/sim) skips the log + shop re-render.
+// battle.grantKillRewards. quiet (offline/sim) skips the log + UI refresh.
 export function grantBossSouls(monster, quiet, shiny) {
     if (!BOSS_UNIQUES[monster.name]) return;
     const amount = SOUL_DROP * (shiny ? 2 : 1);
@@ -27,7 +36,7 @@ export function grantBossSouls(monster, quiet, shiny) {
                 (amount > 1 ? 's' : '') +
                 '!<br /></span>'
         );
-        if (typeof window.renderSoulShop === 'function') window.renderSoulShop();
+        refreshSoulUi();
     }
 }
 
@@ -51,7 +60,7 @@ function buyBossUnique(bossName) {
             '!<br /></span>'
     );
     CreateInventoryWeaponHtml();
-    if (typeof window.renderSoulShop === 'function') window.renderSoulShop();
+    refreshSoulUi();
 }
 
 Object.assign(window, { buyBossUnique });
