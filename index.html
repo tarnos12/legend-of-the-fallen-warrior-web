@@ -31,27 +31,6 @@
     </script>
     <script>
     $(function() {
-        $( "#dialogTest" ).dialog({
-            dialogClass: "no-close dialogStyling",
-            autoOpen: false,
-            width: 600,
-            create: function (e, ui) {
-                var pane = $(this).dialog("widget").find(".ui-dialog-buttonpane")
-                $("<label class='shut-up' ><input style='visibility:visible; position:relative;' type='checkbox'/>Don't show it again.</label>").prependTo(pane)
-            },
-            buttons: [
-              {
-                  text: "OK",
-                  click: function() {
-                      $( this ).dialog( "close" );
-                  }
-              }
-            ]
-        });
-    });
-    </script>
-    <script>
-    $(function() {
         $( ".draggable" ).draggable(
             {
                 containment:'.container-fluid'
@@ -84,10 +63,6 @@
          they hung headless captures and stall page load when their CDNs are slow).
          Restore from git history (see this comment's commit) if wanted again. -->
     <div class="container-fluid darkBackground">
-
-        <div id="dialogTest" title="Basic dialog">
-            <p>This is the default dialog which is useful for displaying information. The dialog window can be moved, resized and closed with the 'x' icon.</p>
-        </div>
 
         <div id="loadingContainer" class="loadingContainer">
         </div>
