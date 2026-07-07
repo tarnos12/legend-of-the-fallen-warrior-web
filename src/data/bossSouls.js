@@ -24,13 +24,15 @@ const BOSS_AREA = {
     TorturedBeholder: 'Zyzx',
 };
 
-// Purchasable uniques, one per area boss, cheapest first. Price scales with the
-// area's position in the chain (later bosses' uniques cost more souls).
+// Purchasable uniques, one per area boss, cheapest first. `price` (buy) scales
+// with the area's position in the chain; `reforgePrice` (re-roll an owned copy
+// at the player's current level) is cheaper since you sacrifice the old item.
 export const SOUL_SHOP = Object.keys(BOSS_UNIQUES).map((bossName, i) => ({
     bossName,
     areaType: BOSS_AREA[bossName],
     def: BOSS_UNIQUES[bossName][0],
     price: 3 + i * 2, // 3, 5, 7, 9, 11, 13, 15
+    reforgePrice: Math.max(1, Math.ceil((3 + i * 2) / 2)), // 2, 3, 4, 5, 6, 7, 8
 }));
 
 export function soulShopEntry(bossName) {

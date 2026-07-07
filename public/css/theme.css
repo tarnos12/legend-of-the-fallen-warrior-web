@@ -66,9 +66,16 @@
     color: var(--soul);
     margin: 4px 0 6px;
 }
+.soulCard button {
+    margin: 2px;
+}
 .soulCard button[disabled] {
     opacity: 0.5;
     cursor: not-allowed;
+}
+.soulReforge {
+    border-color: var(--soul) !important;
+    color: var(--soul) !important;
 }
 .soulLocked {
     color: var(--text-dim);

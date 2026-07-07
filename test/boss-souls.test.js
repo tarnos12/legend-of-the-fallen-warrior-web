@@ -69,3 +69,37 @@ describe('boss souls — soul shop purchase', () => {
         expect(player.properties.bossSouls).toBe(entry.price - 1);
     });
 });
+
+describe('boss souls — reforge', () => {
+    it('reforges an owned copy: consumes the old item, mints a fresh one, costs reforgePrice', () => {
+        const entry = data.SOUL_SHOP[0]; // LordVarik / BanditHideout
+        const area = monsterAreas.find((a) => a.type === entry.areaType);
+        area.isUnlocked = true;
+        player.properties.level = 30;
+        playerInventory.length = 0;
+        // own one copy first
+        player.properties.bossSouls = entry.price;
+        souls.buyBossUnique(entry.bossName);
+        expect(playerInventory.length).toBe(1);
+        const oldId = playerInventory[0].id;
+        // reforge it
+        player.properties.bossSouls = entry.reforgePrice;
+        souls.reforgeBossUnique(entry.bossName);
+        expect(player.properties.bossSouls).toBe(0);
+        expect(playerInventory.length).toBe(1); // old consumed, fresh minted (net same)
+        expect(playerInventory[0].name).toBe(entry.def.name);
+        expect(playerInventory[0].isUnique).toBe(true);
+        expect(playerInventory[0].id).not.toBe(oldId); // a genuinely fresh item
+    });
+
+    it('refuses reforge when no inventory copy is owned', () => {
+        const entry = data.SOUL_SHOP[0];
+        const area = monsterAreas.find((a) => a.type === entry.areaType);
+        area.isUnlocked = true;
+        playerInventory.length = 0;
+        player.properties.bossSouls = 999;
+        souls.reforgeBossUnique(entry.bossName);
+        expect(playerInventory.length).toBe(0);
+        expect(player.properties.bossSouls).toBe(999);
+    });
+});

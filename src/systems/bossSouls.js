@@ -3,7 +3,7 @@
 // Boss Souls system: grant souls on area-boss kills and spend them in the Soul
 // Shop to buy a boss's signature unique (guaranteed, scaled to player level).
 // Data/prices live in data/bossSouls.js; the shop UI is ui/soulShopUI.js.
-import { player } from '../core/core.js';
+import { player, playerInventory } from '../core/core.js';
 import { monsterAreas } from '../data/gameObjects.js';
 import { Log } from '../core/log.js';
 import { BOSS_UNIQUES } from '../data/bossUniques.js';
@@ -63,5 +63,36 @@ function buyBossUnique(bossName) {
     refreshSoulUi();
 }
 
-Object.assign(window, { buyBossUnique });
-export { buyBossUnique };
+// Index of the first OWNED (inventory) copy of a named unique, or -1. Equipped
+// copies aren't counted — reforge acts on an inventory item (unequip first).
+export function ownedUniqueIndex(name) {
+    return playerInventory.findIndex((it) => it && it.isUnique === true && it.name === name);
+}
+
+// Soul-Shop reforge (inline-onclick handler): consume an owned inventory copy of
+// the unique and mint a fresh one at the player's CURRENT level (new random
+// affixes + rescaled base), for a reduced soul cost. Needs the area unlocked, a
+// copy owned, and enough souls.
+function reforgeBossUnique(bossName) {
+    const entry = soulShopEntry(bossName);
+    if (!entry || !areaUnlocked(entry.areaType)) return;
+    const idx = ownedUniqueIndex(entry.def.name); // find BEFORE minting
+    if (idx === -1) return;
+    if ((player.properties.bossSouls || 0) < entry.reforgePrice) return;
+    const item = mintBossUnique(entry.def, player.properties.level); // pushed at end
+    if (!item) return;
+    playerInventory.splice(idx, 1); // remove the old copy (idx precedes the new item)
+    player.properties.bossSouls -= entry.reforgePrice;
+    Log(
+        '<span class="bold" style="color:#ff9d1a;">♻ Reforged ' +
+            entry.def.name +
+            ' to level ' +
+            player.properties.level +
+            '!<br /></span>'
+    );
+    CreateInventoryWeaponHtml();
+    refreshSoulUi();
+}
+
+Object.assign(window, { buyBossUnique, reforgeBossUnique });
+export { buyBossUnique, reforgeBossUnique };
