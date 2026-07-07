@@ -74,6 +74,10 @@ var player = {
         combatArea: '', // '' = first unlocked area
         combatWave: 0, // index into the area's monsters (wave 1 = index 0)
         combatAutoProgress: true,
+        // Boss Souls (systems/bossSouls.js): guaranteed currency dropped by
+        // area-boss kills; spent in the Soul Shop to buy any unlocked boss's
+        // signature unique. Old saves backfill to 0 via load()'s missing-prop pass.
+        bossSouls: 0,
         // Collectible enemy cards (systems/cards.js). cardsOwned maps monster
         // key -> true; the three bonuses are the aggregate % from COMPLETED
         // per-area card sets, recomputed on card gain + on load, read by the

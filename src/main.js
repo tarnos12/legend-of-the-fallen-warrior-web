@@ -43,6 +43,9 @@ import './ui/stageUI.js';
 // World map (area travel) + bestiary panels; both need battleCanvas/monsterList.
 import './ui/mapUI.js';
 import './ui/bestiaryUI.js';
+// Boss Souls currency + Soul Shop (buy boss uniques with souls).
+import './systems/bossSouls.js';
+import './ui/soulShopUI.js';
 // Canvas skill trees (Skills panel); needs skills/weaponMastery data.
 import './ui/skillTreeUI.js';
 import './data/gameObjects.js';

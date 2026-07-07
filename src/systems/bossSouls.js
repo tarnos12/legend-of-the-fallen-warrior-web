@@ -1,0 +1,58 @@
+'use strict';
+
+// Boss Souls system: grant souls on area-boss kills and spend them in the Soul
+// Shop to buy a boss's signature unique (guaranteed, scaled to player level).
+// Data/prices live in data/bossSouls.js; the shop UI is ui/soulShopUI.js.
+import { player } from '../core/core.js';
+import { monsterAreas } from '../data/gameObjects.js';
+import { Log } from '../core/log.js';
+import { BOSS_UNIQUES } from '../data/bossUniques.js';
+import { SOUL_DROP, soulShopEntry } from '../data/bossSouls.js';
+import { mintBossUnique } from './itemDrop.js';
+import { CreateInventoryWeaponHtml } from '../ui/inventoryUI.js';
+
+// Grant souls on an area-boss kill (no-op for non-bosses). Called from
+// battle.grantKillRewards. quiet (offline/sim) skips the log + shop re-render.
+export function grantBossSouls(monster, quiet, shiny) {
+    if (!BOSS_UNIQUES[monster.name]) return;
+    const amount = SOUL_DROP * (shiny ? 2 : 1);
+    player.properties.bossSouls += amount;
+    if (!quiet) {
+        Log(
+            '<span class="bold" style="color:#c08bff;">☠ ' +
+                monster.displayName +
+                ' dropped ' +
+                amount +
+                ' Boss Soul' +
+                (amount > 1 ? 's' : '') +
+                '!<br /></span>'
+        );
+        if (typeof window.renderSoulShop === 'function') window.renderSoulShop();
+    }
+}
+
+function areaUnlocked(areaType) {
+    const a = monsterAreas.find((x) => x.type === areaType);
+    return a ? a.isUnlocked === true : false;
+}
+
+// Soul-Shop purchase (inline-onclick handler). Buys the boss's unique at the
+// player's current level if the area is unlocked and enough souls are held.
+function buyBossUnique(bossName) {
+    const entry = soulShopEntry(bossName);
+    if (!entry || !areaUnlocked(entry.areaType)) return;
+    if ((player.properties.bossSouls || 0) < entry.price) return;
+    const item = mintBossUnique(entry.def, player.properties.level);
+    if (!item) return;
+    player.properties.bossSouls -= entry.price;
+    Log(
+        '<span class="bold" style="color:#ff9d1a;">✦ Bought a unique: ' +
+            entry.def.name +
+            '!<br /></span>'
+    );
+    CreateInventoryWeaponHtml();
+    if (typeof window.renderSoulShop === 'function') window.renderSoulShop();
+}
+
+Object.assign(window, { buyBossUnique });
+export { buyBossUnique };

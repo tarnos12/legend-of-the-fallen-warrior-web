@@ -57,20 +57,8 @@ export function rollBossUnique(monster, quiet, shiny) {
     if (!defs || defs.length === 0) return null;
     if (Math.random() >= BOSS_UNIQUE_CHANCE * (shiny ? 2 : 1)) return null;
     var def = defs[Math.floor(Math.random() * defs.length)];
-    var before = playerInventory.length;
-    // crafted 'Legendary' base: pushed unconditionally (uniques bypass the sell
-    // filters and are always kept) and rolls its own random affixes first
-    getItemType(monster.level, false, def.itemType, def.subType, 'Legendary');
-    if (playerInventory.length === before) return null;
-    var item = playerInventory[playerInventory.length - 1];
-    item.name = def.name;
-    item.color = '#ff9d1a';
-    item.isUnique = true;
-    item.lore = def.lore;
-    // guarantee the signature affix at (at least) its fixed magnitude
-    var sig = signatureValue(def.signature, monster.level);
-    item[def.signature.key] = Math.max(item[def.signature.key] || 0, sig);
-    item.Value = Math.floor(item.Value * 1.5) + 500;
+    var item = mintBossUnique(def, monster.level);
+    if (!item) return null;
     if (!quiet) {
         Log(
             '<span class="bold" style="color:#ff9d1a;">✦ ' +
@@ -81,6 +69,28 @@ export function rollBossUnique(monster, quiet, shiny) {
         );
         CreateInventoryWeaponHtml();
     }
+    return item;
+}
+
+// Mint the actual unique item from a boss-unique def at a given level and push
+// it to the inventory. Shared by the RNG boss drop (rollBossUnique) and the
+// guaranteed Soul-Shop purchase (systems/bossSouls.buyBossUnique). Returns the
+// item, or null if generation failed. Does not log or re-render.
+export function mintBossUnique(def, level) {
+    var before = playerInventory.length;
+    // crafted 'Legendary' base: pushed unconditionally (uniques bypass the sell
+    // filters and are always kept) and rolls its own random affixes first
+    getItemType(level, false, def.itemType, def.subType, 'Legendary');
+    if (playerInventory.length === before) return null;
+    var item = playerInventory[playerInventory.length - 1];
+    item.name = def.name;
+    item.color = '#ff9d1a';
+    item.isUnique = true;
+    item.lore = def.lore;
+    // guarantee the signature affix at (at least) its fixed magnitude
+    var sig = signatureValue(def.signature, level);
+    item[def.signature.key] = Math.max(item[def.signature.key] || 0, sig);
+    item.Value = Math.floor(item.Value * 1.5) + 500;
     return item;
 }
 

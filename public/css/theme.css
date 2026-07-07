@@ -18,6 +18,56 @@
     --red: #ef4444;
     --blue: #60a5fa;
     --hud-h: 64px; /* bottom HUD height; #stage and the panels key off it */
+    --soul: #c08bff;
+}
+
+/* ---- soul shop (Shop panel) ---- */
+.soulHeader {
+    color: var(--soul);
+    margin: 4px 0 10px;
+}
+.soulHeader strong {
+    color: var(--gold-bright);
+}
+.soulGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 10px;
+    margin-bottom: 12px;
+}
+.soulCard {
+    background: var(--bg-inset);
+    border: 1px solid var(--border-dim);
+    border-radius: 6px;
+    padding: 8px;
+    text-align: center;
+}
+.soulCard.soulBuyable {
+    border-color: var(--soul);
+    box-shadow: 0 0 6px rgba(192, 139, 255, 0.35);
+}
+.soulName {
+    color: var(--gold-bright);
+    font-weight: bold;
+    font-size: 13px;
+}
+.soulMeta {
+    color: var(--text-dim);
+    font-size: 11px;
+    margin: 2px 0;
+}
+.soulPrice {
+    color: var(--soul);
+    margin: 4px 0 6px;
+}
+.soulCard button[disabled] {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+.soulLocked {
+    color: var(--text-dim);
+    font-style: italic;
+    font-size: 12px;
 }
 
 /* ---- page ---- */

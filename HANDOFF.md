@@ -9,6 +9,22 @@ _Last updated: 2026-07-05_
 
 ## Current status
 
+**Boss-unique acquisition rework — Stage 0 (Boss Souls + Soul Shop): DONE.** Removes the old
+"20% RNG + slot-gated" acquisition. Area-boss kills now drop a guaranteed **Boss Soul** currency
+(`player.properties.bossSouls`; `SOUL_DROP`=1, 2× shiny) via `systems/bossSouls.grantBossSouls`
+(wired into `battle.grantKillRewards`). A **Soul Shop** at the top of the Shop tab
+(`ui/soulShopUI.js` → `#soulShop`) spends souls to buy ANY unlocked boss's signature unique at
+the player's level (`buyBossUnique` → `itemDrop.mintBossUnique`, prices 3→15 by area in
+`data/bossSouls.js`). The RNG drop still exists as a lucky bonus. Souls persist automatically
+(in `player.properties`, backfilled on old saves — no version bump). Tests: `test/boss-souls.test.js`
+(drop amount/shiny/non-boss, purchase deduct+mint, lock/affordability guards). **83/83 pass, build +
+lint clean.** Live-verified in Chromium: bought Lord Varik's Cleaver for 3 souls (Legendary, +2
+Extra targets), panel renders with locked/affordable states, no console errors.
+- **Design note:** this is Stage 0 (prove the loop) per the staged-roadmap rule — chose the
+  Souls+Shop direction over themed sets. Next polish if kept: show the soul balance in the HUD;
+  a "buy at a chosen level" or bulk option; maybe let souls reroll/upgrade an owned unique. If
+  you'd rather pivot to sets, the Souls currency + `mintBossUnique` foundation still applies.
+
 **Dead-code + unpolished-feature removal pass: DONE.** Cut cruft and a half-finished tab
 (surveyed via two explore agents), bundle dropped ~35 KB (244→209 KB):
 - **Dead code:** the ~310-line commented `itemDropRandom` block + dead `materia` refs
@@ -95,8 +111,8 @@ for every enemy.)
 - Bestiary shows per-monster card status + per-area set progress/bonus.
 - Tests: `test/cards.test.js` (drop/dedupe, set completion, bonus applies, progress).
   **77/77 pass, build + lint clean.** No version bump (self-contained backfill).
-- NOTE: acquisition of boss uniques is deliberately still the Phase-2 RNG drop — user
-  wants to playtest before deciding on Souls/Soul-Shop/sets (see "later ideas" below).
+- NOTE: acquisition reworked since — Boss Souls + Soul Shop shipped (see Current status);
+  the Phase-2 RNG drop remains as a lucky bonus on top.
 
 **Item redesign — Phase 2 (named boss uniques): DONE.**
 - `src/data/bossUniques.js` — one signature named item per area boss (7 bosses; keyed
@@ -136,10 +152,10 @@ for every enemy.)
 
 ## In flight / next steps
 
-- **Boss-unique acquisition rework (after playtesting).** Current = 20% RNG drop, and a
-  slot is gated behind reaching its boss's area. User is weighing: Boss Souls (guaranteed
-  currency) + a Soul Shop (buy any unique, scaled to your level) to fix both the RNG and
-  the slot-gating; and/or themed multi-piece sets. Revisit with fresh ideas post-playtest.
+- **Boss-unique acquisition rework — Stage 0 shipped** (Boss Souls + Soul Shop; see Current
+  status). Open follow-ups: HUD soul-balance indicator; buy-at-chosen-level / bulk; souls to
+  reroll or upgrade an owned unique; or pivot/augment with themed multi-piece SETS (the Souls
+  currency + `mintBossUnique` foundation is reusable either way). Revisit after playtesting.
 - Polish backlog is cleared (big-number formatting, accessory offensive-affix wiring, organic
   skill-tree layouts, and the painted world map all shipped — see Current status). Optional
   follow-ups if wanted: extend `formatBig` to combat damage floaters / health-mana readouts;

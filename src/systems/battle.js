@@ -10,6 +10,7 @@ import { playerRevive } from './intervalFunctions.js';
 import { quest } from './quest.js';
 import { monsterItemDrop, rollBossUnique } from './itemDrop.js';
 import { rollCard } from './cards.js';
+import { grantBossSouls } from './bossSouls.js';
 import { pageReload, reset } from '../core/save.js';
 import { CreateMonsterHtml } from '../ui/monsterUI.js';
 import { activeBuffsHtml } from '../ui/panelsUI.js';
@@ -204,6 +205,9 @@ export function grantKillRewards(monsterStats, quiet, shiny) {
     quest(quiet); // unlocks always run; quiet only skips the panel rerender
     // area bosses can drop their signature named unique (no-op for non-bosses)
     rollBossUnique(monsterStats, quiet, shiny);
+    // area bosses also drop guaranteed Boss Souls for the Soul Shop (no-op for
+    // non-bosses)
+    grantBossSouls(monsterStats, quiet, shiny);
     // every enemy can drop its collectible card
     rollCard(monsterStats, quiet, shiny);
     // (The prestige Warp button lives in the combat control bar now, shown
