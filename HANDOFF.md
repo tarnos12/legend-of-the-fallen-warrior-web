@@ -9,6 +9,22 @@ _Last updated: 2026-07-05_
 
 ## Current status
 
+**Soul-Shop Stage 1 + polish batch (3 tasks, agent-team parallelized): DONE.** Ran as an
+in-session agent team (manager built reforge on `master`; two worktree-isolated subagents did
+the independent polish in parallel; integrated serially, tests green after each merge).
+- **Reforge** (`ui/soulShopUI.js` + `systems/bossSouls.js` + `data/bossSouls.js`): a ♻ Reforge
+  button in the Soul Shop (shown when you own an inventory copy) spends `reforgePrice` souls
+  (≈½ buy price) to consume the old copy and mint a fresh one at your CURRENT level — a
+  perpetual soul sink that doesn't clutter the inventory. `reforgeBossUnique`/`ownedUniqueIndex`.
+  Live-verified: iLvl 50 copy → fresh iLvl 80, souls deducted, net inventory unchanged.
+- **HUD soul counter** (`#soulCount`, prior commit): live ☠ balance next to gold.
+- **`formatBig` everywhere** (subagent): combat damage/gold floaters (`battleCanvas.js`) and the
+  health & mana readouts (`stats.js`) now use compact `1.2M`-style formatting (display only,
+  combat math untouched).
+- **Dead-cruft removal** (subagent): the orphaned `#dialogTest` jQuery-UI dialog (`index.html`)
+  and the now-unused `.story` CSS (`tooltip.css`/`text.css`).
+Working directly on `master` (default branch) per the new rule. 85/85 tests, build + lint clean.
+
 **Boss-unique acquisition rework — Stage 0 (Boss Souls + Soul Shop): DONE.** Removes the old
 "20% RNG + slot-gated" acquisition. Area-boss kills now drop a guaranteed **Boss Soul** currency
 (`player.properties.bossSouls`; `SOUL_DROP`=1, 2× shiny) via `systems/bossSouls.grantBossSouls`
@@ -155,10 +171,10 @@ for every enemy.)
 
 - **Boss-unique acquisition rework — Stage 0 shipped** (Boss Souls + Soul Shop; see Current
   status), plus a live **HUD soul counter** (`#soulCount`, purple ☠ next to gold — updated by
-  `stats.updateHtml` + `refreshSoulUi` on gain/spend). Open follow-ups: buy-at-chosen-level /
-  bulk; souls to reroll or upgrade an owned unique (repeat-buy already gives a fresh roll but
-  clutters inventory); or pivot/augment with themed multi-piece SETS (the Souls currency +
-  `mintBossUnique` foundation is reusable either way). Revisit after playtesting.
+  `stats.updateHtml` + `refreshSoulUi` on gain/spend), plus in-place **reforge** (see the
+  Stage 1 batch above). Open follow-ups: buy-at-chosen-level / bulk; reforge in place while
+  EQUIPPED (currently inventory-only); or pivot/augment with themed multi-piece SETS (the Souls
+  currency + `mintBossUnique` foundation is reusable either way). Revisit after playtesting.
 - Polish backlog is cleared (big-number formatting, accessory offensive-affix wiring, organic
   skill-tree layouts, and the painted world map all shipped — see Current status). Optional
   follow-ups if wanted: extend `formatBig` to combat damage floaters / health-mana readouts;
