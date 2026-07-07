@@ -8,9 +8,8 @@
 //     skills chained below, lit once the mastery level reaches each skill's
 //     requirement (informational — weapon skills unlock by fighting).
 // Hovering a node fills the side info panel (#passiveTreeInfo/#weaponTreeInfo).
-// The legacy DOM renderers (CreateWeaponSkillHtml/CreatePlayerSkillsHtml)
-// still run into their now-hidden divs — updateBar() and several systems
-// write into spans there — these canvases are only the visible presentation.
+// These canvases are the sole presentation of the skill trees (the old hidden
+// DOM renderers CreateWeaponSkillHtml/CreatePlayerSkillsHtml were removed).
 import { player } from '../core/core.js';
 import { playerPassive, weaponSkillList } from '../data/skills.js';
 import { weaponMastery } from '../data/weaponMastery.js';

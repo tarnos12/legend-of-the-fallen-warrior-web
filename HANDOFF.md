@@ -9,6 +9,26 @@ _Last updated: 2026-07-05_
 
 ## Current status
 
+**Dead-code + unpolished-feature removal pass: DONE.** Cut cruft and a half-finished tab
+(surveyed via two explore agents), bundle dropped ~35 KB (244→209 KB):
+- **Dead code:** the ~310-line commented `itemDropRandom` block + dead `materia` refs
+  (`itemDrop.js`), the unreachable `BackPack` equip branch (`equip.js`).
+- **Hidden legacy skill renderers:** removed `CreateWeaponSkillHtml`, `CreatePlayerSkillsHtml`,
+  and `updateBar` (they rendered into invisible `.legacyHidden` divs, superseded by the canvas
+  trees) — plus their ~15 call sites, the dead `player.properties.*Skill` props, the
+  `weaponTypeObject.type2` fields, the `#weaponSkill`/`#playerSkills` divs, the `.legacyHidden`
+  CSS, and 2 render snapshot tests. Live weapon-mastery XP (in `battle.weaponSkill`) untouched.
+- **Story tab removed:** it was half-finished (only areas 1–3 had lore, an empty Twisted Marrow
+  tab, areas 5–7 missing, a typo). Deleted the nav item + pane in `index.html` and regenerated
+  `quest.js` (787→188 lines) keeping ONLY progression (isShown / area unlocks) — the narrative
+  writes + `monsterUnlock` gating are gone. `test/combat-sim.test.js` verifies unlock consistency.
+- **Professions polished (not removed):** dropped the debug `console.log`s, fixed the herb
+  progress-bar id bug (`displayMineral.name`→`displayHerb.name`), and de-duplicated the gather
+  progress-bar ids (prefixed `gatherBar_`) so `getElementById(name)` cleanly targets the count span.
+
+Verified live in headless Chromium (skills/map/bestiary render, professions panel populates,
+Story tab gone, no console errors). 80/80 tests, build + lint clean.
+
 **Real world-map art: DONE.** The map panel (`ui/mapUI.js`) no longer draws a placeholder
 grid — it paints a full procedural continent on `#mapCanvas`: a deterministic sine-perturbed
 coastline (`coastPath`/`coastM`, with `isOcean` as the shared land/water test), per-area biome
@@ -126,6 +146,10 @@ for every enemy.)
   give talismans a dedicated defensive-special affix once combat readers exist; swap the
   procedural map for bespoke raster art (would need actual image assets); per-area map
   ambience (e.g. animated waves) if a render loop is ever added to the map panel.
+- Leftover minor cruft (low priority, not yet removed): the orphaned `#dialogTest` jQuery-UI
+  dialog + its inline init in `index.html` (was only opened by the deleted story code); the now
+  unused `.story` CSS in `public/css/tooltip.css`/`text.css`; and a few vestigial bits in
+  `professions.js` (a dead `craftingHtml2` comment ref, a commented "LEGEND" block).
 
 ## Decisions waiting on the user (blockers for content work)
 

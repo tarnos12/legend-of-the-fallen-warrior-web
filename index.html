@@ -167,7 +167,6 @@
                 <li><a href="#tab_mainProfessions" data-toggle="tab">Professions</a></li>
                 <li onclick="renderSkillTrees();"><a href="#tab_mainSkills" data-toggle="tab">Skills</a></li>
                 <li><a href="#tab_mainShop" data-toggle="tab">Shop</a></li>
-                <li><a href="#tab_mainStory" data-toggle="tab">Story</a></li>
                 <li><a href="#tab_mainOptions" data-toggle="tab">Options</a></li>
             </ul>
         </div>
@@ -266,21 +265,17 @@
                             </ul>
                             <div class="tab-content">
                                 <div class="tab-pane active" id="tab_weaponSkillsShow">
-                                    <!-- canvas node tree (ui/skillTreeUI.js); the legacy
-                                         render below stays hidden: updateBar() and other
-                                         systems write into its spans -->
+                                    <!-- canvas node tree (ui/skillTreeUI.js) -->
                                     <div class="treeLayout">
                                         <canvas id="weaponTreeCanvas" width="640" height="560"></canvas>
                                         <div id="weaponTreeInfo" class="treeInfo c4"></div>
                                     </div>
-                                    <div id="weaponSkill" class="legacyHidden"></div>
                                 </div>
                                 <div class="tab-pane" id="tab_passiveSkillsShow">
                                     <div class="treeLayout">
                                         <canvas id="passiveTreeCanvas" width="740" height="560"></canvas>
                                         <div id="passiveTreeInfo" class="treeInfo c4"></div>
                                     </div>
-                                    <div id="playerSkills" class="legacyHidden"></div>
                                 </div>
                             </div>
                         </div>
@@ -292,66 +287,6 @@
                         </div>
                         <div id="shopTabs"></div>
 
-                    </div>
-                    <div id="tab_mainStory" class="tab-pane unselectable c4 border marginBottom">
-                        <div class="row">
-                            <div class="col-xs-12 marginTop marginBottom">
-                                <div class="c4 border">
-                                    <ul class="nav nav-tabs borderBottom">
-                                        <li role="presentation" class="active"><a href="#tab_prologue" data-toggle="tab">Prologue</a></li>
-                                        <li role="presentation"><a href="#tab_varik" data-toggle="tab">Varik's Hideout</a></li>
-                                        <li role="presentation"><a href="#tab_forest" data-toggle="tab">Forest of Narus</a></li>
-                                        <li role="presentation"><a href="#tab_ozJotnar" data-toggle="tab">Oz Jotnar</a></li>
-                                        <li role="presentation"><a href="#tab_twistedMarrow" data-toggle="tab">Twisted Marrow</a></li>
-                                    </ul>
-                                    <div class="tab-content">
-
-                                        <div class="tab-pane active" id="tab_prologue">
-                                            <div class="story c4" id="story">
-                                                <h1><b>Prologue</b></h1><br /><br />
-                                                <p class="story">
-                                                    The dead stay dead, but in your case that isn't true.
-                                                    You have experienced death and discovered that your life is as infinite as the heavens, but nothing good comes without a price.
-                                                    On your first death the soul of a long dead warrior attempted to possess your body, but due to your "uniqueness" it failed and is now fused with your being.
-                                                    It speaks to you and it desires only one thing: Battle.<br /><br />
-                                                    "Become the Legend I was and help me feel alive again."<br /><br />
-                                                    You respond by opening your door and taking the first steps towards a new life.
-                                                </p>
-                                            </div>
-                                        </div>
-                                        <div class="tab-pane" id="tab_varik">
-                                            <div class="story c4" id="varik">
-                                                <h1><b>Varik's Hideout</b></h1><br />
-                                                <h3><b>Varik Grunts</b></h3><br />
-                                                <p class="story">
-                                                    Of course, you have to start somewhere.
-                                                    You can't just go gallivanting into the Forest of Narsus and expect to come back not in a body bag.
-                                                    Instead, you start simple:  A group of bandits under the name of Variks Avarice have been terrorizing your town of Old Hemlock for a few months now.
-                                                    So, you go stir up some trouble with the Varik Grunts and hope someone notices.
-                                                    Their hideout is very easy to find because they just don't care about hiding it or they are kind of stupid.
-                                                    You started trouble with them by breaking a bottle over one of their heads.
-                                                </p>
-                                            </div>
-                                        </div>
-                                        <div class="tab-pane" id="tab_forest">
-                                            <div class="story c4" id="forestOfNarsus">
-                                                <h1><b>Forest of Narsus</b></h1><br />
-                                            </div>
-                                        </div>
-                                        <div class="tab-pane" id="tab_ozJotnar">
-                                            <div class="story c4" id="ozJotnar">
-                                                <h1><b>Oz Jotnar</b></h1><br />
-                                            </div>
-                                        </div>
-                                        <div class="tab-pane" id="tab_twistedMarrow">
-                                            <div class="story c4" id="twistedMarrow">
-                                                <h1><b>Twisted Marrow</b></h1><br />
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
                     </div>
                     <div id="tab_mainOptions" class="tab-pane c4 border marginBottom">
                         <ul class="nav nav-tabs">

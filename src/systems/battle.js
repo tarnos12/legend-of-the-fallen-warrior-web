@@ -12,7 +12,7 @@ import { monsterItemDrop, rollBossUnique } from './itemDrop.js';
 import { rollCard } from './cards.js';
 import { pageReload, reset } from '../core/save.js';
 import { CreateMonsterHtml } from '../ui/monsterUI.js';
-import { CreateWeaponSkillHtml, activeBuffsHtml } from '../ui/panelsUI.js';
+import { activeBuffsHtml } from '../ui/panelsUI.js';
 // `target` carries the hp pool the retaliation effects (thorn/counter) hit and
 // whose death ends the fight. The classic button combat passes the shared
 // monsterList entry itself; the canvas combat passes a per-enemy clone (its
@@ -237,37 +237,6 @@ function weaponSkill(monsterStats, monster) {
                     '<br />' +
                     '</span>'
             );
-            CreateWeaponSkillHtml();
-        }
-    }
-    updateBar();
-}
-export function updateBar() {
-    if (equippedItems.weapon.isEquipped === true) {
-        var subType = equippedItems.weapon.subType;
-        var itemStat = weaponMastery[subType];
-        var weaponExp = Math.floor((itemStat.experience / itemStat.maxExperience) * 100);
-        var divArray = document.getElementById(subType + '1'); //Doing + 1 so I can use "subType" for a span, which let me center progress bar value.
-        divArray.style.width = weaponExp + '%';
-        if (subType === 'sword') {
-            document.getElementById('sword').innerHTML = weaponExp + '%';
-            player.properties.swordSkill = weaponExp;
-        }
-        if (subType === 'axe') {
-            document.getElementById('axe').innerHTML = weaponExp + '%';
-            player.properties.axeSkill = weaponExp;
-        }
-        if (subType === 'mace') {
-            document.getElementById('mace').innerHTML = weaponExp + '%';
-            player.properties.maceSkill = weaponExp;
-        }
-        if (subType === 'staff') {
-            document.getElementById('staff').innerHTML = weaponExp + '%';
-            player.properties.staffSkill = weaponExp;
-        }
-        if (subType === 'ranged') {
-            document.getElementById('ranged').innerHTML = weaponExp + '%';
-            player.properties.rangedSkill = weaponExp;
         }
     }
 }

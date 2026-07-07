@@ -33,12 +33,9 @@ import { playerReviveCheck } from '../systems/intervalFunctions.js';
 import { applyOfflineProgress } from '../systems/offline.js';
 import { quest } from '../systems/quest.js';
 import { createPotionInventory, CreatePlayerHotBar } from '../systems/potionsHotbar.js';
-import { updateBar } from '../systems/battle.js';
 import { backpackStatus, statStatus } from '../data/shop.js';
 import { CreateMonsterHtml } from '../ui/monsterUI.js';
 import {
-    CreatePlayerSkillsHtml,
-    CreateWeaponSkillHtml,
     checkBoxHtml,
     primaryStatUpdate,
     secondaryStatUpdate,
@@ -163,7 +160,6 @@ function newGame(slot) {
         }
         EquippedItemsEmpty();
         CreatePlayerHotBar();
-        CreatePlayerSkillsHtml();
         primaryStatUpdate();
         secondaryStatUpdate();
         saveGameSlot();
@@ -262,11 +258,8 @@ function load(slot) {
                 characterRaces[key].raceAge = savegame[key + 'raceAge'];
         }
         loadIsEquipped();
-        CreateWeaponSkillHtml();
         quest();
         CreateMonsterHtml();
-        CreatePlayerSkillsHtml();
-        updateBar();
         characterCreationHtml();
         playerReviveCheck();
         removeStartingScreen();

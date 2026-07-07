@@ -424,9 +424,7 @@ function gather(monsterStat, type) {
     var maxResources = 1000 + playerPassive.storage.bonusTotal();
     var criticalGather = Math.floor(Math.random() * 100 + 1);
     if (criticalGather <= playerPassive[type + 'Critical'].bonusTotal()) {
-        console.log(resourceGain);
         resourceGain *= 5;
-        console.log(resourceGain);
     }
     monsterStats.hp -= professionType.damage();
     if (monsterStats.hp <= 0) {
@@ -778,7 +776,7 @@ function professionGatherHtml() {
                 '<div style="width:' +
                 monsterPercent +
                 '%' +
-                ';" aria-valuemax="100" aria-valuemin="0" aria-valuenow="60" role="progressbar" class="progress-bar" id="' +
+                ';" aria-valuemax="100" aria-valuemin="0" aria-valuenow="60" role="progressbar" class="progress-bar" id="gatherBar_' +
                 displayMineral.name +
                 '">';
             html +=
@@ -821,8 +819,8 @@ function professionGatherHtml() {
                 '<div style="width:' +
                 monsterPercent +
                 '%' +
-                ';" aria-valuemax="100" aria-valuemin="0" aria-valuenow="60" role="progressbar" class="progress-bar" id="' +
-                displayMineral.name +
+                ';" aria-valuemax="100" aria-valuemin="0" aria-valuenow="60" role="progressbar" class="progress-bar" id="gatherBar_' +
+                displayHerb.name +
                 '">';
             html +=
                 '<span style="font-size:13px;">' + displayHerb.hp + ' HP</span>' + '</div></div>';

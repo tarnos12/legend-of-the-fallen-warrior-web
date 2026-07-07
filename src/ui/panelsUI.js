@@ -1,94 +1,15 @@
 'use strict';
 
-// Stat/skill panel rendering, extracted from dynamicHtml.js. All six are imported
-// cross-module (battle/core/save/stats/gameObjects/potionsHotbar) and re-exported
-// via dynamicHtml.js for backward compatibility. Pure render functions — no
-// inline-onclick handlers, so nothing to register on window.
-import { weaponMastery } from '../data/weaponMastery.js';
-import { playerPassive, weaponSkillList } from '../data/skills.js';
-import { primaryStatInfo, secondaryStatInfo, weaponTypeObject } from '../data/gameObjects.js';
+// Stat/skill panel rendering, extracted from dynamicHtml.js. All four are
+// imported cross-module (battle/core/save/stats/potionsHotbar). Pure render
+// functions — no inline-onclick handlers, so nothing to register on window.
+// (The old hidden weapon/passive skill renderers were removed once the visible
+// canvas trees in ui/skillTreeUI.js became the sole presentation.)
+import { primaryStatInfo, secondaryStatInfo } from '../data/gameObjects.js';
 import { player } from '../core/core.js';
 import { state } from '../core/state.js';
 import { updateHtml } from '../systems/stats.js';
 import { testss } from './uiCommon.js';
-
-function CreateWeaponSkillHtml() {
-    let mastery = '';
-    for (var itemType in weaponTypeObject) {
-        if (weaponTypeObject.hasOwnProperty(itemType)) {
-            var item = weaponTypeObject[itemType];
-            var itemType3 = item.type2;
-            var weaponStat = weaponMastery[item.type];
-            let multipliers = '';
-            for (var statName in weaponStat) {
-                if (weaponStat.hasOwnProperty(statName)) {
-                    if (
-                        'strength, endurance, agility, dexterity, intelligence, wisdom, luck'.indexOf(
-                            statName
-                        ) !== -1
-                    ) {
-                        multipliers += `${statName.capitalizeFirstLetter()}: ${(weaponStat[statName]() * 100).toFixed(0)}%<br />`;
-                    }
-                }
-            }
-            mastery +=
-                `<div class="col-xs-2 passiveMargin">` +
-                `<a class="tooltips">` +
-                `<img class="skillBorder" src="images/skills/${item.type}.png">` +
-                `<span style="width:300px; bottom:30px; right:-150px;">` +
-                `<div class="row">` +
-                `<div class="col-xs-12">` +
-                `${item.displayName} skill progress:<br />` +
-                `Level: ${weaponStat.level}<br />` +
-                `<div class="progress">` +
-                `<div style="width: ${player.properties[itemType3]}%;" aria-valuemax="100" aria-valuemin="0" aria-valuenow="60" role="progressbar" class="progress-bar" id="${item.type}1">` +
-                `<span id="${item.type}">${player.properties[itemType3]}%</span></div></div>` +
-                `</div>` +
-                `</div>` +
-                `Stat Multiplier:<br />` +
-                multipliers +
-                `</span></a>` +
-                `</div>`;
-        }
-    }
-
-    let skills = '';
-    for (var type in weaponSkillList) {
-        if (weaponSkillList.hasOwnProperty(type)) {
-            var weaponType = weaponSkillList[type];
-            let entries = '';
-            for (var skill in weaponType) {
-                if (weaponType.hasOwnProperty(skill)) {
-                    var weaponSkill = weaponType[skill];
-                    entries +=
-                        `<div class="col-xs-12 passiveMargin">` +
-                        `<a class="tooltips">` +
-                        `<img class="skillBorder" src="images/skills/${weaponSkill.image}.png">` +
-                        `<span style="width:200px; bottom:30px; right:-100px;">` +
-                        `${weaponSkill.name}<br />` +
-                        `Weapon skill required: ${weaponSkill.levelReq}<br />` +
-                        weaponSkill.description() +
-                        `</span></a>` +
-                        `<div class="row">` +
-                        `<div class="col-xs-8 col-xs-offset-2">` +
-                        `<img class="skillBorder" src="images/arrow.png">` +
-                        `</div>` +
-                        `</div>` +
-                        `</div>`;
-                }
-            }
-            skills += `<div class="col-xs-2"><div class="row">${entries}</div></div>`;
-        }
-    }
-
-    document.getElementById('weaponSkill').innerHTML =
-        `<div class="row">` +
-        `<div class="col-xs-10 col-xs-offset-1">` +
-        `<div class="row">${mastery}</div>` +
-        `<div class="row">${skills}</div>` +
-        `</div>` +
-        `</div>`;
-}
 
 function checkBoxHtml() {
     const rarities = [
@@ -115,67 +36,6 @@ function checkBoxHtml() {
         `</div>` +
         `</div>`;
     testss();
-}
-
-function CreatePlayerSkillsHtml() {
-    let tree = '';
-    for (var passiveSkill in playerPassive) {
-        if (playerPassive.hasOwnProperty(passiveSkill)) {
-            var passive = playerPassive[passiveSkill];
-            const onclickevent = `upgradePassive('${passiveSkill}');`;
-            let skillClass = 'skill ';
-            if (passive.levelReq <= player.properties.level) {
-                if (passive.level === 0) {
-                    skillClass += 'can-add-points ';
-                }
-                if (passive.level > 0 && passive.level < passive.maxLevel) {
-                    skillClass += 'can-add-points has-points ';
-                }
-                if (passive.level === passive.maxLevel) {
-                    skillClass += 'has-points has-max-points';
-                }
-            }
-            tree +=
-                (passive.firstRow === true ? `<div class="col-xs-4 col-md-1">` : '') +
-                `<div class="col-xs-12">` + //Opening Div for skill image
-                `<div class="${skillClass}">` +
-                //Icon div's
-                `<div class="icon-container">` +
-                `<div class="icon">` +
-                `<img src="images/passive/${passive.image}.png"">` +
-                `</div></div>` +
-                //Div Frame
-                `<div class="frame" onclick="${onclickevent}">` +
-                `<a class="tooltips" style="position:absolute; width:80px; height:80px; z-index:5;">` +
-                `<span style="bottom:110px; right:-100px; width:250px;">` +
-                `${passive.name}<br />` +
-                passive.description() +
-                `<br />Level: ${passive.levelReq}` +
-                `<br />Level: ${passive.level}/${passive.maxLevel}` +
-                `</span></a>` +
-                `<div class="skill-points">` +
-                `${passive.level}/${passive.maxLevel}` +
-                `</div>` +
-                `</div>` + //Close frame
-                `</div>` + //Close skill div
-                `</div>` + //Close skill-image div
-                (passive.lastRow === true ? `</div>` : '');
-        }
-    }
-    document.getElementById('playerSkills').innerHTML =
-        `<div class="row">` +
-        `<div class="col-xs-10 col-xs-offset-1">` +
-        `<div class="row">` +
-        `<div class="col-xs-6 col-xs-offset-3 c3">` +
-        `<button type="button" onclick="resetPassiveSkills();">Reset</button>` +
-        `<div class="fontSize">Skill points remaining: ${player.properties.skillPoints}</div>` +
-        `</div>` +
-        `</div>` +
-        `<div class="row">` +
-        `<div class="talent-tree">${tree}</div>` +
-        `</div>` +
-        `</div>` +
-        `</div>`;
 }
 
 function primaryStatUpdate() {
@@ -292,11 +152,4 @@ function activeBuffsHtml() {
     updateHtml();
 }
 
-export {
-    CreateWeaponSkillHtml,
-    checkBoxHtml,
-    CreatePlayerSkillsHtml,
-    primaryStatUpdate,
-    secondaryStatUpdate,
-    activeBuffsHtml,
-};
+export { checkBoxHtml, primaryStatUpdate, secondaryStatUpdate, activeBuffsHtml };

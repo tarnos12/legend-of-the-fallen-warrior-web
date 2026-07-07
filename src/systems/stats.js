@@ -6,11 +6,7 @@ import { Log, fadeLog } from '../core/log.js';
 import { formatBig } from '../core/format.js';
 import { CreatePlayerHotBar } from './potionsHotbar.js';
 import { CreateMonsterHtml } from '../ui/monsterUI.js';
-import {
-    CreatePlayerSkillsHtml,
-    CreateWeaponSkillHtml,
-    secondaryStatUpdate,
-} from '../ui/panelsUI.js';
+import { secondaryStatUpdate } from '../ui/panelsUI.js';
 function updateHtml() {
     if (player.properties.stats >= 1) {
         // Show "plus" image when player level up
@@ -241,7 +237,6 @@ function updateHtml() {
 
     //primaryStatUpdate();
     secondaryStatUpdate();
-    CreateWeaponSkillHtml();
     playerHealthBar();
 }
 
@@ -297,7 +292,6 @@ function levelUp() {
     }
     CreateMonsterHtml();
     updateHtml();
-    CreatePlayerSkillsHtml();
     CreatePlayerHotBar();
 }
 
@@ -520,7 +514,6 @@ function upgradePassive(skillName) {
         }
     }
     skillLog();
-    CreatePlayerSkillsHtml();
     CreatePlayerHotBar();
     updateHtml();
 }

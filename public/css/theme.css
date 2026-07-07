@@ -530,10 +530,6 @@ textarea {
     padding-bottom: 6px;
     margin-bottom: 6px;
 }
-.legacyHidden {
-    display: none;
-}
-
 /* ---- bestiary panel ---- */
 .beastGrid {
     display: grid;

@@ -13,7 +13,7 @@ import { monsterList, MakeMonsterList } from '../data/monsterList.js';
 import { quest } from './quest.js';
 import { getStartingItem } from './equip.js';
 import { CreateMonsterHtml, changedTabmonster } from '../ui/monsterUI.js';
-import { CreatePlayerSkillsHtml, primaryStatUpdate, secondaryStatUpdate } from '../ui/panelsUI.js';
+import { primaryStatUpdate, secondaryStatUpdate } from '../ui/panelsUI.js';
 import {
     ShopBuyButtons,
     displayShopItems,
@@ -107,7 +107,6 @@ function resetPassiveSkills() {
         }
     }
     player.properties.skillPoints = player.properties.level - 1;
-    CreatePlayerSkillsHtml();
     primaryStatUpdate();
     secondaryStatUpdate();
 }

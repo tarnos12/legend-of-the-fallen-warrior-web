@@ -6,9 +6,7 @@ import { characterRaces } from '../src/data/gameObjects.js';
 import { MakeMonsterList } from '../src/data/monsterList.js';
 import { CreateMonsterHtml } from '../src/ui/monsterUI.js';
 import {
-    CreateWeaponSkillHtml,
     checkBoxHtml,
-    CreatePlayerSkillsHtml,
     primaryStatUpdate,
     secondaryStatUpdate,
 } from '../src/ui/panelsUI.js';
@@ -59,12 +57,6 @@ describe('render snapshots (fixed game state)', () => {
     });
     it('CreateMonsterHtml', () => {
         expect(captureRender(CreateMonsterHtml, 'monsterTabs')).toMatchSnapshot();
-    });
-    it('CreateWeaponSkillHtml', () => {
-        expect(captureRender(CreateWeaponSkillHtml, 'weaponSkill')).toMatchSnapshot();
-    });
-    it('CreatePlayerSkillsHtml', () => {
-        expect(captureRender(CreatePlayerSkillsHtml, 'playerSkills')).toMatchSnapshot();
     });
     it('primaryStatUpdate', () => {
         expect(captureRender(primaryStatUpdate, 'primaryStat')).toMatchSnapshot();

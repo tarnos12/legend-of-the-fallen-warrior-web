@@ -1048,36 +1048,11 @@ var monsterAreas = [
     },
 ];
 var weaponTypeObject = [
-    {
-        type: 'sword',
-        displayName: 'Sword',
-        icon: 'sword',
-        type2: 'swordSkill',
-    },
-    {
-        type: 'axe',
-        displayName: 'Axe',
-        icon: 'axe',
-        type2: 'axeSkill',
-    },
-    {
-        type: 'mace',
-        displayName: 'Mace',
-        icon: 'mace',
-        type2: 'maceSkill',
-    },
-    {
-        type: 'staff',
-        displayName: 'Staff',
-        icon: 'staff',
-        type2: 'staffSkill',
-    },
-    {
-        type: 'ranged',
-        displayName: 'Ranged',
-        icon: 'ranged',
-        type2: 'rangedSkill',
-    },
+    { type: 'sword', displayName: 'Sword', icon: 'sword' },
+    { type: 'axe', displayName: 'Axe', icon: 'axe' },
+    { type: 'mace', displayName: 'Mace', icon: 'mace' },
+    { type: 'staff', displayName: 'Staff', icon: 'staff' },
+    { type: 'ranged', displayName: 'Ranged', icon: 'ranged' },
 ];
 
 var CharacterRace = function (
@@ -2005,9 +1980,9 @@ function raceStats() {
 }
 
 // Phase 3 ESM: export the symbols consumed by other modules. The CharacterRace
-// constructor, the individual race instances (human/halfElf/dwarf/orc/elf/
-// halfing/sylph/giant), and materiaType are only referenced within this file,
-// so they stay module-private (no export, no window).
+// constructor and the individual race instances (human/halfElf/dwarf/orc/elf/
+// halfing/sylph/giant) are only referenced within this file, so they stay
+// module-private (no export, no window).
 export {
     itemToCraft,
     secondaryStatInfo,

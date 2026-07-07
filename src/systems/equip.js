@@ -8,14 +8,11 @@ import { createEquippedItemsObject, equippedItems, player, playerInventory } fro
 import { updateHtml } from './stats.js';
 import { CreatePlayerHotBar } from './potionsHotbar.js';
 import { getItemType } from './itemDrop.js';
-import { updateBar } from './battle.js';
-import { CreateWeaponSkillHtml, CreatePlayerSkillsHtml } from '../ui/panelsUI.js';
 import { CreateInventoryWeaponHtml, checkIfEquippedEmpty } from '../ui/inventoryUI.js';
 
 //Equip item function
 // Armor/accessory sub-types whose equip path is identical apart from the slot
-// name. (weapon is keyed off itemType and also toggles a weapon-type flag;
-// backpack is a separate legacy path.)
+// name. (weapon is keyed off itemType and also toggles a weapon-type flag.)
 var equipSlotSubTypes = [
     'shield',
     'chest',
@@ -101,32 +98,10 @@ function equipItem(id) {
             equipSlot('weapon', item, id);
         } else if (equipSlotSubTypes.indexOf(item.subType) > -1) {
             equipSlot(item.subType, item, id);
-        } else if (item.itemType === 'BackPack') {
-            if (equippedItems.backpack.isEquipped === true) {
-                var typeItem = 'duo'; // It means that we equip item while another item is already equipped
-                unequipItem(typeItem);
-            }
-            if (item.id === id) {
-                equippedItems.backpack = item;
-                equippedItems.backpack.isEquipped = true;
-                var item = playerInventory.filter(function (obj) {
-                    return obj.id === id;
-                })[0];
-                var index = playerInventory.indexOf(item, 0);
-                if (index > -1) {
-                    playerInventory.splice(index, 1);
-                }
-            }
-            player.functions.backpack = $('#testingItem' + id);
-            $('#testingItem' + id).remove();
-            updateHtml();
         }
     }
-    CreateWeaponSkillHtml();
     updateHtml();
-    CreatePlayerSkillsHtml();
     CreatePlayerHotBar();
-    updateBar();
     checkIfEquippedEmpty();
     CreateInventoryWeaponHtml();
 }
@@ -150,9 +125,7 @@ function unequipItem(id, type) {
             break;
         }
     }
-    CreateWeaponSkillHtml();
     updateHtml();
-    CreatePlayerSkillsHtml();
     CreatePlayerHotBar();
     checkIfEquippedEmpty();
     if (type === 'solo') {
