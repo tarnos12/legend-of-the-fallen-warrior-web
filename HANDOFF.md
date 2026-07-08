@@ -9,6 +9,19 @@ _Last updated: 2026-07-05_
 
 ## Current status
 
+**Flaky-fix + big-number-finish batch (3 tasks — dynamic Workflow): DONE.** Workflow planned
+(Opus, with precise line-level spec validation), delegated to Sonnet/Opus worktree subagents,
+Opus-reviewed (all 3 `correct`), manager integrated. 92/92, build+lint clean.
+- **Flaky test FIXED**: `item-affixes.test.js "commons have no affixes, legendaries have several"`
+  now generates 800 Master swords (was 60) + guards `legendaries.length > 0`, so a zero-Legendary
+  RNG round can't fail it. Verified 5/5 stable runs.
+- **Combat-log numbers** use `formatBig` (`battle.js` — enemy hit / thorn / counter / block /
+  hero damage / lifesteal, display-only; hp/state math untouched).
+- **Stat-panel numbers** use `formatBig` (`stats.js` updateHtml — total damage + the 7 stat
+  totals + spell power; `primaryStatUpdate` snapshot stayed byte-identical since values <10000
+  floor the same). The big-number pass is now comprehensive (gold/exp/souls, health/mana,
+  floaters, item badges, shop prices, stat panel, combat log).
+
 **QoL polish batch (5 tasks — dynamic Workflow + 2 standalone agents): DONE.** Ran a dynamic
 Workflow that PLANNED (Opus validated specs vs. the codebase), delegated to Sonnet/Opus
 worktree subagents by complexity, and REVIEWED (Opus, per task) — plus two standalone worktree
@@ -26,9 +39,8 @@ merge. 92/92 tests, build+lint clean. Live-verified. Items:
 - **Boss Souls save test** (Sonnet, standalone): `test/save-roundtrip.test.js` now covers souls
   surviving save→load and backfilling to 0 on old saves.
 - Also: `.gitignore` now excludes `.claude/worktrees/` (transient agent worktrees). Noted a
-  pre-existing FLAKY test — `item-affixes.test.js "commons have no affixes, legendaries have
-  several"` uses unseeded `Math.random` and can rarely fail; a seed/large-sample fix is a good
-  future cleanup.
+  FLAKY test `item-affixes.test.js "commons have no affixes, legendaries have several"` — now
+  FIXED (larger sample + length guard; see the batch above).
 
 **Unique-set + reforge/polish batch (3 tasks, agent-team parallelized): DONE.** Manager built
 themed sets on `master`; two worktree subagents did reforge-while-equipped + inventory number
