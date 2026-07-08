@@ -56,7 +56,7 @@ function updateHtml() {
 
     strength.innerHTML =
         '<span class=\'cursorHelp\' data-toggle="tooltip" data-placement="top" title="Total Strength">' +
-        player.functions.totalStrength() +
+        formatBig(player.functions.totalStrength()) +
         '</span>' +
         '<a class="tooltipA">' +
         '<p class="glyphicon glyphicon-info-sign"></p>' +
@@ -74,7 +74,7 @@ function updateHtml() {
 
     endurance.innerHTML =
         '<span class=\'cursorHelp\' data-toggle="tooltip" data-placement="top" title="Total Endurance">' +
-        player.functions.totalEndurance() +
+        formatBig(player.functions.totalEndurance()) +
         '</span>' +
         '<a class="tooltipA">' +
         '<p class="glyphicon glyphicon-info-sign"></p>' +
@@ -93,7 +93,7 @@ function updateHtml() {
 
     agility.innerHTML =
         '<span class=\'cursorHelp\' data-toggle="tooltip" data-placement="top" title="Total Agility">' +
-        player.functions.totalAgility() +
+        formatBig(player.functions.totalAgility()) +
         '</span>' +
         '<a class="tooltipA">' +
         '<p class="glyphicon glyphicon-info-sign"></p>' +
@@ -111,7 +111,7 @@ function updateHtml() {
 
     dexterity.innerHTML =
         '<span class=\'cursorHelp\' data-toggle="tooltip" data-placement="top" title="Total Dexterity">' +
-        player.functions.totalDexterity() +
+        formatBig(player.functions.totalDexterity()) +
         '</span>' +
         '<a class="tooltipA">' +
         '<p class="glyphicon glyphicon-info-sign"></p>' +
@@ -130,7 +130,7 @@ function updateHtml() {
 
     wisdom.innerHTML =
         '<span class=\'cursorHelp\' data-toggle="tooltip" data-placement="top" title="Total Wisdom">' +
-        player.functions.totalWisdom() +
+        formatBig(player.functions.totalWisdom()) +
         '</span>' +
         '<a class="tooltipA">' +
         '<p class="glyphicon glyphicon-info-sign"></p>' +
@@ -148,7 +148,7 @@ function updateHtml() {
 
     intelligence.innerHTML =
         '<span class=\'cursorHelp\' data-toggle="tooltip" data-placement="top" title="Total Intelligence">' +
-        player.functions.totalIntelligence() +
+        formatBig(player.functions.totalIntelligence()) +
         '</span>' +
         '<a class="tooltipA">' +
         '<p class="glyphicon glyphicon-info-sign"></p>' +
@@ -167,7 +167,7 @@ function updateHtml() {
 
     luck.innerHTML =
         '<span class=\'cursorHelp\' data-toggle="tooltip" data-placement="top" title="Total Luck">' +
-        player.functions.totalLuck() +
+        formatBig(player.functions.totalLuck()) +
         '</span>' +
         '<a class="tooltipA">' +
         '<p class="glyphicon glyphicon-info-sign"></p>' +
@@ -183,9 +183,9 @@ function updateHtml() {
 
     damage.innerHTML =
         '<span class=\'cursorHelp\' data-toggle="tooltip" data-placement="top" title="Total Damage">' +
-        player.functions.minDamage().toFixed(0) +
+        formatBig(player.functions.minDamage()) +
         '-' +
-        player.functions.maxDamage().toFixed(0) +
+        formatBig(player.functions.maxDamage()) +
         '</span>' +
         '<a class="tooltipA">' +
         '<p class="glyphicon glyphicon-info-sign"></p>' +
@@ -201,7 +201,7 @@ function updateHtml() {
 
     spellPower.innerHTML =
         '<span class=\'cursorHelp\' data-toggle="tooltip" data-placement="top" title="Total Spell Power">' +
-        player.functions.spellPower().toFixed(0) +
+        formatBig(player.functions.spellPower()) +
         '</span>' +
         '<a class="tooltipA">' +
         '<p class="glyphicon glyphicon-info-sign"></p>' +
