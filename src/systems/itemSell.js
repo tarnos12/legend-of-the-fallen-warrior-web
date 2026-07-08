@@ -5,8 +5,26 @@ var total = 0;
 var inventoryId = [];
 function sellAllItems() {
     var canSell = false;
-    if (state.checkBoxEpic === true || state.checkBoxLegendary === true) {
-        if (confirm('You are going to sell Epic and/or Legendary items, are you sure?') === true) {
+    // would any currently-checked rarity bucket include a unique item? Uniques
+    // (boss drops bought with souls) must never be lost to an accidental bulk sell.
+    var hasUniqueInSelection = playerInventory.some(function (invItem) {
+        return (
+            invItem.isUnique === true &&
+            ((invItem.itemRarity === 'Legendary' && state.checkBoxLegendary === true) ||
+                (invItem.itemRarity === 'Epic' && state.checkBoxEpic === true) ||
+                (invItem.itemRarity === 'Rare' && state.checkBoxRare === true) ||
+                (invItem.itemRarity === 'Uncommon' && state.checkBoxUncommon === true) ||
+                (invItem.itemRarity === 'Common' && state.checkBoxCommon === true))
+        );
+    });
+    if (state.checkBoxEpic === true || state.checkBoxLegendary === true || hasUniqueInSelection) {
+        if (
+            confirm(
+                hasUniqueInSelection
+                    ? 'You are going to sell one or more Unique items, are you sure?'
+                    : 'You are going to sell Epic and/or Legendary items, are you sure?'
+            ) === true
+        ) {
             canSell = true;
         } else {
             canSell = false;
@@ -52,10 +70,11 @@ function itemSell(id) {
     var item = playerInventory.filter(function (obj) {
         return obj.id === id;
     })[0];
-    // high-rarity items are painful to lose to a stray click
+    // high-rarity items (and any Unique, boss-souls-bought item regardless of
+    // rarity) are painful to lose to a stray click
     if (
         item !== undefined &&
-        (item.itemRarity === 'Epic' || item.itemRarity === 'Legendary') &&
+        (item.itemRarity === 'Epic' || item.itemRarity === 'Legendary' || item.isUnique === true) &&
         confirm('Sell ' + item.itemRarity + ' ' + item.name + ' for ' + item.Value + ' gold?') !==
             true
     ) {
