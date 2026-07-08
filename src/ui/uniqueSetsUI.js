@@ -42,5 +42,14 @@ function renderUniqueSets() {
         nextLine;
 }
 
-Object.assign(window, { renderUniqueSets });
-export { renderUniqueSets };
+// Always-visible HUD indicator mirroring the set piece-count outside the Shop.
+// Hidden (empty) until at least 2 pieces are equipped (i.e. a set bonus is active).
+function renderSetHud() {
+    const el = document.getElementById('setHud');
+    if (!el) return;
+    const pieces = player.functions.equippedUniqueCount();
+    el.innerHTML = pieces < 2 ? '' : '⚜ ' + pieces + '/' + UNIQUE_SET_MAX;
+}
+
+Object.assign(window, { renderUniqueSets, renderSetHud });
+export { renderUniqueSets, renderSetHud };
