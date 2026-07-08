@@ -28,6 +28,12 @@
     white-space: nowrap;
     font-weight: bold;
 }
+/* ---- Fallen Legends set: always-visible HUD indicator ---- */
+#setHud {
+    color: gold;
+    margin-left: 6px;
+    white-space: nowrap;
+}
 .soulHeader {
     color: var(--soul);
     margin: 4px 0 10px;

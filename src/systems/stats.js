@@ -238,6 +238,7 @@ function updateHtml() {
     if (soulCount) soulCount.innerHTML = formatBig(player.properties.bossSouls || 0);
     // refresh the equipped-unique set-bonus panel (no-op if not rendered)
     if (typeof window.renderUniqueSets === 'function') window.renderUniqueSets();
+    if (typeof window.renderSetHud === 'function') window.renderSetHud();
 
     //primaryStatUpdate();
     secondaryStatUpdate();
