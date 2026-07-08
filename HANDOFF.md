@@ -9,6 +9,20 @@ _Last updated: 2026-07-05_
 
 ## Current status
 
+**Unique-set + reforge/polish batch (3 tasks, agent-team parallelized): DONE.** Manager built
+themed sets on `master`; two worktree subagents did reforge-while-equipped + inventory number
+formatting in parallel; integrated serially (tests green after each merge). 90/90, build+lint clean.
+- **"Fallen Legends" unique set** (`data/uniqueSets.js` + `core.js` + `ui/uniqueSetsUI.js`):
+  wearing 2/3/4 boss uniques grants an escalating live bonus (+dmg%/+def%/+magic-find/+gold),
+  computed from `equippedItems` (no persistence). A set-progress panel (pips + active bonus +
+  next tier) sits under the Soul Shop, refreshed via `updateHtml`. Live-verified: 3 pieces →
+  +12%/+12%/+4%/+4%.
+- **Reforge-while-equipped** (subagent): the ♻ Reforge now works when your only copy is EQUIPPED
+  (unequips via `window.unequipItem` first, then mints a fresh copy at level into inventory).
+  `ownsUnique`/`equippedUniqueId` added. Live-verified: equipped iLvl-40 → fresh iLvl-90.
+- **`formatBig` on inventory power badges** (subagent): `.invPower` corner number now compact
+  (`1.2M`); tooltip snapshot untouched.
+
 **Soul-Shop Stage 1 + polish batch (3 tasks, agent-team parallelized): DONE.** Ran as an
 in-session agent team (manager built reforge on `master`; two worktree-isolated subagents did
 the independent polish in parallel; integrated serially, tests green after each merge).
@@ -171,10 +185,10 @@ for every enemy.)
 
 - **Boss-unique acquisition rework — Stage 0 shipped** (Boss Souls + Soul Shop; see Current
   status), plus a live **HUD soul counter** (`#soulCount`, purple ☠ next to gold — updated by
-  `stats.updateHtml` + `refreshSoulUi` on gain/spend), plus in-place **reforge** (see the
-  Stage 1 batch above). Open follow-ups: buy-at-chosen-level / bulk; reforge in place while
-  EQUIPPED (currently inventory-only); or pivot/augment with themed multi-piece SETS (the Souls
-  currency + `mintBossUnique` foundation is reusable either way). Revisit after playtesting.
+  `stats.updateHtml` + `refreshSoulUi` on gain/spend), in-place **reforge** (inventory OR
+  equipped), and the **"Fallen Legends" set** (see the batches above). Open follow-ups:
+  buy-at-chosen-level / bulk; per-slot or multiple named sets instead of one collection set;
+  a HUD/character-panel set indicator (currently only in the Shop). Revisit after playtesting.
 - Polish backlog is cleared (big-number formatting, accessory offensive-affix wiring, organic
   skill-tree layouts, and the painted world map all shipped — see Current status). Optional
   follow-ups if wanted: extend `formatBig` to combat damage floaters / health-mana readouts;
