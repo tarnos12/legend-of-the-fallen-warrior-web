@@ -9,6 +9,27 @@ _Last updated: 2026-07-05_
 
 ## Current status
 
+**QoL polish batch (5 tasks — dynamic Workflow + 2 standalone agents): DONE.** Ran a dynamic
+Workflow that PLANNED (Opus validated specs vs. the codebase), delegated to Sonnet/Opus
+worktree subagents by complexity, and REVIEWED (Opus, per task) — plus two standalone worktree
+agents in parallel. Manager (me) integrated only review-passed branches, re-verifying after each
+merge. 92/92 tests, build+lint clean. Live-verified. Items:
+- **Unique sell-protection** (Sonnet): selling any `isUnique` item always `confirm()`s (single +
+  bulk paths) so soul-bought uniques survive a stray click (`systems/itemSell.js`).
+- **Bestiary soul price** (Sonnet): the mastered-tier signature-drop line now also shows the
+  unique's Soul-Shop price (`ui/bestiaryUI.js`).
+- **Always-visible set HUD** (Opus): `renderSetHud` → a `⚜ N/4` indicator next to the soul
+  counter (hidden below 2 pieces), refreshed via `updateHtml` (`ui/uniqueSetsUI.js` + index.html
+  + stats.js + theme.css).
+- **Gold-shop price formatting** (Sonnet, standalone): `.invPower` price badges use `formatBig`
+  (`ui/shopUI.js`).
+- **Boss Souls save test** (Sonnet, standalone): `test/save-roundtrip.test.js` now covers souls
+  surviving save→load and backfilling to 0 on old saves.
+- Also: `.gitignore` now excludes `.claude/worktrees/` (transient agent worktrees). Noted a
+  pre-existing FLAKY test — `item-affixes.test.js "commons have no affixes, legendaries have
+  several"` uses unseeded `Math.random` and can rarely fail; a seed/large-sample fix is a good
+  future cleanup.
+
 **Unique-set + reforge/polish batch (3 tasks, agent-team parallelized): DONE.** Manager built
 themed sets on `master`; two worktree subagents did reforge-while-equipped + inventory number
 formatting in parallel; integrated serially (tests green after each merge). 90/90, build+lint clean.
