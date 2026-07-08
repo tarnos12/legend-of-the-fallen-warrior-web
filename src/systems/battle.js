@@ -3,7 +3,7 @@ import { weaponMastery } from '../data/weaponMastery.js';
 import { weaponSkillList } from '../data/skills.js';
 import { equippedItems, player } from '../core/core.js';
 import { Log, deathLog, levelUpLog } from '../core/log.js';
-import { getTen } from '../core/format.js';
+import { getTen, formatBig } from '../core/format.js';
 import { state } from '../core/state.js';
 import { updateHtml, manaRegen, levelUp } from './stats.js';
 import { playerRevive } from './intervalFunctions.js';
@@ -57,7 +57,7 @@ function monsterDmg(monsterStats, target) {
     if (thornDamage > 0) {
         Log(
             '<span class ="bold" style="color:green;">You deal ' +
-                thornDamage +
+                formatBig(thornDamage) +
                 ' thorn damage' +
                 '<br />' +
                 '</span>'
@@ -92,7 +92,7 @@ function monsterDamageDeal(monsterDamage, monsterStats, target) {
         target.hp -= counterDamageDealt;
         Log(
             '<span class ="bold" style="color:purple;">You counter enemy for ' +
-                counterDamageDealt +
+                formatBig(counterDamageDealt) +
                 '<br />' +
                 '</span>'
         );
@@ -104,7 +104,7 @@ function monsterDamageDeal(monsterDamage, monsterStats, target) {
     if (randomBlockNumber <= player.functions.blockChance()) {
         Log(
             '<span class ="bold" style="color:blue;">You block ' +
-                player.functions.blockAmount() +
+                formatBig(player.functions.blockAmount()) +
                 ' damage!' +
                 '<br />' +
                 '</span>'
@@ -120,7 +120,7 @@ function monsterDamageDeal(monsterDamage, monsterStats, target) {
 
     Log(
         '<span class ="bold" style="color:purple;">Enemy hits you for ' +
-            monsterDamage +
+            formatBig(monsterDamage) +
             text +
             '.' +
             '<br />' +
@@ -387,7 +387,7 @@ export function heroSpellRoll(monsterStats) {
 function heroHitLanded(monsterStats, damage, name, type) {
     Log(
         '<span class ="bold" style="color:red;">You deal ' +
-            damage +
+            formatBig(damage) +
             type +
             ' with ' +
             name +
@@ -402,7 +402,7 @@ function heroHitLanded(monsterStats, damage, name, type) {
         }
         Log(
             '<span class ="bold" style="color:green;">You life steal for ' +
-                lifeSteal +
+                formatBig(lifeSteal) +
                 ' health.<br />' +
                 '</span>'
         );
