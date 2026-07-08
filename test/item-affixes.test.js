@@ -93,11 +93,15 @@ describe('rarity affix budget scales', () => {
         const commons = generate('weapon', 'sword', 60, 'Common');
         // Common weapons: 0 pool affixes (innate crit is expected, excluded above)
         for (const c of commons) expect(affixCount(c)).toBe(0);
-        const legendaries = generate('weapon', 'sword', 60, 'Master').filter(
+        // Sample size matches the "compressed power curve" test below so
+        // Legendaries reliably appear (60 was flaky: unlucky RNG rounds could
+        // roll zero Legendaries and silently pass a 0/0 average).
+        const legendaries = generate('weapon', 'sword', 800, 'Master').filter(
             (i) => i.itemRarity === 'Legendary'
         );
+        expect(legendaries.length).toBeGreaterThan(0);
         // Legendary: 2-3 prefixes + 2-3 suffixes -> comfortably several
-        const avg = legendaries.reduce((s, i) => s + affixCount(i), 0) / (legendaries.length || 1);
+        const avg = legendaries.reduce((s, i) => s + affixCount(i), 0) / legendaries.length;
         expect(avg).toBeGreaterThan(2);
     });
 });
