@@ -3,7 +3,7 @@
 // Boss Souls system: grant souls on area-boss kills and spend them in the Soul
 // Shop to buy a boss's signature unique (guaranteed, scaled to player level).
 // Data/prices live in data/bossSouls.js; the shop UI is ui/soulShopUI.js.
-import { player, playerInventory } from '../core/core.js';
+import { player, playerInventory, equippedItems } from '../core/core.js';
 import { monsterAreas } from '../data/gameObjects.js';
 import { Log } from '../core/log.js';
 import { BOSS_UNIQUES } from '../data/bossUniques.js';
@@ -69,6 +69,23 @@ export function ownedUniqueIndex(name) {
     return playerInventory.findIndex((it) => it && it.isUnique === true && it.name === name);
 }
 
+// id of an EQUIPPED copy of a named unique, or null. equippedItems is a map of
+// slot -> item; empty slots hold a zero-filled placeholder without isUnique, so
+// those are skipped.
+export function equippedUniqueId(name) {
+    for (const slot of Object.keys(equippedItems)) {
+        const it = equippedItems[slot];
+        if (it && it.isUnique === true && it.name === name) return it.id;
+    }
+    return null;
+}
+
+// True if the player owns a named unique anywhere — inventory OR equipped. Used
+// by the Soul Shop to decide whether the ♻ Reforge button is offered.
+export function ownsUnique(name) {
+    return ownedUniqueIndex(name) !== -1 || equippedUniqueId(name) !== null;
+}
+
 // Soul-Shop reforge (inline-onclick handler): consume an owned inventory copy of
 // the unique and mint a fresh one at the player's CURRENT level (new random
 // affixes + rescaled base), for a reduced soul cost. Needs the area unlocked, a
@@ -76,7 +93,16 @@ export function ownedUniqueIndex(name) {
 function reforgeBossUnique(bossName) {
     const entry = soulShopEntry(bossName);
     if (!entry || !areaUnlocked(entry.areaType)) return;
-    const idx = ownedUniqueIndex(entry.def.name); // find BEFORE minting
+    // If the only copy is EQUIPPED, unequip it first (via the existing global)
+    // so it lands in playerInventory and the normal reforge path can act on it.
+    // The fresh reforged copy is minted UNEQUIPPED — the player re-equips it.
+    if (ownedUniqueIndex(entry.def.name) === -1) {
+        const eqId = equippedUniqueId(entry.def.name);
+        if (eqId != null && typeof window.unequipItem === 'function') {
+            window.unequipItem(eqId, 'solo');
+        }
+    }
+    const idx = ownedUniqueIndex(entry.def.name); // re-find AFTER unequip, BEFORE minting
     if (idx === -1) return;
     if ((player.properties.bossSouls || 0) < entry.reforgePrice) return;
     const item = mintBossUnique(entry.def, player.properties.level); // pushed at end

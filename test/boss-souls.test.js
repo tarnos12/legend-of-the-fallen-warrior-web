@@ -14,6 +14,16 @@ beforeAll(async () => {
     ({ player, playerInventory } = core);
     core.copyPlayerProperties();
     core.createEquippedItemsObject('all');
+    // Build the stat DOM so window.equipItem's updateHtml pass has its targets
+    // (equipping is exercised by the "reforge an EQUIPPED copy" test below).
+    const { characterRaces } = await import('../src/data/gameObjects.js');
+    for (const r of Object.values(characterRaces)) r.raceAge = 'Adulthood';
+    core.player.properties.heroRace = 'Human';
+    const { primaryStatUpdate, secondaryStatUpdate } = await import('../src/ui/panelsUI.js');
+    primaryStatUpdate();
+    secondaryStatUpdate();
+    const eq = await import('../src/ui/inventoryUI.js');
+    eq.EquippedItemsEmpty();
     await import('../src/systems/equip.js');
     ({ monsterAreas } = await import('../src/data/gameObjects.js'));
     data = await import('../src/data/bossSouls.js');
@@ -101,5 +111,30 @@ describe('boss souls — reforge', () => {
         souls.reforgeBossUnique(entry.bossName);
         expect(playerInventory.length).toBe(0);
         expect(player.properties.bossSouls).toBe(999);
+    });
+
+    it('reforges an EQUIPPED copy: unequips it, then mints a fresh copy in inventory', () => {
+        const entry = data.SOUL_SHOP[0]; // LordVarik / BanditHideout
+        const area = monsterAreas.find((a) => a.type === entry.areaType);
+        area.isUnlocked = true;
+        player.properties.level = 30;
+        playerInventory.length = 0;
+        // buy one copy, then equip it so nothing sits in inventory
+        player.properties.bossSouls = entry.price;
+        souls.buyBossUnique(entry.bossName);
+        expect(playerInventory.length).toBe(1);
+        const oldId = playerInventory[0].id;
+        window.equipItem(oldId);
+        expect(souls.ownedUniqueIndex(entry.def.name)).toBe(-1); // no inventory copy
+        expect(souls.equippedUniqueId(entry.def.name)).toBe(oldId); // it's equipped
+        // reforge: should unequip the equipped copy then reforge it in inventory
+        player.properties.bossSouls = entry.reforgePrice;
+        souls.reforgeBossUnique(entry.bossName);
+        expect(player.properties.bossSouls).toBe(0); // souls deducted
+        const idx = souls.ownedUniqueIndex(entry.def.name);
+        expect(idx).not.toBe(-1); // a fresh copy is in inventory
+        expect(playerInventory[idx].isUnique).toBe(true);
+        expect(playerInventory[idx].id).not.toBe(oldId); // genuinely fresh item
+        expect(souls.equippedUniqueId(entry.def.name)).toBeNull(); // unequipped, not re-equipped
     });
 });

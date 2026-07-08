@@ -7,7 +7,7 @@
 import { player } from '../core/core.js';
 import { monsterAreas } from '../data/gameObjects.js';
 import { SOUL_SHOP } from '../data/bossSouls.js';
-import { ownedUniqueIndex } from '../systems/bossSouls.js';
+import { ownsUnique } from '../systems/bossSouls.js';
 
 function area(areaType) {
     return monsterAreas.find((x) => x.type === areaType) || null;
@@ -23,7 +23,7 @@ function renderSoulShop() {
         const areaName = a ? a.displayName : e.areaType;
         const affordable = souls >= e.price;
         const canBuy = unlocked && affordable;
-        const owned = unlocked && ownedUniqueIndex(e.def.name) !== -1;
+        const owned = unlocked && ownsUnique(e.def.name);
         const canReforge = owned && souls >= e.reforgePrice;
         let actions;
         if (!unlocked) {
