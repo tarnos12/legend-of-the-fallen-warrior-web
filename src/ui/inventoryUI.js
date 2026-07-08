@@ -10,7 +10,7 @@ import {
     loadingEquippedItems,
 } from '../data/gameObjects.js';
 import { equippedItems, player, playerInventory } from '../core/core.js';
-import { compare } from '../core/format.js';
+import { compare, formatBig } from '../core/format.js';
 import { createPotionInventory } from '../systems/potionsHotbar.js';
 import { testss } from './uiCommon.js';
 
@@ -129,7 +129,7 @@ function CreateInventoryWeaponHtml() {
                     (hasType ? `</div>` : '') +
                     `</span>` +
                     `</a>` +
-                    `<span class="invPower">${power}</span>` +
+                    `<span class="invPower">${formatBig(power)}</span>` +
                     `</div>`;
             }
         }
