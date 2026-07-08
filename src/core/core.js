@@ -8,6 +8,7 @@
 import { weaponMastery } from '../data/weaponMastery.js';
 import { playerPassive, weaponSkillList } from '../data/skills.js';
 import { loadingEquippedItems } from '../data/gameObjects.js';
+import { uniqueSetBonus } from '../data/uniqueSets.js';
 
 var currentGameVersion = 1.8;
 var defaultValues = {
@@ -255,10 +256,16 @@ var player = {
             return sumEquippedStat('Bonus mana', equipmentSlots);
         },
         totalMagicFind: function () {
-            return sumEquippedStat('Magic find', equipmentSlots);
+            return (
+                sumEquippedStat('Magic find', equipmentSlots) +
+                (player.functions.uniqueSetBonus().magicFind || 0)
+            );
         },
         totalGoldDrop: function () {
-            return sumEquippedStat('Gold drop', equipmentSlots);
+            return (
+                sumEquippedStat('Gold drop', equipmentSlots) +
+                (player.functions.uniqueSetBonus().gold || 0)
+            );
         },
         totalExperienceRate: function () {
             return sumEquippedStat('Experience rate', equipmentSlots);
@@ -271,8 +278,22 @@ var player = {
         totalBonusDamage: function () {
             return sumEquippedStat('Bonus damage', accessorySlots);
         },
+        // "Fallen Legends" set: count distinct boss uniques currently equipped
+        // (isUnique across all slots; at most 4 wearable) and the active bonus.
+        equippedUniqueCount: function () {
+            var n = 0;
+            for (var i = 0; i < equipmentSlots.length; i++) {
+                if (equippedItems[equipmentSlots[i]].isUnique === true) n++;
+            }
+            return n;
+        },
+        uniqueSetBonus: function () {
+            return uniqueSetBonus(player.functions.equippedUniqueCount());
+        },
         bonusDamage: function () {
-            var damage = player.functions.totalBonusDamage();
+            var damage =
+                player.functions.totalBonusDamage() +
+                (player.functions.uniqueSetBonus().damage || 0);
             if (playerPassive.brawler.level > 0) {
                 damage += playerPassive.brawler.bonusTotal();
             }
@@ -359,7 +380,7 @@ var player = {
             return manaRegen;
         },
         bonusDefense: function () {
-            var defense = 0;
+            var defense = player.functions.uniqueSetBonus().defense || 0;
             if (playerPassive.armorProficiency.level > 0) {
                 defense += playerPassive.armorProficiency.bonusTotal();
             }

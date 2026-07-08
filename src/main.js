@@ -46,6 +46,8 @@ import './ui/bestiaryUI.js';
 // Boss Souls currency + Soul Shop (buy boss uniques with souls).
 import './systems/bossSouls.js';
 import './ui/soulShopUI.js';
+// "Fallen Legends" unique-set bonus display (set logic lives in core.js).
+import './ui/uniqueSetsUI.js';
 // Canvas skill trees (Skills panel); needs skills/weaponMastery data.
 import './ui/skillTreeUI.js';
 import './data/gameObjects.js';

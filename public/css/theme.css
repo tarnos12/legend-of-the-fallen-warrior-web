@@ -77,6 +77,34 @@
     border-color: var(--soul) !important;
     color: var(--soul) !important;
 }
+/* Fallen Legends unique-set progress panel */
+#uniqueSets {
+    margin: 4px 0 12px;
+    padding: 8px 10px;
+    background: var(--bg-inset);
+    border: 1px solid var(--border-dim);
+    border-radius: 6px;
+}
+.setHeader {
+    color: var(--gold-bright);
+}
+.setPip {
+    color: var(--border-dim);
+    margin-left: 2px;
+}
+.setPip.setPipOn {
+    color: var(--soul);
+}
+.setActive {
+    color: var(--soul);
+    margin-top: 3px;
+}
+.setInactive,
+.setNext {
+    color: var(--text-dim);
+    font-size: 12px;
+    margin-top: 3px;
+}
 .soulLocked {
     color: var(--text-dim);
     font-style: italic;
