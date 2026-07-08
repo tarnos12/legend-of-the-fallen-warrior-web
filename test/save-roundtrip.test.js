@@ -82,4 +82,33 @@ describe('save -> mutate -> load round trip', () => {
         // save-wipe guard: version matched, so the save must still be there
         expect(localStorage.EncodedSave2).toBeTypeOf('string');
     });
+
+    it('round-trips bossSouls', () => {
+        player.properties.bossSouls = 37;
+
+        window.saveGameFunction('manualSave', 2);
+        const payload = JSON.parse(atob(localStorage.EncodedSave2));
+        expect(payload.playerProperties.bossSouls).toBe(37);
+
+        // wreck the live state
+        player.properties.bossSouls = 0;
+
+        window.load(2);
+
+        expect(player.properties.bossSouls).toBe(37);
+    });
+
+    it('backfills bossSouls to 0 when missing from an old save', () => {
+        player.properties.bossSouls = 37;
+        window.saveGameFunction('manualSave', 2);
+
+        // simulate an old save made before bossSouls existed
+        const payload = JSON.parse(atob(localStorage.EncodedSave2));
+        delete payload.playerProperties.bossSouls;
+        localStorage.EncodedSave2 = btoa(JSON.stringify(payload));
+
+        window.load(2);
+
+        expect(player.properties.bossSouls).toBe(0);
+    });
 });
