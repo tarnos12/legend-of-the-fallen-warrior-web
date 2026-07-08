@@ -14,6 +14,7 @@ import { areaMonsterKeys } from '../data/waves.js';
 import { ownsCard, areaCardProgress, isAreaSetComplete } from '../systems/cards.js';
 import { CARD_SET_BONUS } from '../data/cards.js';
 import { BOSS_UNIQUES } from '../data/bossUniques.js';
+import { SOUL_SHOP } from '../data/bossSouls.js';
 
 export const BESTIARY_MASTERY_KILLS = 100;
 
@@ -47,7 +48,11 @@ function monsterCard(key) {
             ? `<div class="beastStats">✦ ${Math.floor(m.baseExp())} exp · 💰 ${m.level}-${m.level + 5} gold</div>`
             : `<div class="beastStats beastLocked">Rewards at 25 kills</div>`;
     const uniqueLine = (BOSS_UNIQUES[m.name] || [])
-        .map((u) => `<div class="beastStats beastUnique">☠ Signature drop: ${u.name}</div>`)
+        .map((u) => {
+            const soulEntry = SOUL_SHOP.find((e) => e.bossName === m.name || e.def.name === u.name);
+            const soulPrice = soulEntry ? ` · ☠${soulEntry.price} in the Soul Shop` : '';
+            return `<div class="beastStats beastUnique">☠ Signature drop: ${u.name}${soulPrice}</div>`;
+        })
         .join('');
     const masteryBlock =
         tier >= 4
