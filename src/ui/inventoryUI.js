@@ -32,6 +32,67 @@ function invCellClick(id) {
     else window.equipItem(id);
 }
 
+// ---- floating item tooltip -------------------------------------------------
+// The overlay panels (#mainPanels > .tab-pane) are scroll containers
+// (overflow-y: auto), which CLIPS the old absolutely-positioned in-cell
+// tooltip spans at the panel edge. This single body-level, position:fixed
+// layer escapes that clipping entirely; cells feed it on hover and it clamps
+// itself to the viewport. Shared by the inventory grid and the shop grid.
+function floatTipEl() {
+    let el = document.getElementById('floatTip');
+    if (!el) {
+        el = document.createElement('div');
+        el.id = 'floatTip';
+        document.body.appendChild(el);
+    }
+    return el;
+}
+function showFloatTip(html, ev) {
+    const el = floatTipEl();
+    el.innerHTML = html;
+    el.style.display = 'block';
+    // position beside the hovered cell, clamped to the viewport
+    const cell = ev && ev.target ? ev.target.getBoundingClientRect() : { right: 0, top: 0, left: 0 };
+    const w = el.offsetWidth;
+    const h = el.offsetHeight;
+    let x = cell.right + 10;
+    if (x + w > window.innerWidth - 8) x = cell.left - w - 10; // flip left
+    if (x < 8) x = 8;
+    let y = cell.top - 20;
+    if (y + h > window.innerHeight - 8) y = window.innerHeight - h - 8;
+    if (y < 8) y = 8;
+    el.style.left = x + 'px';
+    el.style.top = y + 'px';
+}
+function hideFloatTip() {
+    const el = document.getElementById('floatTip');
+    if (el) el.style.display = 'none';
+}
+// hover handler for inventory cells: builds the same compare-tooltip content
+// the old in-cell span carried (equipped item side-by-side when one is worn)
+function invTipShow(id, ev) {
+    const item = playerInventory.filter((obj) => obj.id === id)[0];
+    if (!item) return;
+    const itemStat = equippedCompareFor(item);
+    const hasType = itemStat && itemStat.hasOwnProperty('itemType');
+    const hint = `<strong>${inventorySellMode ? 'Left-Click to SELL' : 'Left-Click to equip'} · Right-Click to sell</strong>`;
+    const html = hasType
+        ? `<div class="floatTipCols"><div class="floatTipCol borderRight">` +
+          itemTooltipTest(itemStat) +
+          `<strong>Currently equipped</strong></div>` +
+          `<div class="floatTipCol">` +
+          itemTooltipTest(item) +
+          hint +
+          `</div></div>`
+        : itemTooltipTest(item) + hint;
+    showFloatTip(html, ev);
+}
+// the equipped item occupying this item's slot (for the compare tooltip)
+function equippedCompareFor(item) {
+    if (item.itemType === 'weapon') return equippedItems.weapon;
+    return equippedItems[item.subType];
+}
+
 function CreateInventoryWeaponHtml() {
     const navTabs = InventoryItemTypes.map((t, k) => {
         const li =
@@ -71,32 +132,13 @@ function CreateInventoryWeaponHtml() {
         for (var i = 0; i < playerInventory.length; i++) {
             if (playerInventory[i].itemType === t.type) {
                 cardCount++;
-                var itemStat;
-                if (playerInventory[i].itemType === 'weapon') {
-                    itemStat = equippedItems.weapon;
-                } else if (playerInventory[i].subType === 'shield') {
-                    itemStat = equippedItems.shield;
-                } else if (playerInventory[i].subType === 'chest') {
-                    itemStat = equippedItems.chest;
-                } else if (playerInventory[i].subType === 'helmet') {
-                    itemStat = equippedItems.helmet;
-                } else if (playerInventory[i].subType === 'legs') {
-                    itemStat = equippedItems.legs;
-                } else if (playerInventory[i].subType === 'boots') {
-                    itemStat = equippedItems.boots;
-                } else if (playerInventory[i].subType === 'ring') {
-                    itemStat = equippedItems.ring;
-                } else if (playerInventory[i].subType === 'amulet') {
-                    itemStat = equippedItems.amulet;
-                } else if (playerInventory[i].subType === 'talisman') {
-                    itemStat = equippedItems.talisman;
-                }
                 const item = playerInventory[i];
-                const hasType = itemStat.hasOwnProperty('itemType');
                 const imgClass = item.itemType === 'weapon' ? item.itemType : item.subType;
                 // corner badge: the item's headline number (avg damage /
                 // defense / item level) — rarity is the icon's outline color,
-                // full detail stays in the hover tooltip
+                // full detail lives in the floating hover tooltip (invTipShow;
+                // the old in-cell tooltip span was clipped by the overlay
+                // panel's overflow-y:auto scroll container)
                 const power =
                     item.itemType === 'weapon'
                         ? Math.round((item.MinDamage + item.MaxDamage) / 2)
@@ -105,30 +147,10 @@ function CreateInventoryWeaponHtml() {
                           : item.iLvl;
                 cards +=
                     `<div class="invCell${inventorySellMode ? ' sellArmed' : ''}" id="testingItem${item.id}">` +
-                    `<a class="tooltips2" style="cursor:pointer;">` +
-                    `<img class="${imgClass}, ${item.itemRarity}"src="images/items/${item.subType}/${item.image}.png"onclick="invCellClick(${item.id})" oncontextmenu="itemSell(${item.id});return false;"/>` +
-                    (hasType
-                        ? `<span style="pointer-events:none; left:-100px;right:0; bottom:100px; width:400px;">`
-                        : `<span style="width:300px; left:80px;right:0; bottom:100px;">`) +
-                    `<div class="row">` +
-                    `<div class="col-xs-12">` +
-                    (hasType
-                        ? `<div class="row">` +
-                          `<div class="col-xs-6 borderRight">` +
-                          itemTooltipTest(itemStat) +
-                          `<strong>Currently equipped</strong>` +
-                          `</div>`
-                        : '') +
-                    (hasType
-                        ? `<div class="col-xs-6">`
-                        : `<div class="col-xs-10 col-xs-offset-1">`) +
-                    itemTooltipTest(item) +
-                    `<strong>${inventorySellMode ? 'Left-Click to SELL' : 'Left-Click to equip'} · Right-Click to sell</strong>` +
-                    `</div></div>` +
-                    `</div>` +
-                    (hasType ? `</div>` : '') +
-                    `</span>` +
-                    `</a>` +
+                    `<img class="${imgClass}, ${item.itemRarity}" style="cursor:pointer;" src="images/items/${item.subType}/${item.image}.png" ` +
+                    `onerror="this.onerror=null;this.src='images/questionMark.png';" ` +
+                    `onmouseenter="invTipShow(${item.id}, event)" onmouseleave="hideFloatTip()" ` +
+                    `onclick="invCellClick(${item.id})" oncontextmenu="itemSell(${item.id});return false;"/>` +
                     `<span class="invPower">${formatBig(power)}</span>` +
                     `</div>`;
             }
@@ -381,14 +403,19 @@ export {
     EquippedItemsEmpty,
     checkIfEquippedEmpty,
     itemTooltipTest,
+    showFloatTip,
 };
 // changedTabInventory is dispatched by the generated `onClick = changedTabInventory(k)`
 // on the inventory nav tabs, so it must be on window (it silently dropped off during
 // the ESM conversion, leaving tab clicks throwing a ReferenceError and the active-tab
 // state stuck at 0 across re-renders).
+// invTipShow/hideFloatTip are the floating-tooltip hover handlers on the
+// generated inventory cells (and hideFloatTip on the shop cells).
 Object.assign(window, {
     CreateInventoryWeaponHtml,
     changedTabInventory,
     toggleSellMode,
     invCellClick,
+    invTipShow,
+    hideFloatTip,
 });

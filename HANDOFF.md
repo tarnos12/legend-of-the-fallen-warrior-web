@@ -9,6 +9,27 @@ _Last updated: 2026-07-05_
 
 ## Current status
 
+**Bugfix — inventory/shop tooltips clipped by the overlay panel: FIXED.** The overlay panels
+(`#mainPanels > .tab-pane`) are `overflow-y:auto` scroll containers, which clipped the old
+absolutely-positioned in-cell tooltip spans at the panel edge (reproduced: a top-row cell's
+tooltip measured `top:-14px` vs. the panel's `top:32px`). Replaced with a single body-level
+`position:fixed` **floating tooltip** (`#floatTip`, z-200): `inventoryUI.showFloatTip` +
+`invTipShow`/`hideFloatTip` hover handlers on inventory cells (with the equipped-vs-hovered
+two-column compare preserved via the untouched, snapshot-locked `itemTooltipTest`), and
+`shopUI.shopTipShow` for shop cells. Viewport-clamped (flips left near the right edge). Also
+added an `onerror` → `questionMark.png` fallback on item icons (stale-save insurance). Bonus:
+cells no longer embed the full tooltip HTML, shrinking inventory re-render payloads.
+Live-verified with a real hover: tooltip fully in-viewport, hides on leave. 92/92, build+lint clean.
+- **"Some item icons don't load" — investigated, NO bug in master:** a full browser sweep
+  (every slot/rarity/level + uniques + bestiary portraits + shop reroll) logged **zero** failed
+  image requests, an exhaustive filename audit (items×rarities×buckets, monsters, passives,
+  skills, buffs, stats, races, potions) found **zero** missing files, and the on-load repair
+  covers both persisted item collections (equipped + inventory; shop stock isn't persisted).
+  The report almost certainly comes from the **stale live gh-pages deploy (2026-07-05)** —
+  redeploying master is the fix (awaiting go-ahead; `npm run deploy`).
+- Equipped paper-doll (`#equipHtml`) still uses old in-cell tooltips — slated for the
+  inventory revamp (plan below).
+
 **Flaky-fix + big-number-finish batch (3 tasks — dynamic Workflow): DONE.** Workflow planned
 (Opus, with precise line-level spec validation), delegated to Sonnet/Opus worktree subagents,
 Opus-reviewed (all 3 `correct`), manager integrated. 92/92, build+lint clean.
@@ -215,6 +236,21 @@ for every enemy.)
   / fists 75 kills per 30 min — within ~5% of the pre-redesign baseline, floor intact.
 
 ## In flight / next steps
+
+- **Inventory revamp (PLANNED — awaiting layout decision).** Goal: a proper grid-based
+  inventory view. Staged plan:
+  - *Stage 1 — Grid foundation:* responsive `.invGrid` (auto-fill columns, not fixed 5);
+    real capacity visualization (render exactly `player.functions.inventory()` cells — used,
+    free, and a "buy backpack" hint on the last row); move the equipped paper-doll to the
+    shared floating tooltip; unified filter bar (rarity + subtype chips + an "upgrades only"
+    filter comparing vs. equipped) — layout fork: single all-items grid with filter chips
+    vs. keeping the per-type tabs.
+  - *Stage 2 — Interactions:* item lock/favorite (🔒 protect from sell-all/sell-mode,
+    persisted on the item); multi-select bulk sell (ctrl-click); drag-to-equip onto the
+    paper-doll; persistent sort preference.
+  - *Stage 3 — Polish:* rarity glow, ⚜ marker on Fallen Legends pieces, "NEW" badge on fresh
+    drops, compact empty-cell footer.
+  Groundwork already in place: floating tooltip layer, `formatBig` badges, unique sell-confirms.
 
 - **Boss-unique acquisition rework — Stage 0 shipped** (Boss Souls + Soul Shop; see Current
   status), plus a live **HUD soul counter** (`#soulCount`, purple ☠ next to gold — updated by

@@ -21,6 +21,36 @@
     --soul: #c08bff;
 }
 
+/* ---- floating item tooltip (ui/inventoryUI.js showFloatTip) ----
+   Body-level, position:fixed layer so item tooltips escape the overlay
+   panels' overflow-y:auto clipping (the old in-cell spans were cut off at
+   the panel edge). z-index above the panels (40). */
+#floatTip {
+    display: none;
+    position: fixed;
+    z-index: 200;
+    max-width: 460px;
+    background: var(--bg-panel-2);
+    color: var(--text);
+    border: 1px solid var(--border-gold);
+    border-radius: 6px;
+    box-shadow: 0 10px 32px rgba(0, 0, 0, 0.7);
+    padding: 10px 12px;
+    font-size: 12px;
+    pointer-events: none;
+}
+.floatTipCols {
+    display: flex;
+    gap: 12px;
+}
+.floatTipCol {
+    flex: 1;
+    min-width: 190px;
+}
+.floatTipCol.borderRight {
+    padding-right: 12px;
+}
+
 /* ---- boss souls: HUD counter + Soul Shop (Shop panel) ---- */
 #soulHud {
     color: var(--soul);

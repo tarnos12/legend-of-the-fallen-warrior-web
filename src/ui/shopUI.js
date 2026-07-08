@@ -9,7 +9,7 @@ import { getItemType } from '../systems/itemDrop.js';
 import { player, playerInventory } from '../core/core.js';
 import { formatBig } from '../core/format.js';
 import { state } from '../core/state.js';
-import { itemTooltipTest, CreateInventoryWeaponHtml } from './inventoryUI.js';
+import { itemTooltipTest, CreateInventoryWeaponHtml, showFloatTip } from './inventoryUI.js';
 import {
     potionStatus,
     mediumPotionStatus,
@@ -94,22 +94,19 @@ function displayShopItems(type) {
     else if (type === itemShopAccessory) [category, containerId] = ['Accessory', 'shopAccessory'];
 
     // same slot-grid cells as the inventory: rarity = outline color, price as
-    // the corner badge, detail in the hover tooltip; the radio (hidden by CSS)
-    // still drives Buy via state.checkedShopItem
+    // the corner badge, detail in the FLOATING hover tooltip (shopTipShow —
+    // the old in-cell span was clipped by the overlay panel's scroll
+    // container); the radio (hidden by CSS) still drives Buy via
+    // state.checkedShopItem
     const items = type
         .map((item) => {
             const imgClass = item.itemType === 'weapon' ? item.itemType : item.subType;
             return (
-                `<div class="invCell shopCell">` +
-                `<a class="tooltips" style="cursor:pointer;">` +
-                `<label> <input type="radio" name="shopItem" value=${item.id}>` +
-                `<img class="${imgClass}, ${item.itemRarity}" src="images/items/${item.subType}/${item.image}.png"/>` +
+                `<div class="invCell shopCell" onmouseenter="shopTipShow(${item.id}, event)" onmouseleave="hideFloatTip()">` +
+                `<label style="cursor:pointer;"> <input type="radio" name="shopItem" value=${item.id}>` +
+                `<img class="${imgClass}, ${item.itemRarity}" src="images/items/${item.subType}/${item.image}.png" ` +
+                `onerror="this.onerror=null;this.src='images/questionMark.png';"/>` +
                 `</label>` +
-                `<span style="width:300px;left:10px; bottom:40px;">` +
-                `<div class="row"><div class="col-xs-10 col-xs-offset-1">` +
-                itemTooltipTest(item) +
-                `<strong>Select, then Buy below</strong>` +
-                `</div></div></span></a>` +
                 `<span class="invPower">${formatBig(item.shopPrice)}g</span>` +
                 `</div>`
             );
@@ -286,4 +283,15 @@ var shopOtherList = [
 ];
 
 export { displayShopItems, ShopBuyButtons, refillShopInterval, shopOther };
-Object.assign(window, { itemBuy, rerollShopItems });
+// floating-tooltip hover handler for shop cells: looks the item up across the
+// three stock arrays and feeds the shared body-level tooltip layer.
+function shopTipShow(id, ev) {
+    const item =
+        itemShopWeapon.find((it) => it.id === id) ||
+        itemShopArmor.find((it) => it.id === id) ||
+        itemShopAccessory.find((it) => it.id === id);
+    if (!item) return;
+    showFloatTip(itemTooltipTest(item) + `<strong>Select, then Buy below</strong>`, ev);
+}
+
+Object.assign(window, { itemBuy, rerollShopItems, shopTipShow });
