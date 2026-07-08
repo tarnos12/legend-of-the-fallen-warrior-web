@@ -7,6 +7,7 @@
 // save. The potion*/backpack/statStatus imports resolve the shopOther price lookup.
 import { getItemType } from '../systems/itemDrop.js';
 import { player, playerInventory } from '../core/core.js';
+import { formatBig } from '../core/format.js';
 import { state } from '../core/state.js';
 import { itemTooltipTest, CreateInventoryWeaponHtml } from './inventoryUI.js';
 import {
@@ -109,7 +110,7 @@ function displayShopItems(type) {
                 itemTooltipTest(item) +
                 `<strong>Select, then Buy below</strong>` +
                 `</div></div></span></a>` +
-                `<span class="invPower">${item.shopPrice}g</span>` +
+                `<span class="invPower">${formatBig(item.shopPrice)}g</span>` +
                 `</div>`
             );
         })
