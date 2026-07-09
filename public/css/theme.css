@@ -599,6 +599,7 @@ textarea {
     max-width: 48px;
     max-height: 48px;
     cursor: pointer;
+    border-radius: 4px;
 }
 .invCell .invPower {
     position: absolute;
@@ -610,6 +611,11 @@ textarea {
     text-shadow: 0 1px 2px #000;
     pointer-events: none;
 }
+/* rarity glow on grid cells */
+.invCell img.Uncommon { box-shadow: 0 0 6px rgba(80, 189, 39, 0.55); }
+.invCell img.Rare { box-shadow: 0 0 6px rgba(96, 165, 250, 0.55); }
+.invCell img.Epic { box-shadow: 0 0 7px rgba(255, 152, 0, 0.6); }
+.invCell img.Legendary { box-shadow: 0 0 8px rgba(239, 68, 68, 0.65); }
 /* sell mode: armed cells warn on hover */
 .invCell.sellArmed:hover {
     border-color: var(--red);
@@ -631,6 +637,18 @@ textarea {
 .shopCell:has(input:checked) {
     border-color: var(--gold);
     box-shadow: 0 0 8px rgba(217, 178, 74, 0.55);
+}
+.invCell .newBadge {
+    position: absolute;
+    left: 2px;
+    bottom: 2px;
+    font-size: 9px;
+    font-weight: bold;
+    color: #1c1712;
+    background: var(--gold-bright);
+    border-radius: 3px;
+    padding: 0 3px;
+    letter-spacing: 0.5px;
 }
 
 /* ---- world map panel ---- */
@@ -1026,4 +1044,6 @@ body.pre-game #hudBar {
     .tooltipA span {
         max-width: 92vw !important;
     }
+    .invChips button, .invChips .invChip { min-height: 34px; }
+    #floatTip { max-width: 92vw; }
 }
