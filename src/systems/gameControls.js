@@ -160,6 +160,17 @@ function changeDifficulty(type, rebirth) {
     CreateMonsterHtml();
     quest();
     document.getElementById('gameDifficulty').innerHTML = 'Current Difficulty: ' + type;
+    markActiveDifficulty();
+}
+
+function markActiveDifficulty() {
+    document.querySelectorAll('[id^="diff_"]').forEach(function (el) {
+        el.classList.remove('diffActive');
+    });
+    var activeButton = document.getElementById('diff_' + player.properties.difficulty);
+    if (activeButton) {
+        activeButton.classList.add('diffActive');
+    }
 }
 
 function rebirth(level) {
@@ -187,4 +198,5 @@ Object.assign(window, {
     rebirth,
     sortShop,
     myAudio,
+    markActiveDifficulty,
 });
