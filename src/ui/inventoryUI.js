@@ -4,32 +4,117 @@
 // inventory tab state. itemTooltipTest is exported because shopUI.js reuses it.
 // CreateInventoryWeaponHtml is both re-exported (barrel) and put on window (some
 // callers reference it by bare name / inline onclick).
-import {
-    InventoryItemTypes,
-    emptyItemSlotInfo,
-    loadingEquippedItems,
-} from '../data/gameObjects.js';
+import { emptyItemSlotInfo, loadingEquippedItems } from '../data/gameObjects.js';
 import { equippedItems, player, playerInventory } from '../core/core.js';
 import { compare, formatBig } from '../core/format.js';
 import { createPotionInventory } from '../systems/potionsHotbar.js';
 import { testss } from './uiCommon.js';
 
-var inventoryTabActiveNum = 0;
-function changedTabInventory(index) {
-    inventoryTabActiveNum = index;
+// ---- unified-grid view state (module-local; resets on reload) ---------------
+// One grid of ALL items with filter chips (type / min-rarity / upgrades-only)
+// replaced the old per-type Bootstrap tabs. 'potions' switches the panel to the
+// hotbar/potion section instead of the item grid.
+var invFilterType = 'all'; // 'all' | 'weapon' | 'armor' | 'accessory' | 'potions'
+var invMinRarity = 0; // index into RARITY_ORDER; 0 = show all rarities
+var invUpgradesOnly = false; // only items whose headline number beats the equipped slot
+var invSelected = []; // ctrl-clicked item ids (bulk sell via itemSell.sellItemsByIds)
+const RARITY_ORDER = ['Common', 'Uncommon', 'Rare', 'Epic', 'Legendary'];
+
+function setInvFilter(type) {
+    invFilterType = type;
+    CreateInventoryWeaponHtml();
+}
+function setInvRarity(i) {
+    invMinRarity = i;
+    CreateInventoryWeaponHtml();
+}
+function toggleInvUpgrades() {
+    invUpgradesOnly = !invUpgradesOnly;
+    CreateInventoryWeaponHtml();
+}
+function sellSelectedItems() {
+    if (invSelected.length > 0 && typeof window.sellItemsByIds === 'function') {
+        window.sellItemsByIds(invSelected.slice());
+        invSelected.length = 0;
+        CreateInventoryWeaponHtml();
+    }
 }
 
 // Sell mode: while ON, clicking an inventory item sells it instead of
 // equipping (right-click sells regardless — desktop shortcut; the toggle is
-// the touch path). Module-local like the tab index; resets on reload.
+// the touch path).
 var inventorySellMode = false;
 function toggleSellMode() {
     inventorySellMode = !inventorySellMode;
     CreateInventoryWeaponHtml();
 }
-function invCellClick(id) {
+// Cell click: Ctrl/Cmd = toggle multi-select, Shift = toggle 🔒 lock,
+// plain = equip (or sell while sell mode is armed).
+function invCellClick(id, ev) {
+    if (ev && (ev.ctrlKey || ev.metaKey)) {
+        const at = invSelected.indexOf(id);
+        if (at === -1) invSelected.push(id);
+        else invSelected.splice(at, 1);
+        CreateInventoryWeaponHtml();
+        return;
+    }
+    if (ev && ev.shiftKey) {
+        const item = playerInventory.filter((obj) => obj.id === id)[0];
+        if (item) {
+            item.locked = item.locked !== true;
+            CreateInventoryWeaponHtml();
+        }
+        return;
+    }
     if (inventorySellMode) window.itemSell(id);
     else window.equipItem(id);
+}
+
+// the item's headline number (same one the corner badge shows)
+function headlinePower(item) {
+    return item.itemType === 'weapon'
+        ? Math.round((item.MinDamage + item.MaxDamage) / 2)
+        : item.itemType === 'armor'
+          ? Math.floor(item.defense)
+          : item.iLvl;
+}
+// "upgrade" = headline number beats whatever is equipped in the item's slot
+// (an empty slot always counts as an upgrade)
+function isUpgrade(item) {
+    const equipped = equippedCompareFor(item);
+    if (!equipped || !equipped.hasOwnProperty('itemType')) return true;
+    return headlinePower(item) > headlinePower(equipped);
+}
+
+// ---- drag-to-equip -----------------------------------------------------------
+// Cells are draggable; dropping anywhere on the equipped paper-doll
+// (#equipHtml) equips the dragged item (equip logic picks the slot from the
+// item itself). Delegated at document level because #equipHtml re-renders.
+var invDragId = null;
+function invDragStart(id, ev) {
+    invDragId = id;
+    if (ev && ev.dataTransfer) {
+        ev.dataTransfer.setData('text/plain', String(id));
+        ev.dataTransfer.effectAllowed = 'move';
+    }
+    hideFloatTip();
+}
+if (typeof document !== 'undefined' && document.addEventListener) {
+    document.addEventListener('dragover', function (e) {
+        if (e.target && e.target.closest && e.target.closest('#equipHtml')) e.preventDefault();
+    });
+    document.addEventListener('drop', function (e) {
+        if (e.target && e.target.closest && e.target.closest('#equipHtml')) {
+            e.preventDefault();
+            var id =
+                invDragId != null
+                    ? invDragId
+                    : parseInt(e.dataTransfer && e.dataTransfer.getData('text/plain'), 10);
+            invDragId = null;
+            if (id != null && !isNaN(id) && typeof window.equipItem === 'function')
+                window.equipItem(id);
+        }
+    });
 }
 
 // ---- floating item tooltip -------------------------------------------------
@@ -94,114 +179,119 @@ function equippedCompareFor(item) {
 }
 
 function CreateInventoryWeaponHtml() {
-    const navTabs = InventoryItemTypes.map((t, k) => {
-        const li =
-            k === inventoryTabActiveNum
-                ? `<li class="active" onClick = changedTabInventory(${k})>`
-                : `<li onClick = changedTabInventory(${k})>`;
-        return (
-            li +
-            `<a href="#tab_${t.type}" data-toggle="tab"><span class="icons ${t.icon}" data-toggle="tooltip" data-placement="top" title="${t.displayName}"></span></a></li>`
-        );
-    }).join('');
+    // prune selections whose items no longer exist (sold/equipped)
+    for (let s = invSelected.length - 1; s >= 0; s--) {
+        if (!playerInventory.some((it) => it.id === invSelected[s])) invSelected.splice(s, 1);
+    }
+    const capacity = player.functions.inventory();
+    const counts = { weapon: 0, armor: 0, accessory: 0 };
+    for (const it of playerInventory) if (counts[it.itemType] !== undefined) counts[it.itemType]++;
+    const totalItems = counts.weapon + counts.armor + counts.accessory;
 
-    const panes = InventoryItemTypes.map((t, j) => {
-        const active = j === inventoryTabActiveNum ? ' active' : '';
-        const paneOpen =
-            t.type === 'other'
-                ? `<div class="col-xs-12 tab-pane${active} marginBottom"`
-                : `<div class="col-xs-10 col-xs-offset-1 tab-pane${active} marginBottom"`;
+    // ---- filter chips ----
+    const typeChip = (key, label) =>
+        `<button type="button" class="invChip${invFilterType === key ? ' chipOn' : ''}" onclick="setInvFilter('${key}')">${label}</button>`;
+    const rarityChip = (i, label) =>
+        `<button type="button" class="invChip rarity${i}${invMinRarity === i ? ' chipOn' : ''}" onclick="setInvRarity(${i})">${label}</button>`;
+    const chipRow1 =
+        typeChip('all', `All (${totalItems})`) +
+        typeChip('weapon', `⚔ Weapons (${counts.weapon})`) +
+        typeChip('armor', `🛡 Armor (${counts.armor})`) +
+        typeChip('accessory', `💍 Accessories (${counts.accessory})`) +
+        typeChip('potions', `🧪 Potions`);
+    const showGrid = invFilterType !== 'potions';
+    const chipRow2 = !showGrid
+        ? ''
+        : `<span class="chipLabel">Rarity:</span>` +
+          rarityChip(0, 'All') +
+          RARITY_ORDER.slice(1)
+              .map((r, i) => rarityChip(i + 1, `${r}+`))
+              .join('') +
+          `<button type="button" class="invChip${invUpgradesOnly ? ' chipOn' : ''}" onclick="toggleInvUpgrades()" title="Only items whose headline number beats what you have equipped">⬆ Upgrades</button>`;
 
-        let sortSection = '';
-        if (t.type !== 'other') {
-            sortSection =
-                `<div class="c3">Sort by:</div>` +
-                `<button type="button" onclick="sortInventory('Value')">Value</button>` +
-                `<button type="button" onclick="sortInventory('Rarity')">Rarity</button>` +
-                `<button type="button" onclick="sortInventory('iLvl')">Level</button>` +
-                (t.type === 'weapon'
-                    ? `<button type="button" onclick="sortInventory('Damage')">Damage</button>`
-                    : '') +
-                `<button type="button" class="sellModeToggle${inventorySellMode ? ' backgroundRed' : ''}" onclick="toggleSellMode()" ` +
-                `title="While ON, clicking an item sells it (right-click always sells)">` +
-                `💰 Sell mode${inventorySellMode ? ' ON' : ''}</button>`;
-        }
+    // ---- toolbar: sort / sell mode / bulk sell ----
+    const toolbar = !showGrid
+        ? ''
+        : `<span class="chipLabel">Sort:</span>` +
+          `<button type="button" onclick="sortInventory('Value')">Value</button>` +
+          `<button type="button" onclick="sortInventory('Rarity')">Rarity</button>` +
+          `<button type="button" onclick="sortInventory('iLvl')">Level</button>` +
+          `<button type="button" onclick="sortInventory('Damage')">Damage</button>` +
+          `<button type="button" class="sellModeToggle${inventorySellMode ? ' backgroundRed' : ''}" onclick="toggleSellMode()" ` +
+          `title="While ON, clicking an item sells it (right-click always sells)">` +
+          `💰 Sell mode${inventorySellMode ? ' ON' : ''}</button>` +
+          (invSelected.length > 0
+              ? `<button type="button" class="backgroundRed" onclick="sellSelectedItems()">Sell selected (${invSelected.length})</button>`
+              : '');
 
-        let cards = '';
-        let cardCount = 0;
+    // ---- the unified item grid ----
+    let cards = '';
+    let shown = 0;
+    if (showGrid) {
         for (var i = 0; i < playerInventory.length; i++) {
-            if (playerInventory[i].itemType === t.type) {
-                cardCount++;
-                const item = playerInventory[i];
-                const imgClass = item.itemType === 'weapon' ? item.itemType : item.subType;
-                // corner badge: the item's headline number (avg damage /
-                // defense / item level) — rarity is the icon's outline color,
-                // full detail lives in the floating hover tooltip (invTipShow;
-                // the old in-cell tooltip span was clipped by the overlay
-                // panel's overflow-y:auto scroll container)
-                const power =
-                    item.itemType === 'weapon'
-                        ? Math.round((item.MinDamage + item.MaxDamage) / 2)
-                        : item.itemType === 'armor'
-                          ? Math.floor(item.defense)
-                          : item.iLvl;
-                cards +=
-                    `<div class="invCell${inventorySellMode ? ' sellArmed' : ''}" id="testingItem${item.id}">` +
-                    `<img class="${imgClass}, ${item.itemRarity}" style="cursor:pointer;" src="images/items/${item.subType}/${item.image}.png" ` +
-                    `onerror="this.onerror=null;this.src='images/questionMark.png';" ` +
-                    `onmouseenter="invTipShow(${item.id}, event)" onmouseleave="hideFloatTip()" ` +
-                    `onclick="invCellClick(${item.id})" oncontextmenu="itemSell(${item.id});return false;"/>` +
-                    `<span class="invPower">${formatBig(power)}</span>` +
-                    `</div>`;
-            }
+            const item = playerInventory[i];
+            if (invFilterType !== 'all' && item.itemType !== invFilterType) continue;
+            if (invMinRarity > 0 && RARITY_ORDER.indexOf(item.itemRarity) < invMinRarity) continue;
+            if (invUpgradesOnly && !isUpgrade(item)) continue;
+            shown++;
+            const imgClass = item.itemType === 'weapon' ? item.itemType : item.subType;
+            const selected = invSelected.indexOf(item.id) !== -1;
+            // corner badges: headline number (avg dmg / defense / iLvl),
+            // 🔒 when locked, ⚜ on Fallen Legends uniques; rarity = outline
+            // color; full detail in the floating hover tooltip (invTipShow)
+            cards +=
+                `<div class="invCell${inventorySellMode ? ' sellArmed' : ''}${selected ? ' invSelected' : ''}" id="testingItem${item.id}">` +
+                `<img class="${imgClass}, ${item.itemRarity}" style="cursor:pointer;" draggable="true" src="images/items/${item.subType}/${item.image}.png" ` +
+                `onerror="this.onerror=null;this.src='images/questionMark.png';" ` +
+                `ondragstart="invDragStart(${item.id}, event)" ` +
+                `onmouseenter="invTipShow(${item.id}, event)" onmouseleave="hideFloatTip()" ` +
+                `onclick="invCellClick(${item.id}, event)" oncontextmenu="itemSell(${item.id});return false;"/>` +
+                `<span class="invPower">${formatBig(headlinePower(item))}</span>` +
+                (item.locked === true ? `<span class="lockBadge">🔒</span>` : '') +
+                (item.isUnique === true ? `<span class="setBadge">⚜</span>` : '') +
+                `</div>`;
         }
-        // fixed 5-wide grid, at least 4 rows; leftover cells render empty
-        if (t.type !== 'other') {
-            const cellTotal = Math.max(20, Math.ceil(cardCount / 5) * 5);
-            for (let empty = cardCount; empty < cellTotal; empty++) {
+        // unfiltered view: render the REAL free capacity as empty cells
+        if (invFilterType === 'all' && invMinRarity === 0 && !invUpgradesOnly) {
+            for (let empty = totalItems; empty < capacity; empty++) {
                 cards += `<div class="invCell empty"></div>`;
             }
-            cards = `<div class="invGrid">${cards}</div>`;
         }
+        cards = `<div class="invGrid">${cards}</div>`;
+    }
 
-        let otherBlock = '';
-        if (t.type === 'other') {
-            const radios = [1, 2, 3, 4, 5, 6, 7, 8]
-                .map(
-                    (n) =>
-                        `<label class="radio-inline"><input class="visibilityLabel" type="radio" name="hotBarValue" value="${n}"${n === 1 ? ' checked="checked"' : ''}>${n}</input></label>`
-                )
-                .join('');
-            otherBlock =
-                `<div class="row">` +
-                `<div class="col-xs-12">` +
-                `Choose hot bar slot, then press a button next to a potion.` +
-                `<form role="form">` +
-                radios +
-                `</form>` +
-                `</div>` +
-                `</div>` +
-                `<div id="potionInventory">`;
-        }
+    // ---- potions / hotbar section (ALWAYS in the DOM: potionsHotbar's
+    // createPotionInventory writes into #potionInventory unconditionally) ----
+    const radios = [1, 2, 3, 4, 5, 6, 7, 8]
+        .map(
+            (n) =>
+                `<label class="radio-inline"><input class="visibilityLabel" type="radio" name="hotBarValue" value="${n}"${n === 1 ? ' checked="checked"' : ''}>${n}</input></label>`
+        )
+        .join('');
+    const potionSection =
+        `<div id="invPotions" style="${showGrid ? 'display:none;' : ''}">` +
+        `<div class="row"><div class="col-xs-12">` +
+        `Choose hot bar slot, then press a button next to a potion.` +
+        `<form role="form">${radios}</form>` +
+        `</div></div>` +
+        `<div id="potionInventory"></div>` +
+        `</div>`;
 
-        return (
-            paneOpen +
-            `id="tab_${t.type}" style="min-height:400px;">` +
-            `<div class="row" id="inventorySpace${t.type}">` +
-            `<div class="c3" style="margin-bottom:10px;"><h4>Inventory</h4>` +
-            sortSection +
-            `</div>` +
-            cards +
-            otherBlock +
-            `</div>` +
-            `</div>`
-        );
-    }).join('');
+    const filterNote =
+        showGrid && (invFilterType !== 'all' || invMinRarity > 0 || invUpgradesOnly)
+            ? `<span class="chipLabel">— showing ${shown}/${totalItems}</span>`
+            : '';
 
     document.getElementById('inventory').innerHTML =
-        `<div class="c3" id="updateInventorySlots">Inventory Slots: ${playerInventory.length}/${player.functions.inventory()}</div>` +
-        `<ul class="nav nav-tabs draggable">${navTabs}</ul>` +
-        `<div class="tab-content" id="tabControl_Inventory">${panes}</div>`;
+        `<div class="c3" id="updateInventorySlots">Inventory Slots: ${totalItems}/${capacity}` +
+        ` <span class="chipLabel">(Ctrl+Click select · Shift+Click 🔒 lock · drag onto Equipped to equip)</span></div>` +
+        `<div class="invChips">${chipRow1}</div>` +
+        (chipRow2 ? `<div class="invChips">${chipRow2}${filterNote}</div>` : '') +
+        (toolbar ? `<div class="invChips">${toolbar}</div>` : '') +
+        `<div class="row" id="inventorySpaceitems" style="min-height:400px;">` +
+        cards +
+        potionSection +
+        `</div>`;
     testss();
     createPotionInventory();
 }
@@ -405,17 +495,21 @@ export {
     itemTooltipTest,
     showFloatTip,
 };
-// changedTabInventory is dispatched by the generated `onClick = changedTabInventory(k)`
-// on the inventory nav tabs, so it must be on window (it silently dropped off during
-// the ESM conversion, leaving tab clicks throwing a ReferenceError and the active-tab
-// state stuck at 0 across re-renders).
-// invTipShow/hideFloatTip are the floating-tooltip hover handlers on the
-// generated inventory cells (and hideFloatTip on the shop cells).
+// All handlers below are dispatched from generated inline onclick/onmouseenter/
+// ondragstart HTML, so they must live on window: filter chips (setInvFilter/
+// setInvRarity/toggleInvUpgrades), bulk sell (sellSelectedItems), cell
+// interactions (invCellClick), drag-to-equip (invDragStart), and the
+// floating-tooltip hover handlers (invTipShow/hideFloatTip — hideFloatTip is
+// also used by the shop cells).
 Object.assign(window, {
     CreateInventoryWeaponHtml,
-    changedTabInventory,
     toggleSellMode,
     invCellClick,
     invTipShow,
     hideFloatTip,
+    setInvFilter,
+    setInvRarity,
+    toggleInvUpgrades,
+    sellSelectedItems,
+    invDragStart,
 });

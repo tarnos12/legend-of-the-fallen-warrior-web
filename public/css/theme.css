@@ -512,11 +512,58 @@ textarea {
 }
 /* ---- inventory: fixed 5-wide slot grid (cells sized to the 50px icons) ---- */
 .invGrid {
+    /* unified inventory: responsive auto-fill grid (was a fixed 5-wide) */
     display: grid;
-    grid-template-columns: repeat(5, 64px);
+    grid-template-columns: repeat(auto-fill, 64px);
     gap: 6px;
     padding: 8px 0;
     justify-content: start;
+}
+/* filter-chip rows above the grid */
+.invChips {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 5px;
+    margin: 4px 0;
+}
+.invChip {
+    background: var(--bg-inset);
+    color: var(--text-dim);
+    border: 1px solid var(--border-dim);
+    border-radius: 12px;
+    padding: 2px 10px;
+    font-size: 12px;
+}
+.invChip.chipOn {
+    color: var(--gold-bright);
+    border-color: var(--gold);
+    background: var(--bg-panel-2);
+}
+.chipLabel {
+    color: var(--text-dim);
+    font-size: 12px;
+    margin: 0 2px;
+}
+/* multi-select ring + lock/set badges */
+.invCell.invSelected {
+    border-color: var(--blue);
+    box-shadow: 0 0 6px rgba(96, 165, 250, 0.6);
+}
+.invCell .lockBadge {
+    position: absolute;
+    left: 2px;
+    top: 0;
+    font-size: 12px;
+    text-shadow: 0 1px 2px #000;
+}
+.invCell .setBadge {
+    position: absolute;
+    right: 3px;
+    top: 0;
+    font-size: 12px;
+    color: var(--gold-bright);
+    text-shadow: 0 1px 2px #000;
 }
 .invCell {
     position: relative;
