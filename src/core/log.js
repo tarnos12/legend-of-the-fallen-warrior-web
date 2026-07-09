@@ -18,11 +18,43 @@ function Log(data) {
         }
         logData[logData.length - 1] = data;
     }
+    // Pause-on-hover: the ring buffer above always advances (so buffered lines
+    // aren't lost), but while the pointer is over #logConsole we skip the
+    // innerHTML write below. There's no scrollTop call to gate — lines render
+    // newest-first (loop below) and the whole innerHTML is replaced every call,
+    // so *that replacement* is what yanks the scroll position back to top.
+    // Skipping the write while hovered is the cheapest fix (Log() stays O(n)
+    // either way, no extra render path); logConsoleEl's mouseleave listener
+    // flushes the latest content once the pointer leaves.
+    var logConsoleEl = document.getElementById('logConsole');
+    if (logConsoleEl && logConsoleEl.matches(':hover')) {
+        return;
+    }
+    renderLogConsole();
+}
+function renderLogConsole() {
+    var logConsoleEl = document.getElementById('logConsole');
+    if (!logConsoleEl) return;
     var logTemp = '';
-    for (i = logData.length - 1; i >= 0; i--) {
+    for (var i = logData.length - 1; i >= 0; i--) {
         logTemp += logData[i];
     }
-    document.getElementById('logConsole').innerHTML = logTemp;
+    logConsoleEl.innerHTML = logTemp;
+}
+// Registered once at module scope: toggles the 'logPaused' class (CSS-only
+// hover affordance) and flushes any lines buffered while hovered.
+if (typeof document !== 'undefined') {
+    document.addEventListener('mouseenter', function (e) {
+        if (e.target && e.target.id === 'logConsole') {
+            e.target.classList.add('logPaused');
+        }
+    }, true);
+    document.addEventListener('mouseleave', function (e) {
+        if (e.target && e.target.id === 'logConsole') {
+            e.target.classList.remove('logPaused');
+            renderLogConsole();
+        }
+    }, true);
 }
 var maxLogLines = 12;
 // Genuinely shared mutable state (reassigned and/or read across files: battle.js,
