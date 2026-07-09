@@ -4,7 +4,7 @@
 // inventory tab state. itemTooltipTest is exported because shopUI.js reuses it.
 // CreateInventoryWeaponHtml is both re-exported (barrel) and put on window (some
 // callers reference it by bare name / inline onclick).
-import { emptyItemSlotInfo, loadingEquippedItems } from '../data/gameObjects.js';
+import { loadingEquippedItems } from '../data/gameObjects.js';
 import { equippedItems, player, playerInventory } from '../core/core.js';
 import { compare, formatBig } from '../core/format.js';
 import { createPotionInventory } from '../systems/potionsHotbar.js';
@@ -356,38 +356,40 @@ function unequipItemLoad() {
     }
 }
 
+// The nine equip slots, rendered weapon-first (matches loadingEquippedItems /
+// equip.js's unequipSlots), as a labeled .dollGrid of .invCell-style cells.
+const dollSlots = [
+    'weapon',
+    'shield',
+    'helmet',
+    'chest',
+    'legs',
+    'boots',
+    'ring',
+    'amulet',
+    'talisman',
+];
+// the empty-slot placeholder image, dimmed; also reused by checkIfEquippedEmpty
+// when an item is removed so the two paths stay byte-identical
+function emptySlotImg(slot) {
+    return `<img src="images/${slot}Empty.png" style="opacity:0.4">`;
+}
+
 function EquippedItemsEmpty() {
     let slots = '';
-    for (var itemType in emptyItemSlotInfo) {
-        if (emptyItemSlotInfo.hasOwnProperty(itemType)) {
-            var item = emptyItemSlotInfo[itemType].type;
-            var itemEmpty = item + 'Empty';
-            const cell = `<div class="col-xs-4 marginTest"id="${itemEmpty}"><img src=images/${itemEmpty}.png></div>`;
-            if (item === 'talisman' || item === 'helmet' || item === 'amulet') {
-                if (item === 'talisman')
-                    slots += `<div class="col-xs-10 col-xs-offset-1"><div class="row">`;
-                slots += cell;
-                if (item === 'amulet') slots += `</div></div>`;
-            } else if (item === 'weapon' || item === 'chest' || item === 'shield') {
-                if (item === 'weapon')
-                    slots += `<div class="col-xs-10 col-xs-offset-1"><div class="row">`;
-                slots += cell;
-                if (item === 'shield') slots += `</div></div>`;
-            } else if (item === 'legs' || item === 'ring') {
-                if (item === 'legs')
-                    slots += `<div class="col-xs-10 col-xs-offset-1"><div class="row"><div class="col-xs-4 marginTest"></div>`;
-                slots += cell;
-                if (item === 'ring') slots += `</div></div>`;
-            } else if (item === 'boots') {
-                slots += `<div class="col-xs-10 col-xs-offset-1"><div class="row"><div class="col-xs-4 col-xs-offset-4"id="${itemEmpty}"><img src=images/${itemEmpty}.png></div></div></div>`;
-            }
-        }
+    for (const slot of dollSlots) {
+        const label = slot.charAt(0).toUpperCase() + slot.slice(1);
+        // #${slot}Empty is the per-slot content holder checkIfEquippedEmpty
+        // rewrites (empty img vs filled item); the label sits under the cell
+        slots +=
+            `<div class="dollCell">` +
+            `<div id="${slot}Empty">${emptySlotImg(slot)}</div>` +
+            `<span class="dollLabel">${label}</span>` +
+            `</div>`;
     }
     document.getElementById('equipHtml').innerHTML =
-        `<div class="row" style="padding-top: 5px; padding-bottom: 10px;">` +
         `<div class="centerText"><h4>Equipped Items</h4></div>` +
-        slots +
-        `</div>`;
+        `<div class="dollGrid">${slots}</div>`;
 }
 
 function checkIfEquippedEmpty() {
@@ -397,8 +399,7 @@ function checkIfEquippedEmpty() {
             var testItem = checkEquippedItemType(item);
             document.getElementById(item + 'Empty').innerHTML = testItem;
         } else if (itemType.isEquipped === false) {
-            var currentItem = '<img src=images/' + item + 'Empty' + '.png>';
-            document.getElementById(item + 'Empty').innerHTML = currentItem;
+            document.getElementById(item + 'Empty').innerHTML = emptySlotImg(item);
         }
     }
 }
@@ -409,11 +410,16 @@ function checkEquippedItemType(newItem, check) {
         return '';
     }
     const imgClass = itemType.itemType === 'weapon' ? itemType.itemType : itemType.subType;
-    // tooltip now floats via equipTipShow (body-level #floatTip), escaping the
-    // overlay-panel clipping the in-cell span suffered
+    // tooltip floats via equipTipShow (body-level #floatTip); clicking the icon
+    // unequips it back to the inventory (unequipItem(id,'solo') re-renders both
+    // panels). The itemRarity className token drives the .dollCell rarity glow.
     return (
         `<div id="equippedItem${itemType.id}">` +
-        `<img class="${imgClass}"src="images/items/${itemType.subType}/${itemType.image}.png" onclick="unequipItem(${itemType.id}, 'solo')" onmouseenter="equipTipShow('${newItem}', event)" onmouseleave="hideFloatTip()" />` +
+        `<img class="${imgClass}, ${itemType.itemRarity}" src="images/items/${itemType.subType}/${itemType.image}.png" ` +
+        `onerror="this.onerror=null;this.src='images/questionMark.png';" ` +
+        `onclick="unequipItem(${itemType.id}, 'solo')" ` +
+        `onmouseenter="equipTipShow('${newItem}', event)" onmouseleave="hideFloatTip()" />` +
+        (itemType.isUnique === true ? `<span class="setBadge">⚜</span>` : '') +
         `</div>`
     );
 }
