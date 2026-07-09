@@ -9,6 +9,27 @@ _Last updated: 2026-07-05_
 
 ## Current status
 
+**Inventory revamp Stages 1+2 (unified grid) + LIVE DEPLOY: DONE.** User picked: unified grid
++ filter chips, all three interactions, deploy now.
+- **Deployed to GitHub Pages** (`gh-pages` @ `4e959b7`, bundle `index-DF_uroWS.js`) — fixes the
+  broken-icons report, which matched the stale 2026-07-05 deploy. (The sandbox proxy blocks
+  fetching github.io, so the branch content was verified via git instead of HTTP.)
+- **Unified grid** (`inventoryUI.js`): one responsive auto-fill grid of all items; type chips
+  with counts + min-rarity chips + ⬆ Upgrades-only filter (`headlinePower` vs equipped; empty
+  slot = upgrade); REAL capacity rendered as cells; "shown/total" note when filtered; 🧪 Potions
+  chip swaps in the hotbar/potion section (`#potionInventory` stays in the DOM — hard contract
+  with `createPotionInventory`). Old per-type Bootstrap tabs + `changedTabInventory` removed.
+- **Interactions:** Ctrl/Cmd+Click multi-select (blue ring) + "Sell selected (N)"; Shift+Click
+  toggles `item.locked` (🔒 badge, persists with the item); drag a cell onto the paper-doll to
+  equip (document-level delegation); ⚜ badge on uniques.
+- **Sell backend** (Sonnet subagent, `itemSell.js` + `test/item-lock.test.js`): locked items
+  can't be sold (single path logs 🔒; bulk paths skip + report), and `sellItemsByIds(ids)` does
+  the batch sell with one confirm (count + gold, flags uniques) and one refresh.
+- Live-verified end-to-end: 13/13 grid checks, then select-3-with-1-locked → bulk sell sold
+  exactly the 2 unlocked (+1835 gold), locked survived. **97/97 tests, build + lint clean.**
+- Remaining Stage 3 polish (not started): rarity glow, "NEW" drop badges, paper-doll onto the
+  floating tooltip, mobile pass for the chip rows.
+
 **Bugfix — inventory/shop tooltips clipped by the overlay panel: FIXED.** The overlay panels
 (`#mainPanels > .tab-pane`) are `overflow-y:auto` scroll containers, which clipped the old
 absolutely-positioned in-cell tooltip spans at the panel edge (reproduced: a top-row cell's
