@@ -527,7 +527,23 @@ textarea {
     gap: 5px;
     margin: 4px 0;
 }
-.invChip {
+/* bare buttons in the chip rows (sort buttons etc.): the legacy button.css
+   paints unclassed <button>s light-on-light; give them the theme's leather
+   look so they're readable */
+.invChips button {
+    background: linear-gradient(180deg, #40331f, #2a2115);
+    color: var(--text);
+    border: 1px solid var(--border-gold);
+    border-radius: 4px;
+    padding: 2px 10px;
+    font-size: 12px;
+    text-shadow: none;
+}
+.invChips button:hover {
+    color: var(--gold-bright);
+    border-color: var(--gold);
+}
+.invChips button.invChip {
     background: var(--bg-inset);
     color: var(--text-dim);
     border: 1px solid var(--border-dim);
@@ -535,7 +551,7 @@ textarea {
     padding: 2px 10px;
     font-size: 12px;
 }
-.invChip.chipOn {
+.invChips button.invChip.chipOn {
     color: var(--gold-bright);
     border-color: var(--gold);
     background: var(--bg-panel-2);
