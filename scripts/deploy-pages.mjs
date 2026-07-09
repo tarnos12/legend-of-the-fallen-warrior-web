@@ -18,7 +18,9 @@ run('npm run build');
 // those links so every deploy forces a refetch.
 const stamp = execSync('git rev-parse --short HEAD').toString().trim();
 let html = readFileSync('dist/index.html', 'utf8');
-html = html.replace(/((?:href|src)="\/(?:css|jquery|vendor|js)\/[^"?]+)"/g, `$1?v=${stamp}"`);
+// the production build uses a RELATIVE base (./css/...), the dev page an
+// absolute one (/css/...) — match both
+html = html.replace(/((?:href|src)="\.?\/(?:css|jquery|vendor|js)\/[^"?]+)"/g, `$1?v=${stamp}"`);
 writeFileSync('dist/index.html', html);
 // Pages runs Jekyll by default, which ignores folders it doesn't like;
 // .nojekyll serves dist exactly as built.
