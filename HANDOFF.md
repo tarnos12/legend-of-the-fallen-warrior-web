@@ -9,6 +9,17 @@ _Last updated: 2026-07-05_
 
 ## Current status
 
+**Live-site mixed-build bug: FIXED (deploy cache-busting).** After deploying, users saw the NEW
+JS bundle (hashed filename → always fresh) with the OLD cached `theme.css` (stable URL →
+browser cache hit): unstyled filter chips, the old fixed-5 grid, "new game looks different".
+`scripts/deploy-pages.mjs` now stamps `?v=<git-sha>` onto the classic css/jquery/vendor/js
+links in `dist/index.html` at deploy time (note: the build uses a RELATIVE base, `./css/...`).
+Also gave the bare sort buttons in the chip rows the theme's leather look (`.invChips button`
+— legacy button.css painted them light-on-light) and bumped chip selector specificity.
+Verified the full save→load path headlessly: grid renders, locks survive the round-trip,
+drag-to-equip works on loaded items, tooltips show — no load-path bug existed. Deployed
+(`gh-pages` @ `09e74f2`, stamps `?v=4dd9b61`). 97/97, build + lint clean.
+
 **Inventory revamp Stages 1+2 (unified grid) + LIVE DEPLOY: DONE.** User picked: unified grid
 + filter chips, all three interactions, deploy now.
 - **Deployed to GitHub Pages** (`gh-pages` @ `4e959b7`, bundle `index-DF_uroWS.js`) — fixes the
