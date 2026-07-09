@@ -9,6 +9,18 @@ _Last updated: 2026-07-05_
 
 ## Current status
 
+**Inventory Stage 3 (tiered-agent workflow, landed as a PR): DONE.** Slices: Opus built the
+coupled `inventoryUI.js` work, Haiku built the `itemDrop.js` isNew flag + test AND the pure-CSS
+slice, Opus/Sonnet reviewed. Features: equipped paper-doll migrated to the floating tooltip
+(`equipTipShow(slot)` — no more clipped in-cell spans anywhere); NEW badge on monster drops
+(`isNew` at drop, cleared on first hover; `test/item-new.test.js`); rarity glow on cell icons;
+mobile pass (34px chip targets, `#floatTip` ≤92vw); "Sell shown (N)" toolbar button when a
+filter is active (sells the visible unlocked set via `sellItemsByIds`; locked always survive).
+Live-verified end-to-end (badge lifecycle, equip tooltip, sell-shown +1430 gold with locked
+survivor). 99/99 tests, build + lint clean. Reviewer note (accepted): the CSS slice merged
+`border-radius` into the existing `.invCell img` rule instead of appending — behaviorally
+identical, cleaner CSS.
+
 **Live-site mixed-build bug: FIXED (deploy cache-busting).** After deploying, users saw the NEW
 JS bundle (hashed filename → always fresh) with the OLD cached `theme.css` (stable URL →
 browser cache hit): unstyled filter chips, the old fixed-5 grid, "new game looks different".
