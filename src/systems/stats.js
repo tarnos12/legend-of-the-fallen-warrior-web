@@ -239,6 +239,11 @@ function updateHtml() {
     // refresh the equipped-unique set-bonus panel (no-op if not rendered)
     if (typeof window.renderUniqueSets === 'function') window.renderUniqueSets();
     if (typeof window.renderSetHud === 'function') window.renderSetHud();
+    const b = document.getElementById('skillsNavBadge');
+    if (b) {
+        const pts = (player.properties.skillPoints || 0) + (player.properties.stats || 0);
+        b.textContent = pts > 0 ? String(pts) : '';
+    }
 
     //primaryStatUpdate();
     secondaryStatUpdate();
