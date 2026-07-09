@@ -9,6 +9,19 @@ _Last updated: 2026-07-05_
 
 ## Current status
 
+**Polish batch 4 (tiered workflow, landed as PR): DONE.** Opus built the paper-doll; Sonnet the
+nav badge + log pause; Haiku the difficulty highlight + all CSS. Features: the equipped panel is
+now a labeled 3-column **paper-doll grid** (empty slots dimmed, rarity glow on equipped,
+click-to-unequip preserved and now visually obvious); an unspent-points **badge on the Skills
+nav tab** (skillPoints + stats, red pill, hidden at 0); the **combat log freezes while hovered**
+(Log() skips the innerHTML rebuild on `:hover`, flushes on mouseleave, ⏸ hint via `.logPaused`);
+the **active difficulty button is highlighted** in Options (`markActiveDifficulty`, `#diff_*`
+ids). EquippedItemsEmpty snapshot deliberately regenerated (the shell was redesigned). One agent
+(Haiku, difficulty) did the work but failed to file its structured report — integrator reviewed
+its diff directly and accepted. 99/99 tests, build + lint clean, live-verified (9 doll cells,
+unequip returns item, badge "5", diffActive follows changeDifficulty).
+
+
 **Inventory Stage 3 (tiered-agent workflow, landed as a PR): DONE.** Slices: Opus built the
 coupled `inventoryUI.js` work, Haiku built the `itemDrop.js` isNew flag + test AND the pure-CSS
 slice, Opus/Sonnet reviewed. Features: equipped paper-doll migrated to the floating tooltip
