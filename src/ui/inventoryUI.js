@@ -39,6 +39,17 @@ function sellSelectedItems() {
         CreateInventoryWeaponHtml();
     }
 }
+// bulk-sell every currently-visible unlocked item (same filter set the grid
+// shows); locked items are never included. sellItemsByIds owns the confirm.
+function sellShownItems() {
+    const ids = playerInventory
+        .filter((item) => passesInvFilter(item) && item.locked !== true)
+        .map((item) => item.id);
+    if (ids.length > 0 && typeof window.sellItemsByIds === 'function') {
+        window.sellItemsByIds(ids);
+        CreateInventoryWeaponHtml();
+    }
+}
 
 // Sell mode: while ON, clicking an inventory item sells it instead of
 // equipping (right-click sells regardless — desktop shortcut; the toggle is
@@ -84,6 +95,14 @@ function isUpgrade(item) {
     const equipped = equippedCompareFor(item);
     if (!equipped || !equipped.hasOwnProperty('itemType')) return true;
     return headlinePower(item) > headlinePower(equipped);
+}
+// the visibility predicate the grid loop applies — factored out so the
+// "Sell shown" button can recompute the exact same visible set
+function passesInvFilter(item) {
+    if (invFilterType !== 'all' && item.itemType !== invFilterType) return false;
+    if (invMinRarity > 0 && RARITY_ORDER.indexOf(item.itemRarity) < invMinRarity) return false;
+    if (invUpgradesOnly && !isUpgrade(item)) return false;
+    return true;
 }
 
 // ---- drag-to-equip -----------------------------------------------------------
@@ -171,6 +190,17 @@ function invTipShow(id, ev) {
           `</div></div>`
         : itemTooltipTest(item) + hint;
     showFloatTip(html, ev);
+    // the NEW badge is a "seen it" flag — clear on first hover; the badge
+    // itself disappears on the next render (we don't re-render here)
+    if (item.isNew === true) item.isNew = false;
+}
+// hover handler for equipped paper-doll cells: floats the tooltip for the
+// item worn in `slot` (escapes the overlay-panel clipping the old in-cell
+// span suffered). Registered on window for the inline onmouseenter.
+function equipTipShow(slot, ev) {
+    const item = equippedItems[slot];
+    if (!item || !item.hasOwnProperty('itemType')) return;
+    showFloatTip(itemTooltipTest(item) + `<strong>Currently equipped</strong>`, ev);
 }
 // the equipped item occupying this item's slot (for the compare tooltip)
 function equippedCompareFor(item) {
@@ -210,6 +240,12 @@ function CreateInventoryWeaponHtml() {
           `<button type="button" class="invChip${invUpgradesOnly ? ' chipOn' : ''}" onclick="toggleInvUpgrades()" title="Only items whose headline number beats what you have equipped">⬆ Upgrades</button>`;
 
     // ---- toolbar: sort / sell mode / bulk sell ----
+    // "Sell shown" appears only when a filter narrows the grid and at least one
+    // visible item is unlocked (N = that unlocked count; locked never counted)
+    const anyFilterActive = invFilterType !== 'all' || invMinRarity > 0 || invUpgradesOnly;
+    const shownUnlocked = anyFilterActive
+        ? playerInventory.filter((item) => passesInvFilter(item) && item.locked !== true).length
+        : 0;
     const toolbar = !showGrid
         ? ''
         : `<span class="chipLabel">Sort:</span>` +
@@ -222,6 +258,9 @@ function CreateInventoryWeaponHtml() {
           `💰 Sell mode${inventorySellMode ? ' ON' : ''}</button>` +
           (invSelected.length > 0
               ? `<button type="button" class="backgroundRed" onclick="sellSelectedItems()">Sell selected (${invSelected.length})</button>`
+              : '') +
+          (anyFilterActive && shownUnlocked > 0
+              ? `<button type="button" class="backgroundRed" onclick="sellShownItems()">Sell shown (${shownUnlocked})</button>`
               : '');
 
     // ---- the unified item grid ----
@@ -230,9 +269,7 @@ function CreateInventoryWeaponHtml() {
     if (showGrid) {
         for (var i = 0; i < playerInventory.length; i++) {
             const item = playerInventory[i];
-            if (invFilterType !== 'all' && item.itemType !== invFilterType) continue;
-            if (invMinRarity > 0 && RARITY_ORDER.indexOf(item.itemRarity) < invMinRarity) continue;
-            if (invUpgradesOnly && !isUpgrade(item)) continue;
+            if (!passesInvFilter(item)) continue;
             shown++;
             const imgClass = item.itemType === 'weapon' ? item.itemType : item.subType;
             const selected = invSelected.indexOf(item.id) !== -1;
@@ -249,6 +286,7 @@ function CreateInventoryWeaponHtml() {
                 `<span class="invPower">${formatBig(headlinePower(item))}</span>` +
                 (item.locked === true ? `<span class="lockBadge">🔒</span>` : '') +
                 (item.isUnique === true ? `<span class="setBadge">⚜</span>` : '') +
+                (item.isNew === true ? `<span class="newBadge">NEW</span>` : '') +
                 `</div>`;
         }
         // unfiltered view: render the REAL free capacity as empty cells
@@ -303,33 +341,13 @@ function unequipItemLoad() {
             var i = loadingEquippedItems[key].type;
             var itemStat = equippedItems[i];
             if (itemStat.subType !== undefined) {
-                const hasType = itemStat.hasOwnProperty('itemType');
                 const imgClass =
                     itemStat.itemType === 'weapon' ? itemStat.itemType : itemStat.subType;
+                // tooltip now floats via equipTipShow (body-level #floatTip),
+                // escaping the overlay-panel clipping the in-cell span suffered
                 var html =
                     `<div class="col-xs-12 col-lg-6 c8"id="testingItem${itemStat.id}">` +
-                    `<a class="tooltips" style="cursor:pointer;">` +
-                    `<img class="${imgClass}"src="images/items/${itemStat.subType}/${itemStat.image}.png" onclick="equipItem(${itemStat.id})"/>` +
-                    (hasType ? `<span>` : `<span style="width:200px;">`) +
-                    `<div class="row">` +
-                    `<div class="col-xs-12">` +
-                    (hasType
-                        ? `<div class="row">` +
-                          `<div class="col-xs-6">` +
-                          itemTooltipTest(itemStat) +
-                          `<strong>Currently equipped</strong>` +
-                          `</div>`
-                        : '') +
-                    (hasType
-                        ? `<div class="col-xs-6">`
-                        : `<div class="col-xs-10 col-xs-offset-1">`) +
-                    itemTooltipTest(itemStat) +
-                    `<strong>Left-Click to equip</strong>` +
-                    `</div></div>` +
-                    `</div>` +
-                    (hasType ? `</div>` : '') +
-                    `</span>` +
-                    `</a>` +
+                    `<img class="${imgClass}"src="images/items/${itemStat.subType}/${itemStat.image}.png" onclick="equipItem(${itemStat.id})" onmouseenter="equipTipShow('${i}', event)" onmouseleave="hideFloatTip()"/>` +
                     `<button type="button" class="equip" onclick="itemSell(${itemStat.id})">Sell</button>` +
                     `</div>`;
                 player.functions[i] = $(html);
@@ -391,18 +409,11 @@ function checkEquippedItemType(newItem, check) {
         return '';
     }
     const imgClass = itemType.itemType === 'weapon' ? itemType.itemType : itemType.subType;
+    // tooltip now floats via equipTipShow (body-level #floatTip), escaping the
+    // overlay-panel clipping the in-cell span suffered
     return (
         `<div id="equippedItem${itemType.id}">` +
-        `<a class="tooltips" style="cursor:pointer;">` +
-        `<img class="${imgClass}"src="images/items/${itemType.subType}/${itemType.image}.png" onclick="unequipItem(${itemType.id}, 'solo')" />` +
-        `<span style="width:200px; left:50px; right:0px; bottom:50px;">` +
-        `<div class="row">` +
-        `<div class="col-xs-12">` +
-        itemTooltipTest(itemType) +
-        `<strong>Currently equipped</strong>` +
-        `</div>` +
-        `</div>` +
-        `</span></a>` +
+        `<img class="${imgClass}"src="images/items/${itemType.subType}/${itemType.image}.png" onclick="unequipItem(${itemType.id}, 'solo')" onmouseenter="equipTipShow('${newItem}', event)" onmouseleave="hideFloatTip()" />` +
         `</div>`
     );
 }
@@ -506,10 +517,12 @@ Object.assign(window, {
     toggleSellMode,
     invCellClick,
     invTipShow,
+    equipTipShow,
     hideFloatTip,
     setInvFilter,
     setInvRarity,
     toggleInvUpgrades,
     sellSelectedItems,
+    sellShownItems,
     invDragStart,
 });
