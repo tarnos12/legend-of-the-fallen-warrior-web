@@ -458,6 +458,7 @@ function getBonusItemMod(monster, dropItem, isDrop) {
                     dropItem.itemRarity === 'Legendary'
                 ) {
                     itemHolder = [];
+                    dropItem['isNew'] = true;
                     itemHolder.push(dropItem);
                     playerInventory.push.apply(
                         playerInventory,
