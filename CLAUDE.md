@@ -47,6 +47,9 @@ live check in the Vite preview (mute `#myAudio` first).
 
 ## Always give the user a test link
 
-After finishing work that changes the game, end the summary with the running
-dev-server URL (normally http://localhost:5173 — start it with `npm run dev` /
-the "game" preview config if it isn't up) so the user can try it immediately.
+**Every time work finishes, end the summary with a clickable link to try it.**
+In a remote/cloud session that means the live GitHub Pages URL —
+https://tarnos12.github.io/legend-of-the-fallen-warrior-web/ — after running
+`npm run deploy` so the link reflects the change (localhost is unreachable to
+the user there). In a local session the dev-server URL works too (normally
+http://localhost:5173 — start it with `npm run dev` if it isn't up).
