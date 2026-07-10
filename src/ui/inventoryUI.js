@@ -227,8 +227,7 @@ function CreateInventoryWeaponHtml() {
         typeChip('all', `All (${totalItems})`) +
         typeChip('weapon', `⚔ Weapons (${counts.weapon})`) +
         typeChip('armor', `🛡 Armor (${counts.armor})`) +
-        typeChip('accessory', `💍 Accessories (${counts.accessory})`) +
-        typeChip('potions', `🧪 Potions`);
+        typeChip('accessory', `💍 Accessories (${counts.accessory})`);
     const showGrid = invFilterType !== 'potions';
     const chipRow2 = !showGrid
         ? ''
@@ -299,7 +298,9 @@ function CreateInventoryWeaponHtml() {
     }
 
     // ---- potions / hotbar section (ALWAYS in the DOM: potionsHotbar's
-    // createPotionInventory writes into #potionInventory unconditionally) ----
+    // createPotionInventory writes into #potionInventory unconditionally;
+    // Potions chip removed from chipRow1 for now but #invPotions must stay
+    // as a hard contract with createPotionInventory) ----
     const radios = [1, 2, 3, 4, 5, 6, 7, 8]
         .map(
             (n) =>
