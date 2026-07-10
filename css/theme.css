@@ -1,0 +1,1103 @@
+/* ==========================================================================
+   Dark-fantasy theme overlay (2026 visual overhaul).
+   Loaded LAST from index.html so it overrides bootstrap + the legacy css
+   without touching any render code. Everything keys off these variables.
+   ========================================================================== */
+:root {
+    --bg-page: #171310;
+    --bg-panel: #241d16;
+    --bg-panel-2: #2d251b;
+    --bg-inset: #1c1712;
+    --border-dim: #4a3b1d;
+    --border-gold: #8a6d1a;
+    --gold: #d9b24a;
+    --gold-bright: #edd26e;
+    --text: #e9ddc2;
+    --text-dim: #b0a184;
+    --green: #4ade80;
+    --red: #ef4444;
+    --blue: #60a5fa;
+    --hud-h: 64px; /* bottom HUD height; #stage and the panels key off it */
+    --soul: #c08bff;
+}
+
+/* ---- floating item tooltip (ui/inventoryUI.js showFloatTip) ----
+   Body-level, position:fixed layer so item tooltips escape the overlay
+   panels' overflow-y:auto clipping (the old in-cell spans were cut off at
+   the panel edge). z-index above the panels (40). */
+#floatTip {
+    display: none;
+    position: fixed;
+    z-index: 200;
+    max-width: 460px;
+    background: var(--bg-panel-2);
+    color: var(--text);
+    border: 1px solid var(--border-gold);
+    border-radius: 6px;
+    box-shadow: 0 10px 32px rgba(0, 0, 0, 0.7);
+    padding: 10px 12px;
+    font-size: 12px;
+    pointer-events: none;
+}
+.floatTipCols {
+    display: flex;
+    gap: 12px;
+}
+.floatTipCol {
+    flex: 1;
+    min-width: 190px;
+}
+.floatTipCol.borderRight {
+    padding-right: 12px;
+}
+#ctxMenu {
+    display: none;
+    position: fixed;
+    z-index: 210;
+    min-width: 130px;
+    background: var(--bg-panel-2);
+    border: 1px solid var(--border-gold);
+    border-radius: 6px;
+    box-shadow: 0 10px 32px rgba(0, 0, 0, 0.7);
+    padding: 4px;
+}
+#ctxMenu .ctxItem {
+    display: block;
+    width: 100%;
+    text-align: left;
+    margin: 2px 0;
+    background: transparent;
+    border: none;
+    color: var(--text);
+    padding: 6px 10px;
+    border-radius: 4px;
+    font-size: 13px;
+    cursor: pointer;
+}
+#ctxMenu .ctxItem:hover {
+    background: var(--bg-inset);
+    color: var(--gold-bright);
+}
+#ctxMenu .ctxItem.ctxSell:hover {
+    color: var(--red);
+}
+
+/* ---- boss souls: HUD counter + Soul Shop (Shop panel) ---- */
+#soulHud {
+    color: var(--soul);
+    margin-left: 10px;
+    white-space: nowrap;
+    font-weight: bold;
+}
+/* ---- Fallen Legends set: always-visible HUD indicator ---- */
+#setHud {
+    color: gold;
+    margin-left: 6px;
+    white-space: nowrap;
+}
+.soulHeader {
+    color: var(--soul);
+    margin: 4px 0 10px;
+}
+.soulHeader strong {
+    color: var(--gold-bright);
+}
+.soulGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 10px;
+    margin-bottom: 12px;
+}
+.soulCard {
+    background: var(--bg-inset);
+    border: 1px solid var(--border-dim);
+    border-radius: 6px;
+    padding: 8px;
+    text-align: center;
+}
+.soulCard.soulBuyable {
+    border-color: var(--soul);
+    box-shadow: 0 0 6px rgba(192, 139, 255, 0.35);
+}
+.soulName {
+    color: var(--gold-bright);
+    font-weight: bold;
+    font-size: 13px;
+}
+.soulMeta {
+    color: var(--text-dim);
+    font-size: 11px;
+    margin: 2px 0;
+}
+.soulPrice {
+    color: var(--soul);
+    margin: 4px 0 6px;
+}
+.soulCard button {
+    margin: 2px;
+}
+.soulCard button[disabled] {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+.soulReforge {
+    border-color: var(--soul) !important;
+    color: var(--soul) !important;
+}
+/* Fallen Legends unique-set progress panel */
+#uniqueSets {
+    margin: 4px 0 12px;
+    padding: 8px 10px;
+    background: var(--bg-inset);
+    border: 1px solid var(--border-dim);
+    border-radius: 6px;
+}
+.setHeader {
+    color: var(--gold-bright);
+}
+.setPip {
+    color: var(--border-dim);
+    margin-left: 2px;
+}
+.setPip.setPipOn {
+    color: var(--soul);
+}
+.setActive {
+    color: var(--soul);
+    margin-top: 3px;
+}
+.setInactive,
+.setNext {
+    color: var(--text-dim);
+    font-size: 12px;
+    margin-top: 3px;
+}
+.soulLocked {
+    color: var(--text-dim);
+    font-style: italic;
+    font-size: 12px;
+}
+
+/* ---- page ---- */
+html,
+body {
+    /* the legacy fixed-width hover tooltips (300-400px absolute spans) hang
+       past the viewport and created horizontal scroll, worst on phones */
+    overflow-x: hidden;
+}
+body {
+    background-image: none;
+    background-color: var(--bg-page);
+    color: var(--text);
+}
+.container-fluid.darkBackground {
+    background-color: var(--bg-page);
+}
+
+/* ---- panels ---- */
+div.c3,
+div.c4,
+div.c8,
+div.darkBackground,
+div.background {
+    background-color: var(--bg-panel);
+    color: var(--text);
+}
+div.darkBackground {
+    background-color: var(--bg-panel-2);
+}
+.border {
+    border: 1px solid var(--border-dim) !important;
+    border-radius: 4px;
+}
+.row.c4.border,
+.row.c4 {
+    background-color: var(--bg-panel);
+}
+h1, h2, h3, h4, h5 {
+    color: var(--gold-bright);
+}
+a {
+    color: var(--gold);
+}
+a:hover,
+a:focus {
+    color: var(--gold-bright);
+}
+font[color='#CC6633'] {
+    color: #d9a06a; /* lore text, readable on dark */
+}
+
+/* ---- buttons ---- */
+.buy,
+.attack,
+.equip,
+.sell,
+.monster,
+.inventorySell,
+.inventoryOther,
+.shopButton,
+.btn-default {
+    /* warm leather, not black — dark enough for the theme, clearly a button */
+    background: linear-gradient(180deg, #40331f, #2a2115);
+    color: var(--text);
+    border: 1px solid var(--border-gold);
+    border-radius: 4px;
+    text-shadow: none;
+    box-shadow: inset 0 1px 0 rgba(237, 210, 110, 0.12);
+    transition: border-color 120ms, color 120ms;
+}
+.buy:hover,
+.attack:hover,
+.equip:hover,
+.sell:hover,
+.monster:hover,
+.inventorySell:hover,
+.inventoryOther:hover,
+.shopButton:hover,
+.btn-default:hover,
+.btn-default:focus {
+    background: linear-gradient(180deg, #4d3e26, #332a1a);
+    color: var(--gold-bright);
+    border-color: var(--gold);
+}
+
+/* the start/slot/race screens sit on .loadingContainer, which was still the
+   legacy bright-gold backdrop (#EDD26E): light theme text was unreadable on
+   it. The logo is bronze-on-transparent and reads fine on dark. */
+.loadingContainer {
+    background-color: var(--bg-page);
+}
+/* race-picker info icons carry inline color:black from the renderer */
+.tooltips .glyphicon-info-sign {
+    color: var(--gold) !important;
+}
+/* save-slot line next to the New Game / Load buttons */
+.slotInfo {
+    color: var(--text-dim);
+    margin-left: 10px;
+    font-size: 14px;
+}
+.slotInfo strong {
+    color: var(--red); /* the Hardcore marker */
+}
+
+/* start screen: proper main-menu buttons (they float alone on the backdrop,
+   so the in-game button chrome read as flat black rectangles there) */
+#startingGameContainer .btn-default {
+    min-width: 230px;
+    padding: 12px 24px;
+    margin: 4px 0;
+    font-size: 17px;
+    color: var(--gold-bright);
+    background: linear-gradient(180deg, #4a3b22, #2b2214);
+    border: 1px solid var(--border-gold) !important;
+    border-radius: 6px;
+    box-shadow:
+        0 3px 12px rgba(0, 0, 0, 0.55),
+        inset 0 1px 0 rgba(237, 210, 110, 0.18);
+}
+#startingGameContainer .btn-default:hover,
+#startingGameContainer .btn-default:focus {
+    background: linear-gradient(180deg, #5a4929, #3a2f1c);
+    border-color: var(--gold) !important;
+    box-shadow:
+        0 3px 16px rgba(217, 178, 74, 0.25),
+        inset 0 1px 0 rgba(237, 210, 110, 0.25);
+}
+/* race-selection Choose / Go Back / slot buttons: same look, regular size */
+#raceDiv .btn-default,
+#startingGameContainer .btn-sm {
+    min-width: 110px;
+    padding: 6px 14px;
+    font-size: 14px;
+}
+/* the small round mute toggle shouldn't stretch to menu width */
+#startingGameContainer .shopButton.btn-default {
+    min-width: 0;
+    padding: 8px 12px;
+    font-size: 14px;
+}
+.backgroundRed {
+    background-color: #7f1d1d !important;
+    color: var(--text) !important;
+}
+
+/* ---- tabs ---- */
+.nav-tabs {
+    border-bottom: 1px solid var(--border-dim);
+}
+.nav-tabs > li > a {
+    background: var(--bg-inset);
+    color: var(--text-dim);
+    border: 1px solid var(--border-dim);
+    border-radius: 4px 4px 0 0;
+}
+.nav-tabs > li > a:hover {
+    background: var(--bg-panel-2);
+    color: var(--gold-bright);
+    border-color: var(--border-gold);
+}
+.nav-tabs > li.active > a,
+.nav-tabs > li.active > a:hover,
+.nav-tabs > li.active > a:focus {
+    background: var(--bg-panel-2);
+    color: var(--gold-bright);
+    border: 1px solid var(--border-gold);
+    border-bottom-color: transparent;
+}
+
+/* ---- progress bars ---- */
+.progress {
+    background-color: var(--bg-inset);
+    border: 1px solid var(--border-dim);
+    box-shadow: none;
+    border-radius: 4px;
+}
+.progress-bar {
+    background-color: #3f8f4f;
+    background-image: none;
+    color: var(--text);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+    box-shadow: none;
+}
+.progressColor {
+    background-color: #8f3f3f !important;
+}
+
+/* ---- forms ---- */
+select,
+input[type='text'],
+textarea {
+    background-color: var(--bg-inset);
+    color: var(--text);
+    border: 1px solid var(--border-gold);
+    border-radius: 4px;
+}
+
+/* ==========================================================================
+   Stage mode: the combat canvas fills the viewport, the HUD bar is fixed at
+   the bottom, and the main tab panes float above the stage as overlay panels.
+   battleCanvas.js sizes the canvas bitmap to #canvasBattleWrap and scales its
+   fixed 700x280 combat world onto it (the ground band is drawn in-canvas).
+   ========================================================================== */
+#stage {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: var(--hud-h);
+    z-index: 0;
+}
+#canvasBattleWrap {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+#battleCanvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(180deg, #171310 0%, #2a2015 100%);
+}
+#battleControls {
+    position: absolute;
+    top: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 5;
+    background: rgba(36, 29, 22, 0.88);
+    border: 1px solid var(--border-dim);
+    border-radius: 6px;
+    padding: 6px 12px;
+    white-space: nowrap;
+}
+#stage #monsterTabs {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    z-index: 5;
+    max-width: 340px;
+    background: rgba(36, 29, 22, 0.88);
+    border: 1px solid var(--border-dim);
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-size: 12px;
+}
+#stage #monsterTabs:empty {
+    display: none;
+}
+#monsterTabs .questArea {
+    color: var(--gold);
+    font-weight: bold;
+}
+#monsterTabs .questGoal {
+    color: var(--text-dim);
+}
+#stage #logConsole {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    bottom: 8px;
+    width: 270px;
+    z-index: 4;
+    overflow-y: auto;
+    background: rgba(28, 23, 18, 0.72);
+    border: 1px solid var(--border-dim);
+    border-radius: 6px;
+    padding: 6px;
+    font-size: 12px;
+}
+#stageDock {
+    position: absolute;
+    left: 8px;
+    bottom: 8px;
+    z-index: 4;
+}
+#logToggle {
+    display: none; /* desktop always shows the side log */
+    position: absolute;
+    right: 8px;
+    bottom: 8px;
+    z-index: 6;
+    min-height: 40px;
+    min-width: 44px;
+}
+
+/* ---- bottom HUD ---- */
+#hudBar {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: var(--hud-h);
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 0 12px;
+    background: var(--bg-panel-2);
+    border-top: 2px solid var(--border-gold);
+}
+#hudVitals {
+    width: 220px;
+    flex-shrink: 0;
+}
+#hudVitals .progress {
+    height: 15px;
+    margin: 4px 0;
+}
+#hudVitals .progress-bar {
+    font-size: 10px;
+    line-height: 15px;
+}
+#hudInfo {
+    flex-shrink: 0;
+    line-height: 1.4;
+}
+#hudBar .nav-tabs {
+    border-bottom: none;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 6px;
+    flex: 1;
+    margin: 0;
+}
+#hudBar .nav-tabs > li {
+    float: none;
+    margin: 0;
+}
+#hudBar .nav-tabs > li > a {
+    border-radius: 4px;
+    margin: 0;
+    padding: 8px 14px;
+}
+#hudBar .nav-tabs > li.active > a {
+    border-bottom-color: var(--border-gold);
+}
+
+/* ---- overlay panels (the top-level tab panes) ---- */
+#mainPanels > .tab-pane {
+    position: fixed;
+    z-index: 40;
+    top: 4vh;
+    bottom: calc(var(--hud-h) + 12px);
+    left: 50%;
+    transform: translateX(-50%);
+    width: 1100px;
+    max-width: 96vw;
+    overflow-y: auto;
+    background: var(--bg-panel);
+    border: 1px solid var(--border-gold);
+    border-radius: 8px;
+    box-shadow: 0 14px 48px rgba(0, 0, 0, 0.65);
+    padding: 10px 16px 20px;
+}
+.panelClose {
+    float: right;
+    margin: 2px 0 8px 10px;
+    min-width: 34px;
+}
+/* ---- inventory: fixed 5-wide slot grid (cells sized to the 50px icons) ---- */
+/* tooltip.css caps div.inventory at 300px; the auto-fill grid is taller, so the
+   parent .border bottom edge would slice through the last row — let it grow */
+div.inventory {
+    height: auto;
+}
+.invGrid {
+    /* unified inventory: literal 5x5 grid (25-slot hard cap) */
+    display: grid;
+    grid-template-columns: repeat(5, 64px);
+    gap: 6px;
+    padding: 8px 0;
+    justify-content: start;
+}
+/* filter-chip rows above the grid */
+.invChips {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 5px;
+    margin: 4px 0;
+}
+/* bare buttons in the chip rows (sort buttons etc.): the legacy button.css
+   paints unclassed <button>s light-on-light; give them the theme's leather
+   look so they're readable */
+.invChips button {
+    background: linear-gradient(180deg, #40331f, #2a2115);
+    color: var(--text);
+    border: 1px solid var(--border-gold);
+    border-radius: 4px;
+    padding: 2px 10px;
+    font-size: 12px;
+    text-shadow: none;
+}
+.invChips button:hover {
+    color: var(--gold-bright);
+    border-color: var(--gold);
+}
+.invChips button.invChip {
+    background: var(--bg-inset);
+    color: var(--text-dim);
+    border: 1px solid var(--border-dim);
+    border-radius: 12px;
+    padding: 2px 10px;
+    font-size: 12px;
+}
+.invChips button.invChip.chipOn {
+    color: var(--gold-bright);
+    border-color: var(--gold);
+    background: var(--bg-panel-2);
+}
+.chipLabel {
+    color: var(--text-dim);
+    font-size: 12px;
+    margin: 0 2px;
+}
+/* multi-select ring + lock/set badges */
+.invCell.invSelected {
+    border-color: var(--blue);
+    box-shadow: 0 0 6px rgba(96, 165, 250, 0.6);
+}
+.invCell .lockBadge {
+    position: absolute;
+    left: 2px;
+    top: 0;
+    font-size: 12px;
+    text-shadow: 0 1px 2px #000;
+}
+.invCell .setBadge {
+    position: absolute;
+    right: 3px;
+    top: 0;
+    font-size: 12px;
+    color: var(--gold-bright);
+    text-shadow: 0 1px 2px #000;
+}
+.invCell {
+    position: relative;
+    width: 64px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-inset);
+    border: 1px solid var(--border-dim);
+    border-radius: 6px;
+}
+.invCell.empty {
+    opacity: 0.45;
+}
+.invCell img {
+    max-width: 48px;
+    max-height: 48px;
+    cursor: pointer;
+    border-radius: 4px;
+}
+.invCell .invPower {
+    position: absolute;
+    right: 4px;
+    bottom: 2px;
+    font-size: 11px;
+    font-weight: bold;
+    color: var(--gold-bright);
+    text-shadow: 0 1px 2px #000;
+    pointer-events: none;
+}
+/* rarity glow on grid cells */
+.invCell img.Uncommon { box-shadow: 0 0 6px rgba(80, 189, 39, 0.55); }
+.invCell img.Rare { box-shadow: 0 0 6px rgba(96, 165, 250, 0.55); }
+.invCell img.Epic { box-shadow: 0 0 7px rgba(255, 152, 0, 0.6); }
+.invCell img.Legendary { box-shadow: 0 0 8px rgba(239, 68, 68, 0.65); }
+/* sell mode: armed cells warn on hover */
+.invCell.sellArmed:hover {
+    border-color: var(--red);
+    box-shadow: 0 0 6px rgba(239, 68, 68, 0.45);
+}
+/* shop cells: the selection radio is invisible, the cell itself shows it */
+.shopCell label {
+    margin: 0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.shopCell input[type='radio'] {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+.shopCell:has(input:checked) {
+    border-color: var(--gold);
+    box-shadow: 0 0 8px rgba(217, 178, 74, 0.55);
+}
+.invCell .newBadge {
+    position: absolute;
+    left: 2px;
+    bottom: 2px;
+    font-size: 9px;
+    font-weight: bold;
+    color: #1c1712;
+    background: var(--gold-bright);
+    border-radius: 3px;
+    padding: 0 3px;
+    letter-spacing: 0.5px;
+}
+
+/* equipped paper-doll grid */
+.dollGrid { display: grid; grid-template-columns: repeat(3, 76px); gap: 8px; justify-content: center; padding: 8px 0; }
+.dollCell { position: relative; width: 76px; height: 88px; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; background: var(--bg-inset); border: 1px solid var(--border-dim); border-radius: 6px; padding-top: 6px; }
+.dollCell img { max-width: 52px; max-height: 52px; cursor: pointer; border-radius: 4px; }
+.dollCell.dollEmpty img { opacity: 0.35; cursor: default; }
+.dollLabel { font-size: 10px; color: var(--text-dim); margin-top: 3px; }
+
+/* HUD nav unspent-points badge */
+.navBadge { background: var(--red); color: #fff; border-radius: 9px; font-size: 10px; font-weight: bold; padding: 1px 5px; margin-left: 5px; vertical-align: top; }
+.navBadge:empty { display: none; }
+
+/* combat log paused-on-hover hint */
+#logConsole.logPaused { box-shadow: inset 0 0 0 1px var(--gold); }
+#logConsole.logPaused::before { content: '⏸ scroll paused'; display: block; color: var(--gold); font-size: 11px; }
+
+/* active difficulty button (Options) */
+.diffActive { border-color: var(--gold) !important; color: var(--gold-bright) !important; box-shadow: 0 0 6px rgba(217, 178, 74, 0.5); }
+
+/* ---- world map panel ---- */
+#mapLayout {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+}
+#mapCanvasWrap {
+    flex: 1;
+    min-width: 0;
+}
+#mapCanvas {
+    display: block;
+    width: 100%;
+    height: auto;
+    background: linear-gradient(180deg, #1c1712, #241d16);
+    border: 1px solid var(--border-dim);
+    border-radius: 6px;
+    cursor: pointer;
+}
+#mapInfo {
+    width: 280px;
+    flex-shrink: 0;
+    background: var(--bg-inset);
+    border: 1px solid var(--border-dim);
+    border-radius: 6px;
+    padding: 10px 12px;
+    min-height: 200px;
+}
+#mapInfo h4 {
+    margin-top: 0;
+}
+.mapBiome {
+    color: var(--text-dim);
+    margin-bottom: 6px;
+}
+.mapMeta {
+    margin: 4px 0;
+}
+.mapEnemyList {
+    margin: 2px 0 8px;
+    padding-left: 18px;
+}
+.mapEnemyLvl {
+    color: var(--text-dim);
+    font-size: 11px;
+}
+.mapUnknown {
+    opacity: 0.55;
+}
+.mapUnique {
+    color: var(--gold-bright);
+    font-style: italic;
+}
+
+/* ---- skill trees (canvas, Skills panel) ---- */
+.treeLayout {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+}
+.treeLayout canvas {
+    flex: 1;
+    min-width: 0;
+    max-width: 760px;
+    width: 100%;
+    height: auto;
+    background: linear-gradient(180deg, #1c1712, #241d16);
+    border: 1px solid var(--border-dim);
+    border-radius: 6px;
+}
+.treeInfo {
+    width: 260px;
+    flex-shrink: 0;
+    background: var(--bg-inset);
+    border: 1px solid var(--border-dim);
+    border-radius: 6px;
+    padding: 10px 12px;
+    min-height: 160px;
+}
+.treeInfo h4 {
+    margin-top: 4px;
+}
+.treeInfoHeader {
+    border-bottom: 1px solid var(--border-dim);
+    padding-bottom: 6px;
+    margin-bottom: 6px;
+}
+/* ---- bestiary panel ---- */
+.beastGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+    gap: 10px;
+    margin-bottom: 14px;
+}
+.beastCard {
+    background: var(--bg-inset);
+    border: 1px solid var(--border-dim);
+    border-radius: 6px;
+    padding: 8px;
+    text-align: center;
+    font-size: 12px;
+}
+.beastCard.beastUnknown {
+    opacity: 0.5;
+}
+.beastPortrait {
+    height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 30px;
+    color: var(--text-dim);
+}
+.beastPortrait img {
+    max-height: 48px;
+}
+.beastName {
+    font-weight: bold;
+    color: var(--gold);
+    margin: 4px 0 2px;
+}
+.beastStats {
+    margin: 2px 0;
+}
+.beastStats.beastLocked {
+    opacity: 0.45;
+    font-style: italic;
+}
+.beastStats.beastMastered {
+    color: var(--gold-bright);
+}
+.beastStats.beastUnique {
+    color: var(--gold-bright);
+    font-style: italic;
+}
+.beastProgress {
+    height: 5px;
+    background: #00000066;
+    border-radius: 3px;
+    margin-top: 6px;
+    overflow: hidden;
+}
+.beastProgressFill {
+    height: 100%;
+    background: var(--gold);
+}
+.beastCard.hasCard {
+    border-color: var(--blue);
+}
+.beastStats.beastCardOwned {
+    color: var(--blue);
+}
+.cardSet {
+    font-size: 12px;
+    font-weight: normal;
+    color: var(--text-dim);
+}
+.cardSet.cardSetDone {
+    color: var(--blue);
+}
+
+/* equipment paper-doll: cap slot art so the column fits unscrolled */
+#equipHtml img {
+    max-width: 52px;
+    max-height: 52px;
+}
+#equipHtml h4 {
+    margin: 4px 0;
+}
+
+/* ---- stat panel: compact flat rows, two per line ---- */
+.statList {
+    margin: 4px 0;
+    display: grid;
+    /* minmax(0,1fr): plain 1fr tracks grow to the widest row's min-content
+       and overflow the narrow stats column, clipping the right column.
+       width:100%: without it the legacy stylesheets collapse the grid to
+       zero width inside the stats tab (observed live). */
+    width: 100%;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    column-gap: 10px;
+}
+.statRow {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    height: 26px; /* the legacy value markup drags odd line-box slack along;
+                     fix the row height and let flex center the content */
+    padding: 0 6px;
+    border-bottom: 1px solid rgba(74, 59, 29, 0.45);
+    min-width: 0;
+    white-space: nowrap;
+}
+.statName {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.statValue,
+.statPlus {
+    flex-shrink: 0;
+}
+.statValue * {
+    vertical-align: middle;
+}
+.statRow:last-child {
+    border-bottom: none;
+}
+.statIcon {
+    width: 16px;
+    height: 16px;
+    display: block;
+}
+.statValue {
+    margin-left: auto;
+    font-weight: bold;
+    color: var(--gold-bright);
+}
+/* updateHtml wraps the breakdown info-icon in a <p>; bootstrap's paragraph
+   margin was doubling every row's height */
+.statValue p {
+    display: inline;
+    margin: 0;
+}
+.statPlus {
+    color: var(--green);
+    padding: 0 4px;
+}
+.statPlus:hover {
+    color: var(--gold-bright);
+}
+
+/* Character panel: kill the double border/background of the legacy wrapper
+   (the overlay panel already provides the chrome) */
+#tab_mainBattle > .row.c4 {
+    border: none !important;
+    background: transparent;
+    margin-bottom: 0;
+}
+/* on desktop the two columns (equipment+stats | inventory) scroll on their
+   own, so a long stat list can never push the other column's content away */
+@media (min-width: 992px) {
+    #tab_mainBattle > .row.c4 > .col-xs-12 > .row.margin {
+        display: flex;
+    }
+    #firstDiv,
+    #secondDiv {
+        max-height: calc(96vh - var(--hud-h) - 90px);
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+}
+#offlineSummary {
+    background: var(--bg-panel-2) !important;
+    border: 1px solid var(--border-gold) !important;
+    border-radius: 4px;
+    color: var(--text);
+}
+
+/* ---- misc legacy fixes ---- */
+#logConsole {
+    background: var(--bg-inset);
+    border-radius: 4px;
+    padding: 4px;
+}
+.ui-dialog,
+.ui-dialog .ui-dialog-content,
+.ui-dialog .ui-dialog-buttonpane {
+    background: var(--bg-panel-2);
+    color: var(--text);
+    border-color: var(--border-gold);
+}
+
+/* ---- pre-game: hide the in-game chrome until a character exists ---- */
+body.pre-game .container-fluid > .row,
+body.pre-game #stage,
+body.pre-game #hudBar {
+    display: none !important;
+}
+
+/* ==========================================================================
+   Mobile (the old layout overflowed and ignored small screens entirely)
+   ========================================================================== */
+@media (max-width: 767px) {
+    :root {
+        --hud-h: 108px; /* HUD wraps to two rows: vitals+info, then the nav */
+    }
+    #hudBar {
+        flex-wrap: wrap;
+        gap: 6px;
+        padding: 4px 8px;
+    }
+    #hudVitals {
+        width: 140px;
+    }
+    #hudVitals .progress {
+        height: 12px;
+        margin: 2px 0;
+    }
+    #hudInfo {
+        font-size: 11px;
+    }
+    #hudBar .nav-tabs {
+        order: 3;
+        flex-basis: 100%;
+    }
+    #hudBar .nav-tabs > li > a {
+        padding: 6px 8px;
+        min-height: 36px;
+    }
+    #stage #logConsole {
+        display: none; /* no room next to the arena on phones... */
+    }
+    #logToggle {
+        display: block; /* ...so 📜 opens it as an overlay sheet instead */
+    }
+    body.logOpen #stage #logConsole {
+        display: block;
+        position: fixed;
+        top: 35vh;
+        left: 8px;
+        right: 8px;
+        bottom: calc(var(--hud-h) + 56px);
+        width: auto;
+        z-index: 45;
+        background: rgba(23, 19, 16, 0.94);
+    }
+    /* controls + quest tracker flow as a top stack (the control bar wraps to
+       a variable height on phones, so absolute offsets can't avoid overlap) */
+    #stage {
+        display: flex;
+        flex-direction: column;
+    }
+    #battleControls {
+        position: static;
+        transform: none;
+        margin: 8px auto 0;
+        max-width: 96vw;
+        white-space: normal;
+        text-align: center;
+    }
+    #stage #monsterTabs {
+        position: static;
+        margin: 6px 8px 0;
+        max-width: none;
+        text-align: center;
+    }
+    #mainPanels > .tab-pane {
+        top: 0;
+        bottom: var(--hud-h);
+        width: 100vw;
+        max-width: 100vw;
+        border-radius: 0;
+    }
+    #mapLayout {
+        flex-direction: column;
+    }
+    #mapInfo {
+        width: 100%;
+    }
+    .treeLayout {
+        flex-direction: column;
+    }
+    .treeInfo {
+        width: 100%;
+    }
+    /* comfortable touch targets */
+    .buy,
+    .attack,
+    .equip,
+    .sell,
+    .monster,
+    .inventorySell,
+    .inventoryOther,
+    .shopButton,
+    .btn-default {
+        min-height: 40px;
+        padding: 8px 12px;
+    }
+    #battleControls select,
+    #battleControls button {
+        min-height: 40px;
+    }
+    /* the start-screen hint row was shoved off-canvas with left:-30% */
+    #buttonDiv .row[style*='left:-30%'] {
+        position: static !important;
+        left: 0 !important;
+    }
+    /* fixed-width tooltips can't exceed the phone screen */
+    .tooltips span,
+    .tooltips2 span,
+    .tooltipA span {
+        max-width: 92vw !important;
+    }
+    .invChips button, .invChips .invChip { min-height: 34px; }
+    #floatTip { max-width: 92vw; }
+}

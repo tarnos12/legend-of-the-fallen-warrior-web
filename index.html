@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Idle incremental RPG: fight waves, unlock areas, master weapons.">
+    <meta name="theme-color" content="#241d16">
+    <link rel="Shortcut icon" href="./images/icon.png">
+    <!-- PWA: installable to a phone home screen (manifest + icons in public/) -->
+    <link rel="manifest" href="./manifest.webmanifest">
+    <link rel="apple-touch-icon" href="./icons/icon-192.png">
+    <title>Legend of the Fallen Warrior</title>
+    <link href="./css/bootstrap.min.css?v=74d85d0" rel="stylesheet" type="text/css">
+    <link href="./css/footer.css?v=74d85d0" rel="stylesheet" type="text/css">
+    <link href="./css/text.css?v=74d85d0" rel="stylesheet" type="text/css">
+    <link href="./css/tooltip.css?v=74d85d0" rel="stylesheet" type="text/css">
+    <link href="./css/icons.css?v=74d85d0" rel="stylesheet" type="text/css">
+    <link href="./css/button.css?v=74d85d0" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="./vendor/jquery-ui/jquery-ui.min.css?v=74d85d0">
+    <script src="./jquery/jquery-1.11.3.min.js?v=74d85d0"></script>
+    <script src="./vendor/jquery-ui/jquery-ui.min.js?v=74d85d0"></script>
+    <script src="./js/bootstrap.min.js?v=74d85d0" type="text/javascript"></script>
+    <link href="./css/main.css?v=74d85d0" rel="stylesheet" type="text/css">
+    <!-- Dark-fantasy theme overlay: loaded last so it overrides everything above. -->
+    <link href="./css/theme.css?v=74d85d0" rel="stylesheet" type="text/css">
+    <script>
+    $(function() {
+        $( ".resizable" ).resizable();
+    });
+    </script>
+    <script>
+    $(function() {
+        $( ".draggable" ).draggable(
+            {
+                containment:'.container-fluid'
+            }
+            );
+        $( ".draggable" ).css('z-index', '1');
+    });
+    </script>
+    <script>
+        $(function () {
+            $('[data-toggle="tooltip"]').tooltip()
+        })
+    </script>
+  <script type="module" crossorigin src="./assets/index-DnL14M3F.js"></script>
+</head>
+<!-- pre-game hides the in-game rows (theme.css) until removeStartingScreen() drops it -->
+<body class="pre-game">
+    <!-- Boot loading overlay (ui/loadingOverlay.js drives the bar and removes it
+         once all sprites are preloaded). Static markup so it shows instantly. -->
+    <div id="loadingOverlay" style="position:fixed; inset:0; z-index:9999; background:#2b2113;
+            display:flex; flex-direction:column; align-items:center; justify-content:center;">
+        <div style="color:#edd26e; font-size:24px; margin-bottom:18px; font-weight:bold;">
+            Legend of the Fallen Warrior</div>
+        <div style="width:320px; height:18px; border:2px solid #edd26e; background:#00000055;">
+            <div id="loadingOverlayBar" style="width:0%; height:100%; background:#edd26e;
+                transition:width 120ms linear;"></div>
+        </div>
+        <div id="loadingOverlayPct" style="color:#edd26e; margin-top:8px; font-size:15px;">0%</div>
+    </div>
+    <!-- Google Analytics + Ko-fi overlay widget removed for now (external scripts;
+         they hung headless captures and stall page load when their CDNs are slow).
+         Restore from git history (see this comment's commit) if wanted again. -->
+    <div class="container-fluid darkBackground">
+
+        <div id="loadingContainer" class="loadingContainer">
+        </div>
+        <div class="startingGameContainer" id="startingGameContainer">
+            <div id="startingScreen">
+                <div class="gameLogo" id="gameLogo"></div>
+                <div class="buttonDiv" id="buttonDiv"></div>
+            </div>
+            <div id="raceDiv" style="display:none;">
+                <div class="raceText" id="raceText"></div>
+                <div id="sliderDivID" class="sliderDiv" style="display:none;">
+                    <label><input id="Adulthood" type="radio" name="raceAge" value="Adulthood" style="visibility: visible;" onclick="getAgeButton()" checked><span style="margin-left:20px;">Adulthood</span></label>
+                    <label><input id="Middle Age" type="radio" name="raceAge" value="Middle Age" style="visibility: visible;" onclick="getAgeButton()"><span style="margin-left:20px;">Middle Age</span></label>
+                    <label><input id="Old" type="radio" name="raceAge" value="Old" style="visibility: visible;" onclick="getAgeButton()"><span style="margin-left:20px;">Old</span></label>
+                    <label><input id="Venerable" type="radio" name="raceAge" value="Venerable" style="visibility: visible;" onclick="getAgeButton()"><span style="margin-left:20px;">Venerable</span></label>
+                </div>
+                <div class="raceCreation" id="raceCreation"></div>
+            </div>
+        </div>
+
+        <!--Full-screen combat stage: ui/battleCanvas.js scales its fixed 700x280
+            combat world onto this canvas (sized by theme.css + resizeCanvas).
+            The panels below overlay it; #hudBar is fixed at the bottom.-->
+        <div id="stage" class="unselectable">
+            <div id="battleControls" class="c3"></div>
+            <!-- always-visible current-quest tracker (monsterUI.CreateMonsterHtml) -->
+            <div id="monsterTabs"></div>
+            <div id="canvasBattleWrap">
+                <canvas id="battleCanvas" width="700" height="280"></canvas>
+            </div>
+            <div class="c4 c3" id="logConsole">
+                Console log
+            </div>
+            <!-- phones hide the side log; this floats bottom-right and toggles
+                 it as an overlay sheet (ui/stageUI.js) -->
+            <button type="button" id="logToggle" class="sell" title="Combat log">📜</button>
+            <div id="stageDock">
+                <div id="activeBuffs"></div>
+                <div id="hotBar"></div>
+            </div>
+        </div>
+
+        <!--Bottom HUD: vitals, level/gold and the main panel nav. The ids must
+            stay (stats.js/updateHtml write into level/experience/gold/exppercent/
+            health); the nav lis are ordinary Bootstrap tab toggles whose panes
+            are the overlay panels below (ui/stageUI.js adds close behavior).-->
+        <div id="hudBar" class="unselectable">
+            <button type="button" class="btn btn-default" id="hudMute" title="Mute music" onclick="muteAudio(); changeMusicImage();"><span id="musicimage2" class="glyphicon glyphicon-volume-up" aria-hidden="true"></span></button>
+            <audio id="myAudio" controls="controls" loop preload="auto" hidden>
+                <source src="./sounds/sound.ogg" type="audio/ogg" />
+                <source src="./sounds/sound.mp3" type="audio/mpeg" />
+                Your browser does not support the audio element.
+            </audio>
+            <div id="hudVitals">
+                <div class="progress">
+                    <div id="progressBar" class="progress-bar" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 20%;">
+                        <span id="exppercent">60% Complete</span>
+                    </div>
+                </div>
+                <div class="progress">
+                    <div id="progressBar2" class="progress-bar progressColor" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 20%;">
+                        <span id="health"></span>
+                    </div>
+                </div>
+            </div>
+            <div id="hudInfo">
+                Level
+                <span id="level">1</span>
+                (<span id="experience">0</span>/<span id="maxexperience">100</span>)<br />
+                Gold:
+                <span id="gold">0</span>
+                <span id="soulHud" title="Boss Souls — spend in the Soul Shop">☠ <span id="soulCount">0</span></span>
+                <span id="setHud" title="Fallen Legends set pieces equipped"></span>
+            </div>
+            <ul class="nav nav-tabs" id="hudNav">
+                <li onclick="CreateInventoryWeaponHtml();"><a href="#tab_mainBattle" data-toggle="tab">Character</a></li>
+                <li onclick="renderWorldMap();"><a href="#tab_mainMap" data-toggle="tab">Map</a></li>
+                <li onclick="renderBestiary();"><a href="#tab_mainBestiary" data-toggle="tab">Bestiary</a></li>
+                <li><a href="#tab_mainProfessions" data-toggle="tab">Professions</a></li>
+                <li onclick="renderSkillTrees();"><a href="#tab_mainSkills" data-toggle="tab">Skills<span id="skillsNavBadge" class="navBadge"></span></a></li>
+                <li onclick="renderSoulShop(); renderUniqueSets();"><a href="#tab_mainShop" data-toggle="tab">Shop</a></li>
+                <li><a href="#tab_mainOptions" data-toggle="tab">Options</a></li>
+            </ul>
+        </div>
+
+        <!--Panel row (the tab panes render as overlays above the stage)-->
+        <div class="row paddingBothSides">
+            <div class="col-xs-12">
+
+                <div class="tab-content" id="mainPanels">
+                    <div class="tab-pane unselectable" id="tab_mainBattle">
+                        <div class="row c4 marginBottom border">
+                            <div class="col-xs-12">
+                                <div class="row margin">
+
+                                    <div id="firstDiv" class="col-md-4">
+
+                                        <!-- equipment first: it's what people open the panel for;
+                                             the long stat list scrolls below it -->
+                                        <div id="equipHtml"> </div>
+
+                                        <div class="row c4" style="border:1px solid;">
+                                            <div class="col-xs-10 col-xs-offset-1 c2">
+                                                <div class="row">
+                                                    <ul class="nav nav-tabs">
+                                                        <li class="active"><a href="#tab_mainStats" data-toggle="tab"><span data-toggle="tooltip" data-placement="top" title="Main Stats"></span>Stats</a></li>
+                                                        <li><a href="#tab_SecondaryStats" data-toggle="tab"><span data-toggle="tooltip" data-placement="top" title="Secondary stats"></span>Secondary stats</a></li>
+                                                    </ul>
+                                                    <div class="tab-content">
+                                                        <div class="tab-pane active" id="tab_mainStats">
+                                                            <div class="col-xs-2">
+                                                                <div id="characterRace"></div>
+                                                            </div>
+                                                            <div class="col-xs-10">
+                                                                <div class="c3">
+                                                                    <h4>Player Stats</h4>
+                                                                </div>
+                                                            </div>
+                                                            <div id="primaryStat"></div>
+                                                        </div>
+
+                                                        <div class="tab-pane" id="tab_SecondaryStats">
+                                                            <div id="secondaryStat"></div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!-- tab content -->
+                                        </div>
+                                        <!-- end of container -->
+                                    </div>
+
+                                    <div id="secondDiv" class="col-md-8">
+
+                                        <div class="row c4 border">
+                                            <div class="col-xs-12">
+                                                <!-- inventory sits right of the stats (the old wave
+                                                     progression list is the on-stage quest tracker now) -->
+                                                <div>
+                                                    <div id="checkBoxHtml"></div>
+                                                </div>
+                                                <div class="inventory" id="inventory"></div>
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="tab_mainMap" class="tab-pane unselectable c4">
+                        <div class="c3"><h4>World Map</h4></div>
+                        <div id="mapLayout">
+                            <div id="mapCanvasWrap">
+                                <canvas id="mapCanvas" width="700" height="380"></canvas>
+                            </div>
+                            <div id="mapInfo" class="c4"></div>
+                        </div>
+                    </div>
+                    <div id="tab_mainBestiary" class="tab-pane unselectable c4">
+                        <div class="c3"><h4>Bestiary</h4></div>
+                        <div id="bestiaryContent"></div>
+                    </div>
+                    <div id="tab_mainProfessions" class="tab-pane unselectable c4">
+
+                        <div id="playerProfessions"></div>
+                    </div>
+                    <div id="tab_mainSkills" class="tab-pane unselectable c4 border marginBottom">
+                        <div class="tab-pane" id="tab_b2">
+                            <div class="c3">
+                                <h4>Weapon Skills and Passives</h4>
+                            </div>
+                            <ul class="nav nav-tabs">
+                                <li class="active"><a href="#tab_weaponSkillsShow" data-toggle="tab"><span class="icons weapon" data-toggle="tooltip" data-placement="top" title="Weapon Skills"></span></a></li>
+                                <li><a href="#tab_passiveSkillsShow" data-toggle="tab"><span class="icons staff" data-toggle="tooltip" data-placement="top" title="Passive Skills"></span></a></li>
+                            </ul>
+                            <div class="tab-content">
+                                <div class="tab-pane active" id="tab_weaponSkillsShow">
+                                    <!-- canvas node tree (ui/skillTreeUI.js) -->
+                                    <div class="treeLayout">
+                                        <canvas id="weaponTreeCanvas" width="640" height="560"></canvas>
+                                        <div id="weaponTreeInfo" class="treeInfo c4"></div>
+                                    </div>
+                                </div>
+                                <div class="tab-pane" id="tab_passiveSkillsShow">
+                                    <div class="treeLayout">
+                                        <canvas id="passiveTreeCanvas" width="740" height="560"></canvas>
+                                        <div id="passiveTreeInfo" class="treeInfo c4"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="tab_mainShop" class="tab-pane unselectable c4 border marginBottom">
+
+                        <div class="c3">
+                            <h4>Shop</h4>
+                        </div>
+                        <div class="c3"><h4>☠ Soul Shop</h4></div>
+                        <div id="soulShop"></div>
+                        <div id="uniqueSets"></div>
+                        <div class="c3"><h4>Gold Shop</h4></div>
+                        <div id="shopTabs"></div>
+
+                    </div>
+                    <div id="tab_mainOptions" class="tab-pane c4 border marginBottom">
+                        <ul class="nav nav-tabs">
+                            <li class="active"><a href="#tab_options" data-toggle="tab"><span class="icons options" data-toggle="tooltip" data-placement="top" title="Options"></span></a></li>
+                            <li><a href="#tab_credits" data-toggle="tab"><span class="icons credits" data-toggle="tooltip" data-placement="top" title="Credits"></span></a></li>
+
+                        </ul>
+                        <div class="tab-content c4">
+
+
+                            <div class="tab-pane active" id="tab_options">
+                                <div class="c3 marginBottom">
+                                    <h4>Difficulty</h4>
+                                    <button id="diff_Mortal" class="sell" onclick="changeDifficulty('Mortal')" data-toggle="tooltip" data-placement="bottom" title="Enemy Stats x 0.2">Mortal</button>
+                                    <button id="diff_Ageless" class="sell" onclick="changeDifficulty('Ageless')" data-toggle="tooltip" data-placement="bottom" title="Enemy Stats x 0.5">Ageless</button>
+                                    <button id="diff_Hero" class="sell" onclick="changeDifficulty('Hero')" data-toggle="tooltip" data-placement="bottom" title="Enemy Stats x 1">Hero</button>
+                                    <button id="diff_Immortal" class="sell" onclick="changeDifficulty('Immortal')" data-toggle="tooltip" data-placement="bottom" title="Enemy Stats x 2">Immortal</button>
+                                    <button id="diff_Lich" class="sell" onclick="changeDifficulty('Lich')" data-toggle="tooltip" data-placement="bottom" title="Enemy Stats x 3">Lich</button>
+                                    <button id="diff_Legend" class="sell" onclick="changeDifficulty('Legend')" data-toggle="tooltip" data-placement="bottom" title="Enemy Stats x 5">Legend</button>
+                                    <br />
+                                    <span id="gameDifficulty">
+                                        Current Difficulty: Hero
+                                    </span>
+                                </div>
+                                <div class="c3">
+                                    <h4>Save & Options</h4>
+                                    <div id="saveGameSlot"></div>
+                                    <div class="marginBottom" id="saveTime"></div>
+
+                                    <div class="row">
+                                        <div class="col-xs-10 col-xs-offset-1">
+                                            <div class="scroll c4 c3" id="saveExport" style="height:100px; -ms-word-wrap: break-word; word-wrap: break-word;"></div><br />
+                                            <button type="button" class="btn btn-sm btn-default" onclick="selectText('saveExport')">
+                                                Select all text
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-default" onclick="importSave()">
+                                                Import
+                                            </button>
+                                            <textarea class="scroll c4 c3 col-xs-12" id="saveImport" rows="6" style=" -ms-word-wrap: break-word; word-wrap: break-word;"></textarea><br />
+
+
+                                            <a href="updates.html" target="_blank">Changelog</a><br />
+                                            <a href="http://www.reddit.com/r/LoFW/" target="_blank">Subreddit</a><br />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="tab-pane" id="tab_credits">
+                                <div class="c3">
+                                    <h4>Credits</h4>
+                                </div>
+                                <div class="centerText">
+                                    <b>Tarnos - Main developer</b><p><a href="http://www.reddit.com/user/tarnos12/" target="_blank">Reddit profile</a></p>
+                                    <b>Rohan Jain - Help with the code/development</b><p><a href="http://www.reddit.com/user/ArjaaAine" target="_blank">Reddit profile</a> - <a href="https://www.linkedin.com/profile/view?id=174286078" target="_blank">LinkedIn profile</a></p>
+                                    <b>Darkshadow44 - Help with game code</b><p><a href="http://steamcommunity.com/profiles/76561198036405586/" target="_blank">Steam profile</a></p>
+                                    <b>Jason Lee - Story</b><p><a href="http://www.reddit.com/user/ParanoiDoom" target="_blank">Reddit profile</a></p>
+                                    <b>Reddit users - Feedback</b><p><a href="http://www.reddit.com/r/incremental_games/" target="_blank">Incremental Reddit</a></p>
+                                    <b>David E. Gervais - Monster images</b><p><a href="http://pousse.rapiere.free.fr/tome/" target="_blank">http://pousse.rapiere.free.fr/tome/</a><br />Published under the Creative Commons licence.</p>
+                                    <b>Music by Eric Matyas</b><p><a href="www.soundimage.org" target="_blank">www.soundimage.org</a></p>
+                                    <div class="c3">
+                                        <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_blank">
+                                            <input type="hidden" name="cmd" value="_s-xclick">
+                                            <input type="hidden" name="hosted_button_id" value="A9UAZH8H9XHFQ">
+                                            <input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
+                                            <img alt="" border="0" src="https://www.paypalobjects.com/pl_PL/i/scr/pixel.gif" width="1" height="1">
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ES module entry (Phase 3): files converted from classic scripts. Module
+         scripts are deferred, so this runs after all the classic scripts above. -->
+
+    <!-- Chatango chat embed removed (external script; kept page busy and stalled
+         captures). Restore from git history if wanted again. -->
+
+
+</body>
+</html>
