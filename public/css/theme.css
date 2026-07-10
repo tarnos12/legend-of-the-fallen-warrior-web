@@ -542,6 +542,11 @@ textarea {
     min-width: 34px;
 }
 /* ---- inventory: fixed 5-wide slot grid (cells sized to the 50px icons) ---- */
+/* tooltip.css caps div.inventory at 300px; the auto-fill grid is taller, so the
+   parent .border bottom edge would slice through the last row — let it grow */
+div.inventory {
+    height: auto;
+}
 .invGrid {
     /* unified inventory: responsive auto-fill grid (was a fixed 5-wide) */
     display: grid;

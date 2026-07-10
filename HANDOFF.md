@@ -5,9 +5,27 @@
 > just did, what's in flight, what's next, and the decisions waiting on the user).
 > **Update this in the same commit as every task**, right before committing.
 
-_Last updated: 2026-07-05_
+_Last updated: 2026-07-10_
 
 ## Current status
+
+**Inventory QoL batch (3 user requests + 1 bugfix, tiered workflow, landed as a PR): DONE.**
+Haiku built the potions-chip removal and the paper-doll reorder; Sonnet built the right-click
+menu; the integrator applied the one-line CSS bugfix (interactive diagnosis). Changes:
+- **Potions chip removed** from the unified inventory grid ("awkward to use" — potion + hotbar
+  UX pending a rework). The hidden `#potionInventory` div stays in the DOM (hard contract:
+  `createPotionInventory` writes into it unconditionally). CAVEAT: assigning potions to the
+  hotbar has no UI *for now*; existing hotbar assignments still work in combat.
+- **Paper-doll slot order** now talisman/helmet/amulet · weapon/chest/shield · ring/legs/boots
+  (user-specified rows; `EquippedItemsEmpty` snapshot deliberately regenerated).
+- **Right-click = quick-action context menu** (`#ctxMenu`, body-level like `#floatTip`):
+  Equip / 🔒 Lock–Unlock / 💰 Sell, closes on click/scroll/Esc. Replaces the old
+  instant right-click sell (`invCtxMenu`/`ctxEquip`/`ctxLock`/`ctxSell` on window).
+- **Bugfix — border line through the grid's last row:** legacy `tooltip.css` caps
+  `div.inventory` at `height:300px`; the auto-fill grid overflowed it and the parent
+  `.row.c4.border` bottom edge sliced through the last row. `theme.css` now overrides with
+  `div.inventory { height: auto; }`.
+99/99 tests, build + lint clean, live-verified headlessly.
 
 **Polish batch 4 (tiered workflow, landed as PR): DONE.** Opus built the paper-doll; Sonnet the
 nav badge + log pause; Haiku the difficulty highlight + all CSS. Features: the equipped panel is
