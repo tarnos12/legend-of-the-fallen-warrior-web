@@ -11,6 +11,9 @@ import { loadingEquippedItems } from '../data/gameObjects.js';
 import { uniqueSetBonus } from '../data/uniqueSets.js';
 
 var currentGameVersion = 1.8;
+// Inventory hard cap: a literal 5x5 grid (see .invGrid in theme.css). Strength
+// and backpackUpgrade used to grant extra slots; they no longer do.
+var INVENTORY_CAPACITY = 25;
 var defaultValues = {
     properties: {},
 };
@@ -448,9 +451,9 @@ var player = {
             );
         },
         inventory: function () {
-            return Math.floor(
-                30 + player.functions.totalStrength() / 10 + player.properties.backpackUpgrade
-            ); //Add backpacks "new item type"
+            // Hard cap: the inventory is a literal 5x5 grid (see .invGrid in
+            // theme.css) — strength/backpackUpgrade no longer grant slots.
+            return INVENTORY_CAPACITY;
         },
         masteryStrength: function () {
             return (
@@ -834,6 +837,7 @@ export {
     defaultValues,
     playerInventory,
     currentGameVersion,
+    INVENTORY_CAPACITY,
     createEquippedItemsObject,
     copyPlayerProperties,
 };
