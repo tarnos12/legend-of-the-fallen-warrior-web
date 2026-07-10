@@ -548,9 +548,9 @@ div.inventory {
     height: auto;
 }
 .invGrid {
-    /* unified inventory: responsive auto-fill grid (was a fixed 5-wide) */
+    /* unified inventory: literal 5x5 grid (25-slot hard cap) */
     display: grid;
-    grid-template-columns: repeat(auto-fill, 64px);
+    grid-template-columns: repeat(5, 64px);
     gap: 6px;
     padding: 8px 0;
     justify-content: start;

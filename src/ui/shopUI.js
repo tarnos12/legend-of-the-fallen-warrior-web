@@ -257,12 +257,6 @@ var shopOtherList = [
         type3: 'statStatus',
     },
     {
-        type: 'Backpack',
-        image: 'images/bag.png',
-        type2: 'buyBackpack',
-        type3: 'backpackStatus',
-    },
-    {
         type: 'Small Potion',
         image: 'images/smallPotion.png',
         type2: 'buySmallPotion',
