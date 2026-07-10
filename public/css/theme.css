@@ -50,6 +50,37 @@
 .floatTipCol.borderRight {
     padding-right: 12px;
 }
+#ctxMenu {
+    display: none;
+    position: fixed;
+    z-index: 210;
+    min-width: 130px;
+    background: var(--bg-panel-2);
+    border: 1px solid var(--border-gold);
+    border-radius: 6px;
+    box-shadow: 0 10px 32px rgba(0, 0, 0, 0.7);
+    padding: 4px;
+}
+#ctxMenu .ctxItem {
+    display: block;
+    width: 100%;
+    text-align: left;
+    margin: 2px 0;
+    background: transparent;
+    border: none;
+    color: var(--text);
+    padding: 6px 10px;
+    border-radius: 4px;
+    font-size: 13px;
+    cursor: pointer;
+}
+#ctxMenu .ctxItem:hover {
+    background: var(--bg-inset);
+    color: var(--gold-bright);
+}
+#ctxMenu .ctxItem.ctxSell:hover {
+    color: var(--red);
+}
 
 /* ---- boss souls: HUD counter + Soul Shop (Shop panel) ---- */
 #soulHud {
@@ -511,6 +542,11 @@ textarea {
     min-width: 34px;
 }
 /* ---- inventory: fixed 5-wide slot grid (cells sized to the 50px icons) ---- */
+/* tooltip.css caps div.inventory at 300px; the auto-fill grid is taller, so the
+   parent .border bottom edge would slice through the last row — let it grow */
+div.inventory {
+    height: auto;
+}
 .invGrid {
     /* unified inventory: responsive auto-fill grid (was a fixed 5-wide) */
     display: grid;

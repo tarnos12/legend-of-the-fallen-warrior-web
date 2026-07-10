@@ -208,6 +208,73 @@ function equippedCompareFor(item) {
     return equippedItems[item.subType];
 }
 
+// ---- right-click quick-action context menu ---------------------------------
+// Right-clicking an inventory cell used to sell it instantly; now it opens a
+// tiny body-level menu (same fixed-position/viewport-clamp approach as
+// #floatTip) with Equip / Lock / Sell actions.
+function ctxMenuEl() {
+    let el = document.getElementById('ctxMenu');
+    if (!el) {
+        el = document.createElement('div');
+        el.id = 'ctxMenu';
+        document.body.appendChild(el);
+    }
+    return el;
+}
+function invCtxMenu(id, ev) {
+    const item = playerInventory.filter((obj) => obj.id === id)[0];
+    if (!item) return;
+    hideFloatTip();
+    const el = ctxMenuEl();
+    el.innerHTML =
+        `<button class="ctxItem" onclick="ctxEquip(${id})">Equip</button>` +
+        `<button class="ctxItem" onclick="ctxLock(${id})">${item.locked === true ? '🔓 Unlock' : '🔒 Lock'}</button>` +
+        `<button class="ctxItem ctxSell" onclick="ctxSell(${id})">💰 Sell</button>`;
+    el.style.display = 'block';
+    // position at the cursor, clamped to the viewport (same clamp approach as showFloatTip)
+    const w = el.offsetWidth;
+    const h = el.offsetHeight;
+    let x = ev ? ev.clientX : 0;
+    let y = ev ? ev.clientY : 0;
+    if (x + w > window.innerWidth - 8) x = window.innerWidth - w - 8;
+    if (x < 8) x = 8;
+    if (y + h > window.innerHeight - 8) y = window.innerHeight - h - 8;
+    if (y < 8) y = 8;
+    el.style.left = x + 'px';
+    el.style.top = y + 'px';
+}
+function closeInvCtxMenu() {
+    const el = document.getElementById('ctxMenu');
+    if (el) el.style.display = 'none';
+}
+function ctxEquip(id) {
+    closeInvCtxMenu();
+    window.equipItem(id);
+}
+function ctxLock(id) {
+    closeInvCtxMenu();
+    const item = playerInventory.filter((obj) => obj.id === id)[0];
+    if (item) {
+        item.locked = item.locked !== true;
+        CreateInventoryWeaponHtml();
+    }
+}
+function ctxSell(id) {
+    closeInvCtxMenu();
+    window.itemSell(id);
+}
+if (typeof document !== 'undefined' && document.addEventListener) {
+    document.addEventListener('mousedown', function (e) {
+        const el = document.getElementById('ctxMenu');
+        if (el && el.style.display !== 'none' && !(e.target && e.target.closest && e.target.closest('#ctxMenu'))) {
+            closeInvCtxMenu();
+        }
+    });
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') closeInvCtxMenu();
+    });
+}
+
 function CreateInventoryWeaponHtml() {
     // prune selections whose items no longer exist (sold/equipped)
     for (let s = invSelected.length - 1; s >= 0; s--) {
@@ -227,8 +294,7 @@ function CreateInventoryWeaponHtml() {
         typeChip('all', `All (${totalItems})`) +
         typeChip('weapon', `⚔ Weapons (${counts.weapon})`) +
         typeChip('armor', `🛡 Armor (${counts.armor})`) +
-        typeChip('accessory', `💍 Accessories (${counts.accessory})`) +
-        typeChip('potions', `🧪 Potions`);
+        typeChip('accessory', `💍 Accessories (${counts.accessory})`);
     const showGrid = invFilterType !== 'potions';
     const chipRow2 = !showGrid
         ? ''
@@ -282,7 +348,7 @@ function CreateInventoryWeaponHtml() {
                 `onerror="this.onerror=null;this.src='images/questionMark.png';" ` +
                 `ondragstart="invDragStart(${item.id}, event)" ` +
                 `onmouseenter="invTipShow(${item.id}, event)" onmouseleave="hideFloatTip()" ` +
-                `onclick="invCellClick(${item.id}, event)" oncontextmenu="itemSell(${item.id});return false;"/>` +
+                `onclick="invCellClick(${item.id}, event)" oncontextmenu="invCtxMenu(${item.id}, event);return false;"/>` +
                 `<span class="invPower">${formatBig(headlinePower(item))}</span>` +
                 (item.locked === true ? `<span class="lockBadge">🔒</span>` : '') +
                 (item.isUnique === true ? `<span class="setBadge">⚜</span>` : '') +
@@ -299,7 +365,9 @@ function CreateInventoryWeaponHtml() {
     }
 
     // ---- potions / hotbar section (ALWAYS in the DOM: potionsHotbar's
-    // createPotionInventory writes into #potionInventory unconditionally) ----
+    // createPotionInventory writes into #potionInventory unconditionally;
+    // Potions chip removed from chipRow1 for now but #invPotions must stay
+    // as a hard contract with createPotionInventory) ----
     const radios = [1, 2, 3, 4, 5, 6, 7, 8]
         .map(
             (n) =>
@@ -356,18 +424,18 @@ function unequipItemLoad() {
     }
 }
 
-// The nine equip slots, rendered weapon-first (matches loadingEquippedItems /
-// equip.js's unequipSlots), as a labeled .dollGrid of .invCell-style cells.
+// The nine equip slots, rendered in paper-doll layout (3 columns x 3 rows),
+// as a labeled .dollGrid of .invCell-style cells.
 const dollSlots = [
-    'weapon',
-    'shield',
+    'talisman',
     'helmet',
+    'amulet',
+    'weapon',
     'chest',
+    'shield',
+    'ring',
     'legs',
     'boots',
-    'ring',
-    'amulet',
-    'talisman',
 ];
 // the empty-slot placeholder image, dimmed; also reused by checkIfEquippedEmpty
 // when an item is removed so the two paths stay byte-identical
@@ -531,4 +599,9 @@ Object.assign(window, {
     sellSelectedItems,
     sellShownItems,
     invDragStart,
+    invCtxMenu,
+    closeInvCtxMenu,
+    ctxEquip,
+    ctxLock,
+    ctxSell,
 });
