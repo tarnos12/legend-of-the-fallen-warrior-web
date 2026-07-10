@@ -25,10 +25,11 @@ import { showFloatTip } from './inventoryUI.js';
 
 const NODE = 52;
 // Radial geometry: the first node of every branch sits FIRST_R from the hub,
-// each successive node STEP further out. Tuned so the longest chains (6 nodes)
-// keep every node and its hit box inside the canvas bitmaps (see index.html).
-const FIRST_R = 70;
-const STEP = 36;
+// each successive node STEP further out. STEP must exceed NODE (+caption room)
+// so nodes along a branch never overlap; the tree may outgrow the bitmap —
+// that's what right-drag panning is for.
+const FIRST_R = 88;
+const STEP = 66;
 
 // group identity for the 8 passive branches (indices into passiveColumns())
 const GROUP_OF = (idx) => (idx <= 2 ? 'Offensive' : idx <= 5 ? 'Defensive' : 'Utility');
