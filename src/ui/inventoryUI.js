@@ -356,18 +356,18 @@ function unequipItemLoad() {
     }
 }
 
-// The nine equip slots, rendered weapon-first (matches loadingEquippedItems /
-// equip.js's unequipSlots), as a labeled .dollGrid of .invCell-style cells.
+// The nine equip slots, rendered in paper-doll layout (3 columns x 3 rows),
+// as a labeled .dollGrid of .invCell-style cells.
 const dollSlots = [
-    'weapon',
-    'shield',
+    'talisman',
     'helmet',
+    'amulet',
+    'weapon',
     'chest',
+    'shield',
+    'ring',
     'legs',
     'boots',
-    'ring',
-    'amulet',
-    'talisman',
 ];
 // the empty-slot placeholder image, dimmed; also reused by checkIfEquippedEmpty
 // when an item is removed so the two paths stay byte-identical
