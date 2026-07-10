@@ -9,6 +9,31 @@ _Last updated: 2026-07-10_
 
 ## Current status
 
+**5x5 inventory + radial skill trees (2 slices, tiered workflow, landed as a PR): DONE.**
+Sonnet built the inventory cap, Opus the tree rework; Opus plan-validated and reviewed both.
+- **Inventory is a literal 5x5 grid with a hard 25-item cap**: `player.functions.inventory()`
+  returns a flat 25 (strength/backpackUpgrade no longer grant slots) — the drop gate
+  (`itemDrop.js`) and slot counter (`itemSell.js`) read the same function so the 25-drop
+  limit follows. The grid ALWAYS renders 25 cells: filters only choose which items fill
+  them (empties pad the rest); legacy >25-item saves render everything, no empties, drops
+  blocked until below cap. `.invGrid` is fixed `repeat(5, 64px)`. The now-useless Backpack
+  ware was removed from the Other shop (buyBackpack/backpackStatus kept inert for save
+  compat; shopOther + derived-stats snapshots deliberately regenerated).
+  Test: `test/inventory-cap.test.js`.
+- **Nodebuster-style radial skill trees** (`ui/skillTreeUI.js` rewrite): both canvases now
+  draw a central hub ("Core" / "Weapons") with chains branching outward — 8 passive
+  branches (group-tinted vines + arc headers for Offensive/Defensive/Utility), 5 weapon
+  branches (mastery nearest the hub, skills outward). Deterministic positions
+  (`branchAngle`/`radialCenter`, FIRST_R=88/STEP=66 — integrator retuned from 36 which
+  overlapped nodes; the tree may outgrow the bitmap, that's what panning is for).
+  **Right-click-drag pans** each canvas (offset applied in draw AND hitAt, so hover/click
+  stay accurate after panning; context menu suppressed; plain right-click = no-op).
+  **Left click** spends a point via `upgradePassive` with unchanged gating. **Hover** shows
+  node details in the shared floating `#floatTip` tooltip; side panels keep only the
+  skill-points/Reset header (passive) and the mastery explainer (weapon).
+103/103 tests, build + lint clean; live-verified headlessly (cap blocks 26th drop, grid
+stays 25 cells under filters, pan→hover→click accuracy, tooltip content, ctx suppressed).
+
 **Inventory QoL batch (3 user requests + 1 bugfix, tiered workflow, landed as a PR): DONE.**
 Haiku built the potions-chip removal and the paper-doll reorder; Sonnet built the right-click
 menu; the integrator applied the one-line CSS bugfix (interactive diagnosis). Changes:

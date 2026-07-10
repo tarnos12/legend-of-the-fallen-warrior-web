@@ -355,9 +355,14 @@ function CreateInventoryWeaponHtml() {
                 (item.isNew === true ? `<span class="newBadge">NEW</span>` : '') +
                 `</div>`;
         }
-        // unfiltered view: render the REAL free capacity as empty cells
-        if (invFilterType === 'all' && invMinRarity === 0 && !invUpgradesOnly) {
-            for (let empty = totalItems; empty < capacity; empty++) {
+        // The 5x5 grid never shrinks: pad with empty cells up to capacity no
+        // matter which filter is active (filters only choose which items
+        // render, not how many cells the grid has). Exception: a legacy save
+        // that holds MORE items than the cap — render every item and no
+        // empties (the grid just grows extra rows; drops stay blocked by the
+        // itemDrop.js cap check until the player sells back under the cap).
+        if (totalItems <= capacity) {
+            for (let empty = shown; empty < capacity; empty++) {
                 cards += `<div class="invCell empty"></div>`;
             }
         }
